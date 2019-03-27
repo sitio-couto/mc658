@@ -5,8 +5,8 @@ int main(int argc, char* argv[]){
   FILE *instance, *parameters;
   int *start_t, *end_t, n_lines, max_node, max_time, i;
 
-  instance = fopen(argv[1], 'r');
-  parameters = fopen(argv[2], 'r');
+  instance = fopen(argv[1], "r");
+  parameters = fopen(argv[2], "r");
 
   fscanf(parameters, " %i \n %i", &max_node, &max_time);
 
