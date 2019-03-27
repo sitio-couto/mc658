@@ -1,0 +1,26 @@
+
+O  formato dos arquivos  de entrada  para o problema   do Flowshop é o
+seguinte:
+
+- primeira linha: n=número de tarefas;
+
+- demais n linhas: 
+  conteúdo = um par de valores inteiros por linha
+
+  duração da tarefa  1 na máquina 1      duração da tarefa  1 na máquina 2
+  duração da tarefa  2 na máquina 1      duração da tarefa  2 na máquina 2
+  ........................................................................
+  duração da tarefa  n na máquina 1      duração da tarefa  n na máquina 2  
+
+
+O exemplo abaixo refere-se à uma instância com 8 tarefas:
+
+8
+ 6  9
+ 4  4
+ 4  1
+ 4  7
+ 4  2
+ 9  8
+ 5  4
+ 5  9
