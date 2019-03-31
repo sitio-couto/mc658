@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
     n_tasks = read_input(argv, &start_t, &end_t, &max_node, &max_time);
 
     // Execution
-    best_solution = bnb(max_node, max_time, &n_nodes);
+    best_solution = bnb(start_t, end_t, n_tasks, max_node, max_time, &n_nodes);
 
     // Output
     printf(" %i %i\n", max_node, max_time);
@@ -35,6 +35,9 @@ int main(int argc, char* argv[]){
     printf("\n");
     for (i = 0; i < n_tasks; ++i)
         printf(" %i |", end_t[i]);
+
+    free(start_t);
+    free(end_t);
 
     return 0;
 }
@@ -60,8 +63,17 @@ int read_input(char *args[], int **start_t, int **end_t, int *max_node, int *max
     return n_tasks;
 }
 
-node* bnb(int max_node, int max_time, int *n_nodes){
+node* bnb(int *start_t, int *end_t, int n_tasks, int max_node, int max_time, int *n_nodes){
     int best_primal = INT_MAX;
+    int best_dual = 0;
+    node **active_nodes;                // Size?
+    
+    // TODO:
+    // Usar heap de minimo como estrutura de dados usando o dual como chave.
+    // Neste problema, não há nó raiz. Como começar?
+    // O melhor primal e o melhor dual não necessariamente serão do mesmo nó. Como retornamos? Passamos apontador ou criamos um nó ficticio para voltar?
+    // Medir tempo (depois).
+    
     
     return 0x0;
 }
