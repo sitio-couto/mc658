@@ -13,6 +13,7 @@
  */
 
 #include "bnb-fs.h"
+#include "heap.h"
 
 // Set and mantained until end of execution
 int n_tasks;                                  // Amount of tasks read
@@ -23,7 +24,7 @@ int best_dual, best_primal;            // best bounds found so far
 float t_best_dual, t_best_primal;      // time taken for each best bound
 
 int main(int argc, char* argv[]){
-    int i, n_nodes = 0;     // amount of nodes and current amount of nodes
+    int i, n_nodes = 0; // amount of nodes and current amount of nodes
     node *best_node;    //--> Is it the same as best_primal?
 
     // Input

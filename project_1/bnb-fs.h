@@ -13,11 +13,11 @@ typedef struct{
 } task;
 
 task* add_task(int id, int dm1, int dm2) {
-  task *node = malloc(sizeof(task));
-  node->id = id;
-  node->dm1 = dm1;
-  node->dm2 = dm2;
-  return node;
+  task *new_task = malloc(sizeof(task));
+  new_task->id = id;
+  new_task->dm1 = dm1;
+  new_task->dm2 = dm2;
+  return new_task;
 }
 
 int cmp_dm1(const void *a, const void *b) {
@@ -30,11 +30,21 @@ int cmp_dm2(const void *a, const void *b) {
 
 typedef struct{
   int dual_bound;   // Lower bound calculated with the classifying functions
-  int primal_bound; // Upper bound given by the sum of finishing times do far
+  int primal_bound; // Upper bound given by the sum of finishing times so far
   float t_dual;
   float t_primal;
   int* result;      // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
+
+node* add_node(int db, int pb, float td, float tp, int r[]){
+  node *new_node = malloc(sizeof(node));
+  new_node->dual_bound = db;
+  new_node->primal_bound = pb;
+  new_node->t_dual = td;
+  new_node->t_primal = tp;
+  new_node->result = r;
+  return new_node;
+}
 
 // Reads the input files into arrays (instance) and variables (parameters), and returns the amount of tasks.
 void read_input(char *args[]);
