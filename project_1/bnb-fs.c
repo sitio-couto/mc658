@@ -20,12 +20,13 @@ int n_tasks;                                  // Amount of tasks read
 int max_node, max_time;                       // maximum amount of nodes and execution time
 task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attributes id, dm1 and dm2
 // Will change during execution
+int best_solution, t_solution;         // best solution found so far
 int best_dual, best_primal;            // best bounds found so far
 float t_best_dual, t_best_primal;      // time taken for each best bound
 
 int main(int argc, char* argv[]){
     int i, n_nodes = 0; // amount of nodes and current amount of nodes
-    node *best_node;    //--> Is it the same as best_primal?
+    node *best_node;    //
 
     // Input
     read_input(argv);
