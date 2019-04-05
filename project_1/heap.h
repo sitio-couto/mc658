@@ -37,8 +37,8 @@ void insert_heap(node *new_node, int n_tasks){
 
 	while(child != 0){      // Havent reached the root
 		father = (child-1)/2; //get father pos
-    f = min_heap[father]->primal_bound;
-    c = min_heap[child]->primal_bound;
+    f = min_heap[father]->sumf2;
+    c = min_heap[child]->sumf2;
     if(c < f) {
       aux = min_heap[father];
       min_heap[father] = min_heap[child];
@@ -63,9 +63,9 @@ node* remove_min(void){
   min_heap[size_used] = NULL;
 
 	while(left < size_used) {
-    f = min_heap[father]->primal_bound;
-    l = min_heap[left]->primal_bound;;
-    if (right < size_used) r = min_heap[right]->primal_bound;
+    f = min_heap[father]->sumf2;
+    l = min_heap[left]->sumf2;
+    if (right < size_used) r = min_heap[right]->sumf2;
     else r = INT_MAX;
 
     if (f > l && (f < r || (f > r && r > l))) {

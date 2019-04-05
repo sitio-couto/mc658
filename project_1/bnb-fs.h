@@ -29,27 +29,22 @@ int cmp_dm2(const void *a, const void *b) {
 }
 
 typedef struct{
-  int dual_bound;   // Lower bound calculated with the classifying functions
-  int primal_bound; // Upper bound given by the sum of finishing times so far
-  float t_dual;
-  float t_primal;
-  int* result;      // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
+  int f1tr;       // End time of last task alocated in machine 1
+  int f2tr;       // End time of last task alocated in machine 2
+  int sumf2;      // Sum of end  times in M2 so far
+  int result[64]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
-
-node* add_node(int db, int pb, float td, float tp, int r[]){
-  node *new_node = malloc(sizeof(node));
-  new_node->dual_bound = db;
-  new_node->primal_bound = pb;
-  new_node->t_dual = td;
-  new_node->t_primal = tp;
-  new_node->result = r;
-  return new_node;
-}
 
 // Reads the input files into arrays (instance) and variables (parameters), and returns the amount of tasks.
 void read_input(char *args[]);
 
 // Branch-and-bound algorithm implementation.
-node* bnb(int *n_nodes);
+void bnb(int *n_nodes);
+
+int primal_bound(int result[], int f1tr, int f2tr, int sumf2);
+
+int dual_bound(int result[], int f1tr, int f2tr, int sumf2);
+
+node* add_node(node *parent, int id);
 
 #endif
