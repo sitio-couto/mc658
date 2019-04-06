@@ -5,5 +5,8 @@ CFLAGS = -Wall -std=c99 -g
 bnb-fs:
 	gcc $(CFLAGS) bnb-fs.c -o bnb-fs
 
+debug:
+	gcc -g $(CFLAGS) bnb-fs.c -o bnb-fs
+
 clean:
 	rm -f bnb-fs

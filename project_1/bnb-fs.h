@@ -49,4 +49,6 @@ node* add_node(node *parent, int id);
 
 float curr_time(void);
 
+void copy_best_node(node*);
+
 #endif
