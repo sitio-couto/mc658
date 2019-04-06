@@ -132,10 +132,11 @@ void bnb(int *n_nodes){
     node_dual = dual_bound(min_node->result, min_node->f1tr, min_node->f2tr, min_node->sumf2);
     node_primal = primal_bound(min_node->result, min_node->f1tr, min_node->f2tr, min_node->sumf2);
 
-    // Try to update optimal dual bound
-    if (node_dual > best_dual){
-      best_dual = node_dual;
-      t_best_dual = curr_time();
+    // Check if prune is possible (limitant)
+    // If my best solution in this node is worst than a known solution, kill it
+    if (node_dual > best_primal){
+      free(min_node);
+      continue;
     }
 
     // Try to update optimal primal bound
@@ -145,16 +146,14 @@ void bnb(int *n_nodes){
       copy_best_node(min_node); // TODO: only for debugging
     }
 
-    // Check if prune is possible (otimality or limitant)
-    // If my best solution in this node is worst than a known solution, kill it
-    if (node_dual > best_primal){
-      free(min_node);
-      continue;
+    // Try to update optimal dual bound only if the node is not pruned
+    if (node_dual > best_dual){
+      best_dual = node_dual;
+      t_best_dual = curr_time();
     }
 
+    // Check if prune is possible (optimality)
     // If the primal bound for this node is already optimal, kill it
-    // NOTE: before freeing, check if the node is not the best node so far, or
-    // else best_node will have a invalid pointer.
     if (node_primal == node_dual) {
       if (best_node != min_node) free(min_node);
       continue;
