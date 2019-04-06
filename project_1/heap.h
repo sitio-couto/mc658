@@ -8,21 +8,24 @@ node **min_heap;
 int size_used = 0,heap_size = 0;
 
 void increase_heap(int n_tasks){
-  node **aux;
-  int i;
+  //node **aux;
+  //int i;
 
   if(heap_size == 0) {
     heap_size = 2*n_tasks;
     min_heap = malloc(sizeof(node*)*heap_size);
   }else{
-    heap_size *= heap_size;
-    if ((aux = malloc(heap_size*sizeof(node*))) == NULL) {
-      printf("FAILED TO RELOCATE MIN HEAP. EXITING...\n");
-      exit(1);
-    } else {
-      for (i = 0; i < heap_size; ++i) aux[i] = min_heap[i];
-      min_heap = aux;
-    }
+    //heap_size *= heap_size;
+    //if ((aux = malloc(heap_size*sizeof(node*))) == NULL) {
+    //  printf("FAILED TO RELOCATE MIN HEAP. EXITING...\n");
+    //  exit(1);
+    //} else {
+    //  for (i = 0; i < heap_size; ++i) aux[i] = min_heap[i];
+    //  free(min_heap);
+    //  min_heap = aux;
+    min_heap = realloc(min_heap, sizeof(node*)*heap_size*heap_size);
+    heap_size*=heap_size;
+    //}
   }
   return;
 }

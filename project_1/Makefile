@@ -1,4 +1,4 @@
-CFLAGS = -Wall -std=c99
+CFLAGS = -Wall -std=c99 -g
 
 .PHONY: bnb-fs clean
 
