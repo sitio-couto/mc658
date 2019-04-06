@@ -170,7 +170,7 @@ void bnb(int *n_nodes){
     free(min_node);
   }
 
-    // free(min_node);
+    free(min_node);
     return;
 }
 
@@ -205,9 +205,8 @@ int dual_bound(int result[], int f1tr, int f2tr, int sumf2){
   second_bound = sumf2;
   for (i = 0; i < n_tasks; ++i){
     if(result[sorted_dm2[i]->id-1] == 0) {
-      ++k;
       d2tk = sorted_dm2[i]->dm2;
-      second_bound += aux + (n_tasks - k + 1)*d2tk;
+      second_bound += aux + (n_tasks - (++k) + 1)*d2tk;
     }
   }
 
