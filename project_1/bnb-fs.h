@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <sys/time.h>
+#include <time.h>
 
 typedef struct{
   int id;   // Val that represents the order in which the task was read from file
@@ -46,5 +46,7 @@ int primal_bound(int result[], int f1tr, int f2tr, int sumf2);
 int dual_bound(int result[], int f1tr, int f2tr, int sumf2);
 
 node* add_node(node *parent, int id);
+
+float curr_time(void);
 
 #endif

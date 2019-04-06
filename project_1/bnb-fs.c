@@ -20,6 +20,7 @@
 int n_tasks;                                  // Amount of tasks read
 int max_nodes, max_time;                       // maximum amount of nodes and execution time
 task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attributes id, dm1 and dm2
+float start_time, end_time;
 
 // Will change during execution
 node *best_node;                          // best node found so far (best solution node)
@@ -29,6 +30,10 @@ float t_best_dual, t_best_primal;         // time taken for each best bound
 
 int main(int argc, char* argv[]){
     int i, n_nodes=0;  // amount of nodes and current amount of nodes
+    
+    // Deveria estar medindo o clock aqui ou no bnb?
+    // Não deve fazer muita diferença pela ordem de grandeza
+    start_time = clock();
 
     // Input
     read_input(argv);
@@ -38,6 +43,9 @@ int main(int argc, char* argv[]){
     insert_heap(best_node, n_tasks);
     bnb(&n_nodes);
 
+    // Medir aqui ou depois acho que não faz tanta diferença pela ordem de grandeza
+    end_time = clock();
+    
     // Output
     printf(" %i %i\n", max_nodes, max_time);
 
@@ -57,15 +65,18 @@ int main(int argc, char* argv[]){
     for (i=0; i< n_tasks; ++i)
         printf("%d: %d | ", i+1, best_node->result[i]);
 
-    printf("\nBest primal: %d\n", best_primal);
+    printf("\n\nBest primal: %d\n", best_primal);
+    printf("Time taken: %.2f\n\n", t_best_primal);
+    
     printf("Best dual: %d\n",best_dual);
+    printf("Time taken: %.2f\n\n", t_best_dual);
+    
     printf("Explored nodes: %d\n", n_nodes);
-    
-    printf("\n");
-    
-    for (i = 0; i < n_tasks; ++i) free(sorted_id[i]);
+    printf("Total time: %.2f\n", (end_time - start_time)/(float)CLOCKS_PER_SEC);
     
     // Freeing EVERYTHING.
+    for (i = 0; i < n_tasks; ++i) 
+        free(sorted_id[i]);
     for (i=0; i<size_used; i++)
         free(min_heap[i]);
     free(min_heap);
@@ -108,10 +119,13 @@ void read_input(char *args[]){
 void bnb(int *n_nodes){
   node *min_node;
   int i, node_primal, node_dual;
+  
+  // Debug limit changer
   //max_nodes = 100000;
+  //float max_time = 0.00050;
 
   // Get min from heap
-  while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes) {
+  while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
     (*n_nodes)++;
       
     // Get bounds for node
@@ -119,14 +133,18 @@ void bnb(int *n_nodes){
     node_primal = primal_bound(min_node->result, min_node->f1tr, min_node->f2tr, min_node->sumf2);
 
     // Try to update optimal bounds
-    if (node_dual > best_dual)
+    if (node_dual > best_dual){
       best_dual = node_dual;
+      t_best_dual = curr_time();
+  }
 
     if (node_primal < best_primal) {
+      best_primal = node_primal;
+      t_best_primal = curr_time();
+      
       if (best_node != min_node) 
         free(best_node);
       best_node = min_node;
-      best_primal = node_primal;
     }
 
     // Check if prune is possible (otimality or limitant)
@@ -154,13 +172,9 @@ void bnb(int *n_nodes){
     // former best solution, then best_node and best_primal have already been
     // updated and the node cannot be freed (due to NULL pointer in best_node).
     // If it isnt better, then we should free the node, for it has no purpose.
-
-
   }
   
     free(min_node);
-    // TODO:
-    // Medir tempo (depois).
     return;
 }
 
@@ -245,4 +259,8 @@ node* add_node(node *parent, int id){
   new_node->result[id] = r+1;
 
   return new_node;
+}
+
+float curr_time(void){
+    return (clock() - start_time)/(float)CLOCKS_PER_SEC;
 }

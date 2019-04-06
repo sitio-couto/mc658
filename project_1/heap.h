@@ -23,8 +23,8 @@ void increase_heap(int n_tasks){
     //  for (i = 0; i < heap_size; ++i) aux[i] = min_heap[i];
     //  free(min_heap);
     //  min_heap = aux;
-    min_heap = realloc(min_heap, sizeof(node*)*heap_size*heap_size);
     heap_size*=heap_size;
+    min_heap = realloc(min_heap, sizeof(node*)*heap_size);
     //}
   }
   return;
