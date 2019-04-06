@@ -155,10 +155,10 @@ void bnb(int *n_nodes){
     // If the primal bound for this node is already optimal, kill it
     // NOTE: before freeing, check if the node is not the best node so far, or
     // else best_node will have a invalid pointer.
-    // if (node_primal == node_dual) {
-    //   if (best_node != min_node) free(min_node);
-    //   continue;
-    // }
+    if (node_primal == node_dual) {
+      if (best_node != min_node) free(min_node);
+      continue;
+    }
 
     // Expand min_nodes child nodes
     for (i = 0; i < n_tasks; ++i)
