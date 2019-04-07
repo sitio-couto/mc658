@@ -7,28 +7,6 @@
 #include <time.h>
 
 typedef struct{
-  int id;   // Val that represents the order in which the task was read from file
-  int dm1;  // Duration of taskID in machine 1
-  int dm2;  // Duration of taskID in mcahine 2
-} task;
-
-task* add_task(int id, int dm1, int dm2) {
-  task *new_task = malloc(sizeof(task));
-  new_task->id = id;
-  new_task->dm1 = dm1;
-  new_task->dm2 = dm2;
-  return new_task;
-}
-
-int cmp_dm1(const void *a, const void *b) {
-  return ( (*(task**)a)->dm1 -(*(task**)b)->dm1 );
-}
-
-int cmp_dm2(const void *a, const void *b) {
-   return ( (*(task**)a)->dm2 - (*(task**)b)->dm2 );
-}
-
-typedef struct{
   int f1tr;       // End time of last task alocated in machine 1
   int f2tr;       // End time of last task alocated in machine 2
   int sumf2;      // Sum of end  times in M2 so far
@@ -36,6 +14,28 @@ typedef struct{
   int primal;
   int result[64]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
+
+typedef struct{
+  int id;   // Val that represents the order in which the task was read from file
+  int dm1;  // Duration of taskID in machine 1
+  int dm2;  // Duration of taskID in mcahine 2
+} task;
+
+// GLOBALS
+// Set and mantained until end of execution
+extern int n_tasks;                                  // Amount of tasks read
+extern int max_nodes, max_time;                      // maximum amount of nodes and execution time
+extern task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attributes id, dm1 and dm2
+extern float start_time, end_time;
+
+// Will change during execution
+extern node *best_node;                    // best node found so far (best solution node)
+extern int best_dual, best_primal;         // best bounds found so far
+extern float t_best_dual, t_best_primal;   // time taken for each best bound
+
+// Definitions for heap handling
+extern node **min_heap;           // Pointer to smallest element of the heap
+extern int size_used, heap_size;  // Alocated and used heap positions
 
 // Reads the input files into arrays (instance) and variables (parameters), and returns the amount of tasks.
 void read_input(char *args[]);
@@ -47,12 +47,28 @@ int primal_bound(int result[], int f1tr, int f2tr, int sumf2);
 
 int dual_bound(int result[], int f1tr, int f2tr, int sumf2);
 
-node* add_node(node *parent, int id);
+task* add_task(int, int, int);
 
-float curr_time(void);
+node* add_node(node *parent, int id);
 
 void copy_best_node(node*);
 
 node* make_root(void);
+
+void print_results(int, int, int);
+
+void increase_heap(int n_tasks);
+
+void insert_heap(node *new_node, int n_tasks);
+
+node* remove_min(void);
+
+int heap_check(void);
+
+float curr_time(void);
+
+int cmp_dm1(const void*, const void*);
+
+int cmp_dm2(const void*, const void*);
 
 #endif

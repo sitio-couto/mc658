@@ -13,23 +13,13 @@
  */
 
 #include "bnb-fs.h"
-#include "heap.h"
 
-// GLOBALS
-// Set and mantained until end of execution
-int n_tasks;                                  // Amount of tasks read
-int max_nodes, max_time;                       // maximum amount of nodes and execution time
-task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attributes id, dm1 and dm2
-float start_time, end_time;
-
-// Will change during execution
 node *best_node;                          // best node found so far (best solution node)
-int best_solution, t_solution;            // best solution found so far
 int best_dual = 0, best_primal = INT_MAX; // best bounds found so far
-float t_best_dual, t_best_primal;         // time taken for each best bound
+float t_best_dual, t_best_primal;
 
 int main(int argc, char* argv[]){
-    int i, n_nodes=0;  // amount of nodes and current amount of nodes
+    int n_nodes=0;  // current amount of explored nodes
 
     // Deveria estar medindo o clock aqui ou no bnb?
     // Não deve fazer muita diferença pela ordem de grandeza
@@ -46,74 +36,9 @@ int main(int argc, char* argv[]){
     // Medir aqui ou depois acho que não faz tanta diferença pela ordem de grandeza
     end_time = clock();
 
-    // // Output
-    // printf(" %i %i\n", max_nodes, max_time);
-    //
-    // printf("\nPrinting \"sorted_id\"\n");
-    // for (i = 0; i < n_tasks; ++i)
-    //   printf("%i->(%i|%i,%i) | ", i, sorted_id[i]->id, sorted_id[i]->dm1, sorted_id[i]->dm2);
-    //
-    // printf("\nPrinting \"sorted_dm1\"\n");
-    // for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm1[i]->dm1);
-    //
-    // printf("\nPrinting \"sorted_dm2\"\n");
-    // for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm2[i]->dm2);
-
-    printf("\n");
-
-    printf("\nBest sum: %d\nResults:\n", best_node->sumf2);
-    for (i=0; i< n_tasks; ++i)
-        printf("%d: %d | ", i+1, best_node->result[i]);
-
-    printf("\n\nBest primal: %d\n", best_primal);
-    printf("Time taken: %.2f\n\n", t_best_primal);
-
-    printf("Best dual: %d\n",best_dual);
-    printf("Time taken: %.2f\n\n", t_best_dual);
-
-    printf("Explored nodes: %d\n", n_nodes);
-    printf("Total time: %.2f\n", (end_time - start_time)/(float)CLOCKS_PER_SEC);
-
-    // Freeing EVERYTHING.
-    for (i = 0; i < n_tasks; ++i)
-        free(sorted_id[i]);
-    for (i=0; i<size_used; i++)
-        free(min_heap[i]);
-    free(min_heap);
-    free(best_node);
-    free(sorted_id);
-    free(sorted_dm1);
-    free(sorted_dm2);
+    print_results(start_time, end_time, n_nodes);
 
     return 0;
-}
-
-void read_input(char *args[]){
-    FILE *instance, *parameters;
-    int i, dm1, dm2;
-
-    instance = fopen(args[1], "r");
-    parameters = fopen(args[2], "r");
-
-    fscanf(parameters, " %i \n %i", &max_nodes, &max_time);
-
-    fscanf(instance, " %i", &n_tasks);
-    sorted_id = malloc(sizeof(task*)*n_tasks);
-    sorted_dm1 = malloc(sizeof(task*)*n_tasks);
-    sorted_dm2 = malloc(sizeof(task*)*n_tasks);
-
-    for (i = 0; i < n_tasks; ++i){
-      fscanf(instance, " %i %i \n", &dm1, &dm2);
-      sorted_id[i] = add_task((i+1), dm1, dm2);
-      sorted_dm1[i] = sorted_id[i];
-      sorted_dm2[i] = sorted_id[i];
-    }
-
-    qsort(sorted_dm1, n_tasks, sizeof(task*), cmp_dm1);
-    qsort(sorted_dm2, n_tasks, sizeof(task*), cmp_dm2);
-
-    fclose(instance);
-    fclose(parameters);
 }
 
 void bnb(int *n_nodes){
@@ -227,63 +152,4 @@ int primal_bound(int result[], int f1tr, int f2tr, int sumf2){
   }
 
   return sumf2;
-}
-
-// This function creates a child node acording to the parent info
-node* add_node(node *parent, int idx){
-  node *child;
-  int i, r;
-
-  child = malloc(sizeof(node));
-
-  // Restriction: a task must wait other tasks in M1 (starts after parent-f1tr)
-  child->f1tr = parent->f1tr + sorted_id[idx]->dm1;
-
-  // Restriction: a task must end in M1 and wait other taks in M2
-  if (child->f1tr > parent->f2tr) { // If no task executinf in M2
-    child->f2tr = child->f1tr + sorted_id[idx]->dm2;
-  } else { // If theres a task executing in M2
-    child->f2tr = parent->f2tr + sorted_id[idx]->dm2;
-  }
-
-  // Add end time in M2 for the newly computed task to the current result
-  child->sumf2 = parent->sumf2 + child->f2tr;
-
-  // If the task is the n-th alocated in the machines, gets the value n (n-th place)
-  // Also copies the order of previously alocated tasks
-  r = 1;
-  for (i = 0; i < n_tasks; ++i) {
-    if (parent->result[i] != 0) ++r;
-    child->result[i] = parent->result[i];
-  }
-  child->result[idx] = r;
-
-  // Add dual_bound for this node to be used as priority key (and primal for prunning)
-  child->dual = dual_bound(child->result, child->f1tr, child->f2tr, child->sumf2);
-  child->primal = primal_bound(child->result, child->f1tr, child->f2tr, child->sumf2);
-
-  return child;
-}
-
-float curr_time(void){
-    return (clock() - start_time)/(float)CLOCKS_PER_SEC;
-}
-
-// This will prevent memory related issues with best_node and min_node
-void copy_best_node(node *node) {
-  int i;
-  best_node->f1tr = node->f1tr;
-  best_node->f2tr = node->f2tr;
-  best_node->sumf2 = node->sumf2;
-  for (i = 0; i < n_tasks; ++i)
-    best_node->result[i] = node->result[i];
-  return;
-}
-
-// Creates a root for the state space tree
-node* make_root(void) {
-  node* root = calloc(1, sizeof(node));
-  root->dual = dual_bound(root->result, root->f1tr, root->f2tr, root->sumf2);
-  root->primal = primal_bound(root->result, root->f1tr, root->f2tr, root->sumf2);
-  return root;
 }
