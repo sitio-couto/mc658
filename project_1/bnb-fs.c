@@ -39,25 +39,25 @@ int main(int argc, char* argv[]){
     read_input(argv);
 
     // Execution
-    best_node = calloc(1, sizeof(node));           // Initialize empty best node
-    insert_heap(calloc(1, sizeof(node)), n_tasks); // Pass root node (0 initialized)
+    best_node = calloc(1, sizeof(node)); // Initialize empty best node
+    insert_heap(make_root(), n_tasks);   // Insert root node in heap
     bnb(&n_nodes);
 
     // Medir aqui ou depois acho que não faz tanta diferença pela ordem de grandeza
     end_time = clock();
 
-    // Output
-    printf(" %i %i\n", max_nodes, max_time);
-
-    printf("\nPrinting \"sorted_id\"\n");
-    for (i = 0; i < n_tasks; ++i)
-      printf("%i->(%i|%i,%i) | ", i, sorted_id[i]->id, sorted_id[i]->dm1, sorted_id[i]->dm2);
-
-    printf("\nPrinting \"sorted_dm1\"\n");
-    for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm1[i]->dm1);
-
-    printf("\nPrinting \"sorted_dm2\"\n");
-    for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm2[i]->dm2);
+    // // Output
+    // printf(" %i %i\n", max_nodes, max_time);
+    //
+    // printf("\nPrinting \"sorted_id\"\n");
+    // for (i = 0; i < n_tasks; ++i)
+    //   printf("%i->(%i|%i,%i) | ", i, sorted_id[i]->id, sorted_id[i]->dm1, sorted_id[i]->dm2);
+    //
+    // printf("\nPrinting \"sorted_dm1\"\n");
+    // for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm1[i]->dm1);
+    //
+    // printf("\nPrinting \"sorted_dm2\"\n");
+    // for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm2[i]->dm2);
 
     printf("\n");
 
@@ -118,7 +118,7 @@ void read_input(char *args[]){
 
 void bnb(int *n_nodes){
   node *min_node;
-  int i, node_primal, node_dual;
+  int i;
 
   // Debug limit changer
   //max_nodes = 100000;
@@ -126,37 +126,34 @@ void bnb(int *n_nodes){
 
   // Get min from heap
   while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
-    (*n_nodes)++;
-
-    // Get bounds for node
-    node_dual = dual_bound(min_node->result, min_node->f1tr, min_node->f2tr, min_node->sumf2);
-    node_primal = primal_bound(min_node->result, min_node->f1tr, min_node->f2tr, min_node->sumf2);
+    if (best_dual == best_primal) break; // If optimal result achieved, end loop
+    (*n_nodes)++; // Node is maturing
 
     // Check if prune is possible (limitant)
     // If my best solution in this node is worst than a known solution, kill it
-    if (node_dual > best_primal){
+    if (min_node->dual > best_primal){
       free(min_node);
       continue;
     }
 
     // Try to update optimal primal bound
-    if (node_primal < best_primal) {
-      best_primal = node_primal;
+    if (min_node->primal < best_primal) {
+      best_primal = min_node->primal;
       best_dual = min_node->dual;
       t_best_primal = curr_time();
       copy_best_node(min_node); // TODO: only for debugging
     }
 
-    // Try to update optimal dual bound only if the node is not pruned
-    if (node_dual > best_dual){
-      best_dual = node_dual;
+    // Try to update optimal dual bound only if the node is not pruned by limitant
+    if (min_node->dual > best_dual){
+      best_dual = min_node->dual;
       t_best_dual = curr_time();
     }
 
     // Check if prune is possible (optimality)
     // If the primal bound for this node is already optimal, kill it
-    if (node_primal == node_dual) {
-      if (best_node != min_node) free(min_node);
+    if (min_node->primal == min_node->dual) {
+      free(min_node);
       continue;
     }
 
@@ -164,24 +161,17 @@ void bnb(int *n_nodes){
     for (i = 0; i < n_tasks; ++i)
       if(min_node->result[i] == 0) // if task i not part of solution yet, expand
         insert_heap(add_node(min_node, i), n_tasks);
-    // NOTE: If the solution found is optimal for the node and better than the
-    // former best solution, then best_node and best_primal have already been
-    // updated and the node cannot be freed (due to NULL pointer in best_node).
-    // If it isnt better, then we should free the node, for it has no purpose.
+
     free(min_node);
-    if(!heap_check()){
-      for (i = 0; i < size_used; ++i) {
-          printf("%i<=", min_heap[i]->dual);
-      }
-      printf("\nHeap has failed.\n");
-      exit(1);
-    }
   }
 
     if (min_node) free(min_node); // check if null first
     return;
 }
 
+// Calculates a certain inferior limitant for the node. The higher the inferior
+// limitan, the closer to the possible optimal solution it is, and more lilkely
+// to be punned as well.
 int dual_bound(int result[], int f1tr, int f2tr, int sumf2){
   int first_bound, second_bound; // dual bounds
   int i, r, k, d1tk, d2tk, aux;
@@ -222,6 +212,8 @@ int dual_bound(int result[], int f1tr, int f2tr, int sumf2){
   else return second_bound;
 }
 
+// Calculates a possible solution for the current node. If the calculated
+// solution is good, prunning is more likely.
 int primal_bound(int result[], int f1tr, int f2tr, int sumf2){
   int i;
 
@@ -237,47 +229,47 @@ int primal_bound(int result[], int f1tr, int f2tr, int sumf2){
   return sumf2;
 }
 
-// This function creates a new node acording to the parent info
+// This function creates a child node acording to the parent info
 node* add_node(node *parent, int idx){
-  node *new_node;
+  node *child;
   int i, r;
 
-  new_node = malloc(sizeof(node));
+  child = malloc(sizeof(node));
 
   // Restriction: a task must wait other tasks in M1 (starts after parent-f1tr)
-  new_node->f1tr = parent->f1tr + sorted_id[idx]->dm1;
+  child->f1tr = parent->f1tr + sorted_id[idx]->dm1;
 
   // Restriction: a task must end in M1 and wait other taks in M2
-  if (new_node->f1tr > parent->f2tr) { // If no task executinf in M2
-    new_node->f2tr = new_node->f1tr + sorted_id[idx]->dm2;
+  if (child->f1tr > parent->f2tr) { // If no task executinf in M2
+    child->f2tr = child->f1tr + sorted_id[idx]->dm2;
   } else { // If theres a task executing in M2
-    new_node->f2tr = parent->f2tr + sorted_id[idx]->dm2;
+    child->f2tr = parent->f2tr + sorted_id[idx]->dm2;
   }
 
   // Add end time in M2 for the newly computed task to the current result
-  new_node->sumf2 = parent->sumf2 + new_node->f2tr;
+  child->sumf2 = parent->sumf2 + child->f2tr;
 
   // If the task is the n-th alocated in the machines, gets the value n (n-th place)
   // Also copies the order of previously alocated tasks
   r = 1;
   for (i = 0; i < n_tasks; ++i) {
     if (parent->result[i] != 0) ++r;
-    new_node->result[i] = parent->result[i];
+    child->result[i] = parent->result[i];
   }
-  new_node->result[idx] = r;
+  child->result[idx] = r;
 
-  // Add dual_bound for this node to be used as priority key
-  new_node->dual = dual_bound(new_node->result, new_node->f1tr, new_node->f2tr, new_node->sumf2);
-  new_node->primal = primal_bound(new_node->result, new_node->f1tr, new_node->f2tr, new_node->sumf2);
+  // Add dual_bound for this node to be used as priority key (and primal for prunning)
+  child->dual = dual_bound(child->result, child->f1tr, child->f2tr, child->sumf2);
+  child->primal = primal_bound(child->result, child->f1tr, child->f2tr, child->sumf2);
 
-  return new_node;
+  return child;
 }
 
 float curr_time(void){
     return (clock() - start_time)/(float)CLOCKS_PER_SEC;
 }
 
-// This will prevent memory related issues
+// This will prevent memory related issues with best_node and min_node
 void copy_best_node(node *node) {
   int i;
   best_node->f1tr = node->f1tr;
@@ -285,4 +277,13 @@ void copy_best_node(node *node) {
   best_node->sumf2 = node->sumf2;
   for (i = 0; i < n_tasks; ++i)
     best_node->result[i] = node->result[i];
+  return;
+}
+
+// Creates a root for the state space tree
+node* make_root(void) {
+  node* root = calloc(1, sizeof(node));
+  root->dual = dual_bound(root->result, root->f1tr, root->f2tr, root->sumf2);
+  root->primal = primal_bound(root->result, root->f1tr, root->f2tr, root->sumf2);
+  return root;
 }

@@ -53,4 +53,6 @@ float curr_time(void);
 
 void copy_best_node(node*);
 
+node* make_root(void);
+
 #endif
