@@ -139,7 +139,6 @@ void bnb(int *n_nodes){
     // Try to update optimal primal bound
     if (min_node->primal < best_primal) {
       best_primal = min_node->primal;
-      best_dual = min_node->dual;
       t_best_primal = curr_time();
       copy_best_node(min_node); // TODO: only for debugging
     }
