@@ -1,10 +1,17 @@
 #ifndef BNBFS
 #define BNBFS 1
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <time.h>
+using namespace std;
+
+//C libraries
+#include <cstdio>
+#include <cstdlib>
+#include <climits>
+#include <ctime>
+
+//C++ libraries
+#include <queue>
+#include <vector>
 
 typedef struct{
   int f1tr;       // End time of last task alocated in machine 1
@@ -14,6 +21,14 @@ typedef struct{
   int primal;
   int result[64]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
+
+struct comparator
+{
+    bool operator()(const node* a, const node* b)
+    {
+        return a->dual > b->dual;
+    }
+};
 
 typedef struct{
   int id;   // Val that represents the order in which the task was read from file
@@ -33,9 +48,8 @@ extern node *best_node;                    // best node found so far (best solut
 extern int best_dual, best_primal;         // best bounds found so far
 extern float t_best_dual, t_best_primal;   // time taken for each best bound
 
-// Definitions for heap handling
-extern node **min_heap;           // Pointer to smallest element of the heap
-extern int size_used, heap_size;  // Alocated and used heap positions
+// Heap
+extern priority_queue<node*, vector<node*>, comparator> heap;
 
 // Reads the input files into arrays (instance) and variables (parameters), and returns the amount of tasks.
 void read_input(char *args[]);
@@ -56,14 +70,6 @@ void copy_best_node(node*);
 node* make_root(void);
 
 void print_results(int, int, int);
-
-void increase_heap(int n_tasks);
-
-void insert_heap(node *new_node, int n_tasks);
-
-node* remove_min(void);
-
-int heap_check(void);
 
 float curr_time(void);
 

@@ -1,12 +1,12 @@
-CFLAGS = -Wall -std=c99 -g
+CFLAGS = -Wall
 
-.PHONY: bnb-fs clean
+.PHONY: bnb-fs clean debug
 
 bnb-fs:
-	gcc $(CFLAGS) bnb-fs.c nodes.c io.c heap.c -o bnb-fs
+	g++ $(CFLAGS) bnb-fs.c nodes.c io.c -o bnb-fs
 
 debug:
-	gcc -g $(CFLAGS) bnb-fs.c nodes.c io.c heap.c -o bnb-fs
+	g++ -g $(CFLAGS) bnb-fs.c nodes.c io.c -o bnb-fs
 
 clean:
-	rm -f bnb-fs
+	rm -f bnb-fs test

@@ -13,7 +13,7 @@ void copy_best_node(node *node) {
 
 // Creates a root for the state space tree
 node* make_root(void) {
-  node* root = calloc(1, sizeof(node));
+  node* root = (node*)calloc(1, sizeof(node));
   root->dual = dual_bound(root->result, root->f1tr, root->f2tr, root->sumf2);
   root->primal = primal_bound(root->result, root->f1tr, root->f2tr, root->sumf2);
   return root;
@@ -24,7 +24,7 @@ node* add_node(node *parent, int idx){
   node *child;
   int i, r;
 
-  child = malloc(sizeof(node));
+  child = (node*)malloc(sizeof(node));
 
   // Restriction: a task must wait other tasks in M1 (starts after parent-f1tr)
   child->f1tr = parent->f1tr + sorted_id[idx]->dm1;

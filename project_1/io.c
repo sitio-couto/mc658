@@ -15,9 +15,9 @@ void read_input(char *args[]){
     fscanf(parameters, " %i \n %i", &max_nodes, &max_time);
 
     fscanf(instance, " %i", &n_tasks);
-    sorted_id = malloc(sizeof(task*)*n_tasks);
-    sorted_dm1 = malloc(sizeof(task*)*n_tasks);
-    sorted_dm2 = malloc(sizeof(task*)*n_tasks);
+    sorted_id = (task**)malloc(sizeof(task*)*n_tasks);
+    sorted_dm1 = (task**)malloc(sizeof(task*)*n_tasks);
+    sorted_dm2 = (task**)malloc(sizeof(task*)*n_tasks);
 
     for (i = 0; i < n_tasks; ++i){
       fscanf(instance, " %i %i \n", &dm1, &dm2);
@@ -64,11 +64,13 @@ void print_results(int start_time, int end_time, int n_nodes) {
   printf("Total time: %.2f\n", (end_time - start_time)/(float)CLOCKS_PER_SEC);
 
   // Freeing EVERYTHING.
+  while(!heap.empty()){
+    free(heap.top());
+    heap.pop();
+  }
+  
   for (i = 0; i < n_tasks; ++i)
       free(sorted_id[i]);
-  for (i=0; i<size_used; i++)
-      free(min_heap[i]);
-  free(min_heap);
   free(best_node);
   free(sorted_id);
   free(sorted_dm1);
@@ -78,7 +80,7 @@ void print_results(int start_time, int end_time, int n_nodes) {
 }
 
 task* add_task(int id, int dm1, int dm2) {
-  task *new_task = malloc(sizeof(task));
+  task *new_task = (task*)malloc(sizeof(task));
   new_task->id = id;
   new_task->dm1 = dm1;
   new_task->dm2 = dm2;

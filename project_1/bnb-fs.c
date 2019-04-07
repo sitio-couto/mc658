@@ -18,22 +18,21 @@ node *best_node;                          // best node found so far (best soluti
 int best_dual = 0, best_primal = INT_MAX; // best bounds found so far
 float t_best_dual, t_best_primal;
 
+priority_queue<node*, vector<node*>, comparator> heap;
+
 int main(int argc, char* argv[]){
     int n_nodes=0;  // current amount of explored nodes
 
-    // Deveria estar medindo o clock aqui ou no bnb?
-    // Não deve fazer muita diferença pela ordem de grandeza
     start_time = clock();
 
     // Input
     read_input(argv);
 
     // Execution
-    best_node = calloc(1, sizeof(node)); // Initialize empty best node
-    insert_heap(make_root(), n_tasks);   // Insert root node in heap
+    best_node = (node*)calloc(1, sizeof(node)); // Initialize empty best node
+    heap.push(make_root());
     bnb(&n_nodes);
 
-    // Medir aqui ou depois acho que não faz tanta diferença pela ordem de grandeza
     end_time = clock();
 
     print_results(start_time, end_time, n_nodes);
@@ -50,7 +49,11 @@ void bnb(int *n_nodes){
   //float max_time = 0.00050;
 
   // Get min from heap
-  while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
+  while ( !heap.empty() && *n_nodes < max_nodes && curr_time() < max_time) {
+      
+    min_node = heap.top();
+    heap.pop();
+    
     if (best_dual == best_primal) break; // If optimal result achieved, end loop
     (*n_nodes)++; // Node is maturing
 
@@ -84,7 +87,7 @@ void bnb(int *n_nodes){
     // Expand min_nodes child nodes
     for (i = 0; i < n_tasks; ++i)
       if(min_node->result[i] == 0) // if task i not part of solution yet, expand
-        insert_heap(add_node(min_node, i), n_tasks);
+        heap.push(add_node(min_node, i));
 
     free(min_node);
   }
