@@ -142,6 +142,7 @@ void bnb(int *n_nodes){
     // Try to update optimal primal bound
     if (node_primal < best_primal) {
       best_primal = node_primal;
+      best_dual = min_node->dual;
       t_best_primal = curr_time();
       copy_best_node(min_node); // TODO: only for debugging
     }
@@ -168,9 +169,16 @@ void bnb(int *n_nodes){
     // updated and the node cannot be freed (due to NULL pointer in best_node).
     // If it isnt better, then we should free the node, for it has no purpose.
     free(min_node);
+    if(!heap_check()){
+      for (i = 0; i < size_used; ++i) {
+          printf("%i<=", min_heap[i]->dual);
+      }
+      printf("\nHeap has failed.\n");
+      exit(1);
+    }
   }
 
-    free(min_node);
+    if (min_node) free(min_node); // check if null first
     return;
 }
 
@@ -257,6 +265,10 @@ node* add_node(node *parent, int idx){
     new_node->result[i] = parent->result[i];
   }
   new_node->result[idx] = r;
+
+  // Add dual_bound for this node to be used as priority key
+  new_node->dual = dual_bound(new_node->result, new_node->f1tr, new_node->f2tr, new_node->sumf2);
+  new_node->primal = primal_bound(new_node->result, new_node->f1tr, new_node->f2tr, new_node->sumf2);
 
   return new_node;
 }

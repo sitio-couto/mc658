@@ -32,6 +32,8 @@ typedef struct{
   int f1tr;       // End time of last task alocated in machine 1
   int f2tr;       // End time of last task alocated in machine 2
   int sumf2;      // Sum of end  times in M2 so far
+  int dual;
+  int primal;
   int result[64]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
 

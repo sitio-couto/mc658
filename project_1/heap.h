@@ -40,8 +40,8 @@ void insert_heap(node *new_node, int n_tasks){
 
 	while(child != 0){      // Havent reached the root
 		father = (child-1)/2; //get father pos
-    f = min_heap[father]->sumf2;
-    c = min_heap[child]->sumf2;
+    f = min_heap[father]->dual;
+    c = min_heap[child]->dual;
     if(c < f) {
       aux = min_heap[father];
       min_heap[father] = min_heap[child];
@@ -62,21 +62,21 @@ node* remove_min(void){
 
   // Replace min node with node from botttom
   --size_used;
-  min_heap[father] = min_heap[size_used];
+  min_heap[0] = min_heap[size_used];
   min_heap[size_used] = NULL;
 
 	while(left < size_used) {
-    f = min_heap[father]->sumf2;
-    l = min_heap[left]->sumf2;
-    if (right < size_used) r = min_heap[right]->sumf2;
+    f = min_heap[father]->dual;
+    l = min_heap[left]->dual;
+    if (right < size_used) r = min_heap[right]->dual;
     else r = INT_MAX;
 
-    if (f > l && (f < r || (f > r && r > l))) {
+    if (f > l && (f <= r || r >= l)) {
       aux = min_heap[left];
       min_heap[left] = min_heap[father];
       min_heap[father] = aux;
       father = left;
-    } else if (f > r && (f < l || (f > l && l > r))) {
+    } else if (f > r && (f <= l || l >= r)) {
       aux = min_heap[right];
       min_heap[right] = min_heap[father];
       min_heap[father] = aux;
@@ -88,6 +88,19 @@ node* remove_min(void){
   }
 
 	return min_node;
+}
+
+int heap_check(void){
+  int i;
+
+  for (i = 1; i < size_used; ++i) {
+    if (min_heap[(i-1)/2]->dual > min_heap[i]->dual){
+      printf("%i <= %i is false\n", min_heap[(i-1)/2]->dual, min_heap[i]->dual);
+      return 0;
+    }
+  }
+
+  return 1;
 }
 
 #endif
