@@ -48,13 +48,11 @@ void bnb(int *n_nodes){
   //float max_time = 0.00050;
 
   // Get min from heap
-  while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
+  while ((min_node = remove_min()) != NULL && curr_time() < max_time) {
       
     // If optimal result achieved, end loop
     if (best_dual == best_primal) 
         break; 
-        
-    (*n_nodes)++; // Node is maturing
 
     // Check if prune is possible (limitant)
     // If my best solution in this node is worst than a known solution, kill it
@@ -84,14 +82,16 @@ void bnb(int *n_nodes){
     }
 
     // Expand min_nodes child nodes
-    for (i = 0; i < n_tasks; ++i)
+    for (i = 0; (i < n_tasks) && (*n_nodes < max_nodes); ++i)
       if(min_node->result[i] == 0){ // if task i not part of solution yet, expand
         new_node = add_node(min_node, i);
         
         if(new_node->dual > best_primal)
             free(new_node);
-        else
+        else{
+            (*n_nodes)++;
             insert_heap(new_node, n_tasks);
+        }
       }
 
     free(min_node);
