@@ -1,8 +1,4 @@
-#ifndef _HEAP
-#define _HEAP
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "bnb-fs.h"
 
 node **min_heap;
 int size_used = 0,heap_size = 0;
@@ -97,5 +93,3 @@ int heap_check(void){
 
   return 1;
 }
-
-#endif
