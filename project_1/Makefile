@@ -1,4 +1,4 @@
-CFLAGS = -Wall
+CFLAGS = -Wall -pedantic
 
 .PHONY: bnb-fs clean debug
 

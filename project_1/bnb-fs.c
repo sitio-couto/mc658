@@ -23,18 +23,19 @@ priority_queue<node*, vector<node*>, comparator> heap;
 int main(int argc, char* argv[]){
     int n_nodes=0;  // current amount of explored nodes
 
-    start_time = clock();
-
     // Input
     read_input(argv);
 
     // Execution
+    start_time = clock();
+    
     best_node = (node*)calloc(1, sizeof(node)); // Initialize empty best node
     heap.push(make_root());
     bnb(&n_nodes);
 
     end_time = clock();
 
+    printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", argv[1], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
     print_results(start_time, end_time, n_nodes);
 
     return 0;
