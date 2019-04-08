@@ -21,28 +21,26 @@ float t_best_dual, t_best_primal;
 int main(int argc, char* argv[]){
     int n_nodes=0;  // current amount of explored nodes
 
-    // Deveria estar medindo o clock aqui ou no bnb?
-    // Não deve fazer muita diferença pela ordem de grandeza
-    start_time = clock();
-
     // Input
     read_input(argv);
 
     // Execution
+    start_time = clock();
+
     best_node = calloc(1, sizeof(node)); // Initialize empty best node
     insert_heap(make_root(), n_tasks);   // Insert root node in heap
     bnb(&n_nodes);
 
-    // Medir aqui ou depois acho que não faz tanta diferença pela ordem de grandeza
     end_time = clock();
 
+    printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", argv[1], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
     print_results(start_time, end_time, n_nodes);
 
     return 0;
 }
 
 void bnb(int *n_nodes){
-  node *min_node;
+  node *min_node, *new_node;
   int i;
 
   // Debug limit changer
@@ -51,7 +49,11 @@ void bnb(int *n_nodes){
 
   // Get min from heap
   while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
-    if (best_dual == best_primal) break; // If optimal result achieved, end loop
+      
+    // If optimal result achieved, end loop
+    if (best_dual == best_primal) 
+        break; 
+        
     (*n_nodes)++; // Node is maturing
 
     // Check if prune is possible (limitant)
@@ -83,13 +85,20 @@ void bnb(int *n_nodes){
 
     // Expand min_nodes child nodes
     for (i = 0; i < n_tasks; ++i)
-      if(min_node->result[i] == 0) // if task i not part of solution yet, expand
-        insert_heap(add_node(min_node, i), n_tasks);
+      if(min_node->result[i] == 0){ // if task i not part of solution yet, expand
+        new_node = add_node(min_node, i);
+        
+        if(new_node->dual > best_primal)
+            free(new_node);
+        else
+            insert_heap(new_node, n_tasks);
+      }
 
     free(min_node);
   }
-
-    if (min_node) free(min_node); // check if null first
+    
+    // If NULL, nothing happens
+    free(min_node); 
     return;
 }
 
