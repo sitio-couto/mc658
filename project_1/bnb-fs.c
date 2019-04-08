@@ -56,6 +56,33 @@ void bnb(int *n_nodes){
         
     (*n_nodes)++; // Node is maturing
 
+    // Check if prune is possible (limitant)
+    // If my best solution in this node is worst than a known solution, kill it
+    if (min_node->dual > best_primal){
+        free(new_node);
+        continue;
+    }
+        
+    // Try to update optimal primal bound
+    if (min_node->primal < best_primal) {
+        best_primal = min_node->primal;
+        t_best_primal = curr_time();
+        copy_best_node(min_node); // TODO: only for debugging
+    }
+
+    // Try to update optimal dual bound
+    if (min_node->dual > best_dual){
+        best_dual = min_node->dual;
+        t_best_dual = curr_time();
+    } 
+    
+    // Check if prune if possible (optimality)
+    // If the primal bound for this node is already optimal, kill it
+    if(min_node->primal == min_node->dual){
+        free(min_node);
+        continue;
+    }
+
     // Expand min_nodes child nodes
     for (i = 0; i < n_tasks; ++i){
         if(min_node->result[i] == 0) {// if task i not part of solution yet, expand
@@ -65,28 +92,8 @@ void bnb(int *n_nodes){
             // If my best solution in this node is worst than a known solution, kill it
             if (new_node->dual > best_primal)
                 free(new_node);
-            else{
-                
-                // Try to update optimal primal bound
-                if (new_node->primal < best_primal) {
-                    best_primal = new_node->primal;
-                    t_best_primal = curr_time();
-                    copy_best_node(new_node); // TODO: only for debugging
-                }
-
-                // Try to update optimal dual bound
-                if (new_node->dual > best_dual){
-                    best_dual = new_node->dual;
-                    t_best_dual = curr_time();
-                } 
-            
-                // Check if prune is possible (optimality)
-                // If the primal bound for this node is already optimal, kill it
-                if(new_node->primal == new_node->dual)
-                    free(new_node);
-                else
-                    heap.push(new_node);
-            }
+            else
+                heap.push(new_node);
         }
     }
     
