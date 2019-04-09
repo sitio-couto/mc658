@@ -14,26 +14,21 @@
 
 #include "bnb-fs.h"
 
-node *best_node;                          // best node found so far (best solution node)
 int best_dual = 0, best_primal = INT_MAX; // best bounds found so far
 float t_best_dual, t_best_primal;
 
 int main(int argc, char* argv[]){
     int n_nodes=0;  // current amount of explored nodes
 
-    // Deveria estar medindo o clock aqui ou no bnb?
-    // Não deve fazer muita diferença pela ordem de grandeza
-    start_time = clock();
-
     // Input
     read_input(argv);
 
     // Execution
-    best_node = calloc(1, sizeof(node)); // Initialize empty best node
+    start_time = clock();
+
     insert_heap(make_root(), n_tasks);   // Insert root node in heap
     bnb(&n_nodes);
 
-    // Medir aqui ou depois acho que não faz tanta diferença pela ordem de grandeza
     end_time = clock();
 
     printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", argv[1], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
@@ -107,7 +102,7 @@ void bnb(int *n_nodes){
 // Calculates a certain inferior limitant for the node. The higher the inferior
 // limitan, the closer to the possible optimal solution it is, and more lilkely
 // to be punned as well.
-int dual_bound(int result[], int f1tr, int f2tr, int sumf2){
+int dual_bound(char result[], int f1tr, int f2tr, int sumf2){
   int first_bound, second_bound; // dual bounds
   int i, r, k, d1tk, d2tk, aux;
 
@@ -149,7 +144,7 @@ int dual_bound(int result[], int f1tr, int f2tr, int sumf2){
 
 // Calculates a possible solution for the current node. If the calculated
 // solution is good, prunning is more likely.
-int primal_bound(int result[], int f1tr, int f2tr, int sumf2){
+int primal_bound(char result[], int f1tr, int f2tr, int sumf2){
   int i;
 
   for (i = 0; i < n_tasks; ++i) {

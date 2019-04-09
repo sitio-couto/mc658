@@ -1,16 +1,5 @@
 #include "bnb-fs.h"
 
-// This will prevent memory related issues with best_node and min_node
-void copy_best_node(node *node) {
-  int i;
-  best_node->f1tr = node->f1tr;
-  best_node->f2tr = node->f2tr;
-  best_node->sumf2 = node->sumf2;
-  for (i = 0; i < n_tasks; ++i)
-    best_node->result[i] = node->result[i];
-  return;
-}
-
 // Creates a root for the state space tree
 node* make_root(void) {
   node* root = calloc(1, sizeof(node));

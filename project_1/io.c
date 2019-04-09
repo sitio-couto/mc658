@@ -35,26 +35,10 @@ void read_input(char *args[]){
 
 void print_results(int start_time, int end_time, int n_nodes) {
   int i;
-  // // Output
-  // printf(" %i %i\n", max_nodes, max_time);
-  //
-  // printf("\nPrinting \"sorted_id\"\n");
-  // for (i = 0; i < n_tasks; ++i)
-  //   printf("%i->(%i|%i,%i) | ", i, sorted_id[i]->id, sorted_id[i]->dm1, sorted_id[i]->dm2);
-  //
-  // printf("\nPrinting \"sorted_dm1\"\n");
-  // for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm1[i]->dm1);
-  //
-  // printf("\nPrinting \"sorted_dm2\"\n");
-  // for (i = 0; i < n_tasks; ++i) printf("%i<=", sorted_dm2[i]->dm2);
 
   printf("\n");
 
-  printf("\nBest sum: %d\nResults:\n", best_node->sumf2);
-  for (i=0; i< n_tasks; ++i)
-      printf("%d: %d | ", i+1, best_node->result[i]);
-
-  printf("\n\nBest primal: %d\n", best_primal);
+  printf("Best primal: %d\n", best_primal);
   printf("Time taken: %.2f\n\n", t_best_primal);
 
   printf("Best dual: %d\n",best_dual);
@@ -69,7 +53,6 @@ void print_results(int start_time, int end_time, int n_nodes) {
   for (i=0; i<size_used; i++)
       free(min_heap[i]);
   free(min_heap);
-  free(best_node);
   free(sorted_id);
   free(sorted_dm1);
   free(sorted_dm2);

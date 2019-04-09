@@ -12,7 +12,7 @@ typedef struct{
   int sumf2;      // Sum of end  times in M2 so far
   int dual;
   int primal;
-  int result[64]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
+  char result[64]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
 
 typedef struct{
@@ -29,7 +29,6 @@ extern task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attribut
 extern float start_time, end_time;
 
 // Will change during execution
-extern node *best_node;                    // best node found so far (best solution node)
 extern int best_dual, best_primal;         // best bounds found so far
 extern float t_best_dual, t_best_primal;   // time taken for each best bound
 
@@ -43,15 +42,13 @@ void read_input(char *args[]);
 // Branch-and-bound algorithm implementation.
 void bnb(int *n_nodes);
 
-int primal_bound(int result[], int f1tr, int f2tr, int sumf2);
+int primal_bound(char result[], int f1tr, int f2tr, int sumf2);
 
-int dual_bound(int result[], int f1tr, int f2tr, int sumf2);
+int dual_bound(char result[], int f1tr, int f2tr, int sumf2);
 
 task* add_task(int, int, int);
 
 node* add_node(node *parent, int id);
-
-void copy_best_node(node*);
 
 node* make_root(void);
 
