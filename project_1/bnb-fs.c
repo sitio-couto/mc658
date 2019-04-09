@@ -14,6 +14,7 @@
 
 #include "bnb-fs.h"
 
+char last_sched[32], best_sched[32];
 int best_dual = 0, best_primal = INT_MAX; // best bounds found so far
 float t_best_dual, t_best_primal;
 
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]){
 
 void bnb(int *n_nodes){
   node *min_node, *new_node;
-  int i;
+  int i, j;
 
   // Debug limit changer
   //float max_time = 0.00050;
@@ -75,6 +76,8 @@ void bnb(int *n_nodes){
         if (new_node->primal < best_primal) {
           best_primal = new_node->primal;
           t_best_primal = curr_time();
+          for (j = 0; j < n_tasks; ++j)
+            best_sched[j] = new_node->result[j];
         }
 
         // Optimality prunning

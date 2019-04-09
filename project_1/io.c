@@ -34,7 +34,7 @@ void read_input(char *args[]){
 }
 
 void print_results(char* instance, int start_time, int end_time, int n_nodes) {
-  int i;
+  int i, r = 0;
 
   // printf("\n");
   //
@@ -47,7 +47,20 @@ void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   // printf("Explored nodes: %d\n", n_nodes);
   // printf("Total time: %.2f\n", (end_time - start_time)/(float)CLOCKS_PER_SEC);
   for(i = 0; instance[i] != '/'; ++i);
-  printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", &instance[++i], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
+  printf("%s,%d,%d,%d,%.2f,%.2f,%.2f,", &instance[++i], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
+
+  for (i = 0; i < n_tasks; ++i)
+    if (best_sched[i] != 0) ++r;
+
+  for (i = 0; i < n_tasks; ++i) {
+    if (best_sched[sorted_dm1[i]->id-1] == 0)
+      best_sched[sorted_dm1[i]->id-1] = ++r;
+  }
+  printf("{");
+  for (i = 0; i < n_tasks; ++i) {
+    if(i < n_tasks-1) printf("%i,", best_sched[i]);
+    else  printf("%i}\n", best_sched[i]);
+  }
 
   // Freeing EVERYTHING.
   for (i = 0; i < n_tasks; ++i)

@@ -12,7 +12,7 @@ typedef struct{
   int sumf2;      // Sum of end  times in M2 so far
   int dual;
   int primal;
-  char result[64]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
+  char result[32]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
 
 typedef struct{
@@ -29,6 +29,7 @@ extern task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attribut
 extern float start_time, end_time;
 
 // Will change during execution
+extern char last_sched[32], best_sched[32];
 extern int best_dual, best_primal;         // best bounds found so far
 extern float t_best_dual, t_best_primal;   // time taken for each best bound
 
