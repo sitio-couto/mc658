@@ -86,7 +86,9 @@ void bnb(int *n_nodes){
           continue;
         }
 
-        insert_heap(new_node, n_tasks);
+        // If is dominated by other nodes, do not insert
+        if (check_dominance(new_node))
+          insert_heap(new_node, n_tasks);
       }
     }
 
@@ -155,4 +157,37 @@ int primal_bound(int result[], int f1tr, int f2tr, int sumf2){
   }
 
   return sumf2;
+}
+
+int check_dominance(node *new_node){
+  node *heap_node;
+  int cond, aux, i, j;
+
+  for (i = 0; i < size_used; ++i) {
+    heap_node = min_heap[i];
+
+    cond = 1;
+    for (j = 0; j < n_tasks; ++j) {
+      aux = (new_node->result[j] == 0 && heap_node->result[j] == 0);
+      aux = aux ||  (new_node->result[j] != 0 && heap_node->result[j] != 0);
+      cond = (cond && aux);
+      if (!cond) break;
+    }
+
+    // Cond must be true for a dominance relation, it indicates if both nodes
+    // have a permutation of the same set of alocated tasks so far.
+    // if heap_node dominates, returns false and does not alocate new node.
+    // else if new_node dominates, remove heap_node from heap and insert new_node.
+    if (cond && new_node->sumf2 >= heap_node->sumf2) {
+      free(new_node);
+      return 0;
+    } else if (cond) {
+      remove_heap(i);
+      return 1;
+    }
+  }
+
+  // if the condition for a dominance relation is not fullfilled,
+  // returns true inserting the node in the heap.
+  return 1;
 }

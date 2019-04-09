@@ -67,6 +67,10 @@ int heap_check(void);
 
 float curr_time(void);
 
+int check_dominance(node*);
+
+void remove_heap(int);
+
 int cmp_dm1(const void*, const void*);
 
 int cmp_dm2(const void*, const void*);
