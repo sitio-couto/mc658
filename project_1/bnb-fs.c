@@ -48,7 +48,7 @@ void bnb(int *n_nodes){
   //float max_time = 0.00050;
 
   // Get min from heap
-  while ((min_node = remove_min()) != NULL && curr_time() < max_time) {
+  while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
       
     // If optimal result achieved, end loop
     if (best_dual == best_primal) 
@@ -65,7 +65,6 @@ void bnb(int *n_nodes){
     if (min_node->primal < best_primal) {
       best_primal = min_node->primal;
       t_best_primal = curr_time();
-      copy_best_node(min_node); // TODO: only for debugging
     }
 
     // Try to update optimal dual bound only if the node is not pruned by limitant
