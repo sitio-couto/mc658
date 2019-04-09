@@ -91,11 +91,12 @@ void bnb(int *n_nodes){
         }
 
         // If is dominated by other nodes, do not insert
-        if (check_dominance(new_node))
+        if (check_dominance(new_node)) {
+          (*n_nodes)++;
           insert_heap(new_node, n_tasks);
-        
-        (*n_nodes)++;
-        insert_heap(new_node, n_tasks);
+        }
+
+
       }
     }
 
