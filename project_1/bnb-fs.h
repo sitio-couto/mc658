@@ -52,7 +52,7 @@ node* add_node(node *parent, int id);
 
 node* make_root(void);
 
-void print_results(int, int, int);
+void print_results(char*, int, int, int);
 
 void increase_heap(int n_tasks);
 

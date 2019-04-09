@@ -25,13 +25,13 @@ int main(int argc, char* argv[]){
 
     // Execution
     start_time = clock();
+
     insert_heap(make_root(), n_tasks);   // Insert root node in heap
     bnb(&n_nodes);
 
     end_time = clock();
 
-    printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", argv[1], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
-    print_results(start_time, end_time, n_nodes);
+    print_results(argv[1], start_time, end_time, n_nodes);
 
     return 0;
 }
