@@ -33,19 +33,21 @@ void read_input(char *args[]){
     fclose(parameters);
 }
 
-void print_results(int start_time, int end_time, int n_nodes) {
+void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   int i;
 
-  printf("\n");
-
-  printf("Best primal: %d\n", best_primal);
-  printf("Time taken: %.2f\n\n", t_best_primal);
-
-  printf("Best dual: %d\n",best_dual);
-  printf("Time taken: %.2f\n\n", t_best_dual);
-
-  printf("Explored nodes: %d\n", n_nodes);
-  printf("Total time: %.2f\n", (end_time - start_time)/(float)CLOCKS_PER_SEC);
+  // printf("\n");
+  //
+  // printf("Best primal: %d\n", best_primal);
+  // printf("Time taken: %.2f\n\n", t_best_primal);
+  //
+  // printf("Best dual: %d\n",best_dual);
+  // printf("Time taken: %.2f\n\n", t_best_dual);
+  //
+  // printf("Explored nodes: %d\n", n_nodes);
+  // printf("Total time: %.2f\n", (end_time - start_time)/(float)CLOCKS_PER_SEC);
+  for(i = 0; instance[i] != '/'; ++i);
+  printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", &instance[++i], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
 
   // Freeing EVERYTHING.
   for (i = 0; i < n_tasks; ++i)

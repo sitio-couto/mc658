@@ -31,8 +31,7 @@ int main(int argc, char* argv[]){
 
     end_time = clock();
 
-    printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", argv[1], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
-    print_results(start_time, end_time, n_nodes);
+    print_results(argv[1], start_time, end_time, n_nodes);
 
     return 0;
 }
@@ -47,12 +46,12 @@ void bnb(int *n_nodes){
 
   // Get min from heap
   while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
-    
+
     // Try to update optimal dual bound
     if (min_node->dual > best_dual){
       best_dual = min_node->dual;
       t_best_dual = curr_time();
-      
+
       // Since a min heap is being used, if we reach a node which has a dual bound
       // higher than or equal to the best primal bound, there are no nodes with
       // lower estimates than a known solution. Hence, the best primal is the optimal solution.
@@ -84,8 +83,8 @@ void bnb(int *n_nodes){
           free(new_node);
           continue;
         }
-        
-        (*n_nodes)++; 
+
+        (*n_nodes)++;
         insert_heap(new_node, n_tasks);
       }
     }
