@@ -81,6 +81,44 @@ node* remove_min(void){
 	return min_node;
 }
 
+void remove_heap(int father){
+	int left = 2*father+1, right = 2*father+2;
+  node *aux;
+  int f, l, r;
+
+  if (size_used == 0) return; // checks if theres at least one to remove
+
+  // Replace min node with node from botttom
+  --size_used;
+  free(min_heap[father]);
+  min_heap[father] = min_heap[size_used];
+  min_heap[size_used] = NULL;
+
+	while(left < size_used) {
+    f = min_heap[father]->dual;
+    l = min_heap[left]->dual;
+    if (right < size_used) r = min_heap[right]->dual;
+    else r = INT_MAX;
+
+    if (f > l && (f <= r || r >= l)) {
+      aux = min_heap[left];
+      min_heap[left] = min_heap[father];
+      min_heap[father] = aux;
+      father = left;
+    } else if (f > r && (f <= l || l >= r)) {
+      aux = min_heap[right];
+      min_heap[right] = min_heap[father];
+      min_heap[father] = aux;
+      father = right;
+    } else break;
+
+    left = 2*father+1;
+    right = 2*father+2;
+  }
+
+	return;
+}
+
 int heap_check(void){
   int i;
 
