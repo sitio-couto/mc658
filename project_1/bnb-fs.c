@@ -96,7 +96,9 @@ void bnb(int *n_nodes){
           insert_heap(new_node, n_tasks);
         }
 
-
+        // Whithout dominance
+        // (*n_nodes)++;
+        // insert_heap(new_node, n_tasks);
       }
     }
 
