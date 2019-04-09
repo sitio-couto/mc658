@@ -144,16 +144,32 @@ int dual_bound(char result[], int f1tr, int f2tr, int sumf2){
 // Calculates a possible solution for the current node. If the calculated
 // solution is good, prunning is more likely.
 int primal_bound(char result[], int f1tr, int f2tr, int sumf2){
-  int i;
+  int i, f1aux, f2aux, first_bound = INT_MAX, second_bound = INT_MAX;
 
+  f1aux = f1tr;
+  f2aux = f2tr;
+  first_bound = sumf2;
   for (i = 0; i < n_tasks; ++i) {
     if (result[sorted_dm1[i]->id-1] == 0) {
-      f1tr = f1tr + sorted_dm1[i]->dm1;
-      if (f1tr > f2tr) f2tr = f1tr + sorted_dm1[i]->dm2;
-      else f2tr = f2tr + sorted_dm1[i]->dm2;
-      sumf2 += f2tr;
+      f1aux = f1aux + sorted_dm1[i]->dm1;
+      if (f1aux > f2aux) f2aux = f1aux + sorted_dm1[i]->dm2;
+      else f2aux += sorted_dm1[i]->dm2;
+      first_bound += f2aux;
     }
   }
 
-  return sumf2;
+  // f1aux = f1tr;
+  // f2aux = f2tr;
+  // second_bound = sumf2;
+  // for (i = 0; i < n_tasks; ++i) {
+  //   if (result[sorted_dm2[i]->id-1] == 0) {
+  //     f1aux = f1aux + sorted_dm2[i]->dm1;
+  //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
+  //     else f2aux += sorted_dm2[i]->dm2;
+  //     second_bound += f2aux;
+  //   }
+  // }
+
+  if (first_bound < second_bound) return first_bound;
+  else return second_bound;
 }
