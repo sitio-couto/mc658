@@ -36,6 +36,7 @@ int main(int argc, char* argv[]){
     // Medir aqui ou depois acho que não faz tanta diferença pela ordem de grandeza
     end_time = clock();
 
+    printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", argv[1], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
     print_results(start_time, end_time, n_nodes);
 
     return 0;
@@ -51,12 +52,15 @@ void bnb(int *n_nodes){
 
   // Get min from heap
   while ((min_node = remove_min()) != NULL && *n_nodes < max_nodes && curr_time() < max_time) {
-    (*n_nodes)++; // Node is maturing
 
     // Try to update optimal dual bound
     if (min_node->dual > best_dual){
       best_dual = min_node->dual;
       t_best_dual = curr_time();
+
+      // Since a min heap is being used, if we reach a node which has a dual bound
+      // higher than or equal to the best primal bound, there are no nodes with
+      // lower estimates than a known solution. Hence, the best primal is the optimal solution.
       if (best_dual >= best_primal) {
         best_dual = best_primal;
         break;
@@ -64,7 +68,7 @@ void bnb(int *n_nodes){
     }
 
     // Expand min_nodes child nodes
-    for (i = 0; i < n_tasks; ++i) {
+    for (i = 0; (i < n_tasks) && (*n_nodes < max_nodes); ++i) {
       if(min_node->result[i] == 0) { // if task i not part of solution yet, expand
         new_node = add_node(min_node, i);
 
@@ -89,13 +93,18 @@ void bnb(int *n_nodes){
         // If is dominated by other nodes, do not insert
         if (check_dominance(new_node))
           insert_heap(new_node, n_tasks);
+        
+        (*n_nodes)++;
+        insert_heap(new_node, n_tasks);
       }
     }
 
     free(min_node);
   }
 
-    if (min_node) free(min_node); // check if null first
+    // If n_nodes >= max_nodes, free last node removed.
+    // If NULL, nothing happens.
+    free(min_node);
     return;
 }
 
