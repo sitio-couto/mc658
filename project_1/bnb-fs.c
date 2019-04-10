@@ -86,20 +86,20 @@ void bnb(int *n_nodes){
         }
 
         // If is dominated by other node, do not insert
-        // if (check_dominance(new_node)) {
-        //   (*n_nodes)++;
-        //   if (best_node == new_node) // If new node has already been alocated, insert
-        //     insert_heap(new_node, n_tasks);
-        //   else                       // otherwise, alocate and insert
-        //     insert_heap(alocate_node(new_node), n_tasks);
-        // } else if (best_node == new_node) in_heap = 0; // If is dominated, but stil the best, singlize not in_heap
+        if (check_dominance(new_node)) {
+          (*n_nodes)++;
+          if (best_node == new_node) // If new node has already been alocated, insert
+            insert_heap(new_node, n_tasks);
+          else                       // otherwise, alocate and insert
+            insert_heap(alocate_node(new_node), n_tasks);
+        } else if (best_node == new_node) in_heap = 0; // If is dominated, but stil the best, singlize not in_heap
 
         // Whithout dominance
-        (*n_nodes)++;
-        if (best_node == new_node) // If new node has already been alocated, insert
-          insert_heap(new_node, n_tasks);
-        else                       // otherwise, alocate and insert
-          insert_heap(alocate_node(new_node), n_tasks);
+        // (*n_nodes)++;
+        // if (best_node == new_node) // If new node has already been alocated, insert
+        //   insert_heap(new_node, n_tasks);
+        // else                       // otherwise, alocate and insert
+        //   insert_heap(alocate_node(new_node), n_tasks);
       }
     }
 
