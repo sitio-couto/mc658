@@ -14,6 +14,7 @@
 
 #include "bnb-fs.h"
 
+int pb1_count = 0, pb2_count = 0;
 char last_sched[32], best_sched[32];
 int best_dual = 0, best_primal = INT_MAX; // best bounds found so far
 float t_best_dual, t_best_primal;
@@ -77,7 +78,7 @@ void bnb(int *n_nodes){
           best_primal = new_node->primal;
           t_best_primal = curr_time();
           for (j = 0; j < n_tasks; ++j)
-            best_sched[j] = new_node->result[j];
+            best_sched[j] = last_sched[j];
         }
 
         // Optimality prunning
@@ -87,14 +88,14 @@ void bnb(int *n_nodes){
         }
 
         // If is dominated by other nodes, do not insert
-        if (check_dominance(new_node)) {
-          (*n_nodes)++;
-          insert_heap(new_node, n_tasks);
-        }
+        // if (check_dominance(new_node)) {
+        //   (*n_nodes)++;
+        //   insert_heap(new_node, n_tasks);
+        // }
 
         // Whithout dominance
-        // (*n_nodes)++;
-        // insert_heap(new_node, n_tasks);
+        (*n_nodes)++;
+        insert_heap(new_node, n_tasks);
       }
     }
 
@@ -153,13 +154,26 @@ int dual_bound(char result[], int f1tr, int f2tr, int sumf2){
 // Calculates a possible solution for the current node. If the calculated
 // solution is good, prunning is more likely.
 int primal_bound(char result[], int f1tr, int f2tr, int sumf2){
-  int i, f1aux, f2aux, first_bound = INT_MAX, second_bound = INT_MAX;
+  int i, r, k;
+  int f1aux, f2aux, first_bound = INT_MAX, second_bound = INT_MAX;
+  char first_sched[32], second_sched[32];
 
+  // Find how many task have been alocated so far (fiding r)
+  r = 0;
+  for (i = 0; i < n_tasks; ++i){
+    if (result[i] > 0) ++r;
+    first_sched[i] = result[i];
+    second_sched[i] = result[i];
+  }
+
+  // Calculate primal bound using sorted_dm1
+  k = r;
   f1aux = f1tr;
   f2aux = f2tr;
   first_bound = sumf2;
   for (i = 0; i < n_tasks; ++i) {
     if (result[sorted_dm1[i]->id-1] == 0) {
+      first_sched[sorted_dm1[i]->id-1] = ++k;
       f1aux = f1aux + sorted_dm1[i]->dm1;
       if (f1aux > f2aux) f2aux = f1aux + sorted_dm1[i]->dm2;
       else f2aux += sorted_dm1[i]->dm2;
@@ -167,11 +181,14 @@ int primal_bound(char result[], int f1tr, int f2tr, int sumf2){
     }
   }
 
+  // Calculate primal bound using sorted_dm2
+  // k = r;
   // f1aux = f1tr;
   // f2aux = f2tr;
   // second_bound = sumf2;
   // for (i = 0; i < n_tasks; ++i) {
   //   if (result[sorted_dm2[i]->id-1] == 0) {
+  //     second_sched[sorted_dm2[i]->id-1] = ++k;
   //     f1aux = f1aux + sorted_dm2[i]->dm1;
   //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
   //     else f2aux += sorted_dm2[i]->dm2;
@@ -179,8 +196,17 @@ int primal_bound(char result[], int f1tr, int f2tr, int sumf2){
   //   }
   // }
 
-  if (first_bound < second_bound) return first_bound;
-  else return second_bound;
+  if (first_bound < second_bound) {
+    ++pb1_count;
+    for (i = 0; i < n_tasks; ++i)
+      last_sched[i] = first_sched[i];
+    return first_bound;
+  } else {
+    ++pb2_count;
+    for (i = 0; i < n_tasks; ++i)
+      last_sched[i] = second_sched[i];
+    return second_bound;
+  }
 }
 
 int check_dominance(node *new_node){
