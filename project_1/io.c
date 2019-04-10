@@ -36,15 +36,13 @@ void read_input(char *args[]){
 void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   int i;
 
-  if (!schedule_check()) printf("-----\nERROR\n-----\n");
+  // if (!schedule_check()) printf("-----\nERROR\n-----\n");
 
   for(i = 0; instance[i] != '/'; ++i);
   printf("%s,%d,%d,%d,%.2f,%.2f,%.2f,", &instance[++i], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
 
-  printf("{");
-  for (i = 0; i < n_tasks; ++i) {
-    if(i < n_tasks-1) printf("%i,", best_sched[i]);
-    else  printf("%i}", best_sched[i]);
+  if (best_primal != best_node->primal) {
+    printf("FAILURE\n");
   }
 
   // printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
@@ -84,20 +82,73 @@ float curr_time(void){
     return (clock() - start_time)/(float)CLOCKS_PER_SEC;
 }
 
+void get_best_sched(char result[], int f1tr, int f2tr, int sumf2) {
+  int i, r, k;
+  int f1aux, f2aux, first_bound = INT_MAX, second_bound = INT_MAX;
+  char first_sched[32], second_sched[32];
+
+  // Find how many task have been alocated so far (fiding r)
+  r = 0;
+  for (i = 0; i < n_tasks; ++i){
+    if (result[i] > 0) ++r;
+    first_sched[i] = result[i];
+    second_sched[i] = result[i];
+  }
+
+  // Calculate primal bound using sorted_dm1
+  k = r;
+  f1aux = f1tr;
+  f2aux = f2tr;
+  first_bound = sumf2;
+  for (i = 0; i < n_tasks; ++i) {
+    if (result[sorted_dm1[i]->id-1] == 0) {
+      first_sched[sorted_dm1[i]->id-1] = ++k;
+      f1aux = f1aux + sorted_dm1[i]->dm1;
+      if (f1aux > f2aux) f2aux = f1aux + sorted_dm1[i]->dm2;
+      else f2aux += sorted_dm1[i]->dm2;
+      first_bound += f2aux;
+    }
+  }
+
+  // Calculate primal bound using sorted_dm2
+  // k = r;
+  // f1aux = f1tr;
+  // f2aux = f2tr;
+  // second_bound = sumf2;
+  // for (i = 0; i < n_tasks; ++i) {
+  //   if (result[sorted_dm2[i]->id-1] == 0) {
+  //     second_sched[sorted_dm2[i]->id-1] = ++k;
+  //     f1aux = f1aux + sorted_dm2[i]->dm1;
+  //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
+  //     else f2aux += sorted_dm2[i]->dm2;
+  //     second_bound += f2aux;
+  //   }
+  // }
+
+  if (first_bound < second_bound) {
+    for (i = 0; i < n_tasks; ++i)
+      best_node->result[i] = first_sched[i];
+  } else {
+    for (i = 0; i < n_tasks; ++i)
+      best_node->result[i] = second_sched[i];
+  }
+}
+
 int schedule_check(void) {
-  int next, i, f1tr = 0, f2tr = 0, sumf2 = 0;
-
-  for (next = 1; next <= n_tasks; ++next) {
-    for (i = 0; i < n_tasks && best_sched[i] != next; ++i);
-    f1tr += sorted_id[i]->dm1;
-    if (f1tr > f2tr) f2tr = f1tr + sorted_id[i]->dm2;
-    else f2tr += sorted_id[i]->dm2;
-    sumf2 += f2tr;
-  }
-
-  if (sumf2 == best_primal) return 1;
-  else {
-    printf("got %i and expected %i!\n", sumf2, best_primal);
-    return 0;
-  }
+  // int next, i, f1tr = 0, f2tr = 0, sumf2 = 0;
+  //
+  // for (next = 1; next <= n_tasks; ++next) {
+  //   for (i = 0; i < n_tasks && best_sched[i] != next; ++i);
+  //   f1tr += sorted_id[i]->dm1;
+  //   if (f1tr > f2tr) f2tr = f1tr + sorted_id[i]->dm2;
+  //   else f2tr += sorted_id[i]->dm2;
+  //   sumf2 += f2tr;
+  // }
+  //
+  // if (sumf2 == best_primal) return 1;
+  // else {
+  //   printf("got %i and expected %i!\n", sumf2, best_primal);
+  //   return 0;
+  // }
+  return 1;
 }

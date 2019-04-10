@@ -29,8 +29,8 @@ extern task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attribut
 extern float start_time, end_time;
 
 // Will change during execution
-extern int pb1_count, pb2_count;           // Counts which primal bound was used
-extern char last_sched[32], best_sched[32];// Saves the last and best task schedules
+// extern int pb1_count, pb2_count;           // Counts which primal bound was used
+extern node *best_node;                         // Points to the node with the best primal found
 extern int best_dual, best_primal;         // best bounds found so far
 extern float t_best_dual, t_best_primal;   // time taken for each best bound
 
@@ -65,6 +65,8 @@ node* remove_min(void);
 int heap_check(void);
 
 int schedule_check(void);
+
+void get_best_sched(char result[], int f1tr, int f2tr, int sumf2);
 
 float curr_time(void);
 
