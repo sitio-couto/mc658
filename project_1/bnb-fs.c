@@ -110,7 +110,7 @@ void bnb(int *n_nodes){
     // If NULL, nothing happens.
     if (min_node != NULL && min_node != best_node)
       free(min_node);
-    free(aux_node)
+    free(aux_node);
     return;
 }
 
