@@ -63,7 +63,7 @@ void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   free(sorted_id);
   free(sorted_dm1);
   free(sorted_dm2);
-  free(best_node);
+  if (!in_heap) free(best_node);
 
   return;
 }
