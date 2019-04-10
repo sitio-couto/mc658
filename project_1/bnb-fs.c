@@ -14,8 +14,9 @@
 
 #include "bnb-fs.h"
 
-// int pb1_count = 0, pb2_count = 0;
+int pb1_count = 0, pb2_count = 0;
 node* best_node = NULL;
+int in_heap = 1;
 int best_dual = 0, best_primal = INT_MAX; // best bounds found so far
 float t_best_dual, t_best_primal;
 
@@ -61,7 +62,7 @@ void bnb(int *n_nodes){
 
     // Expand min_nodes child nodes
     for (i = 0; (i < n_tasks) && (*n_nodes < max_nodes); ++i) {
-      if(min_node->result[i] == 0) { // if task i not part of solution yet, expand
+      if(min_node->result[i] == 0) { // if task (i+1) not part of solution yet, expand
         new_node = add_node(min_node, i);
 
         // Limitant prunning
@@ -75,11 +76,11 @@ void bnb(int *n_nodes){
           best_primal = new_node->primal;
           t_best_primal = curr_time();
           //TODO: DEBUG
-          if (best_node != NULL){
-            free(new_node);
-            best_node = NULL;
+          if (best_node != NULL && !in_heap){
+            free(best_node);
           }
           best_node = new_node;
+          in_heap = 1;
         }
 
         // Optimality prunning
@@ -87,8 +88,7 @@ void bnb(int *n_nodes){
           // TODO: DEBUG
           if (best_node != new_node){
             free(new_node);
-            new_node = NULL;
-          }
+          } else in_heap = 0;
           continue;
         }
 
@@ -104,10 +104,9 @@ void bnb(int *n_nodes){
       }
     }
 
-    if (best_node != new_node){
+    if (best_node != min_node){
       free(min_node);
-      min_node = NULL;
-    }
+    } else in_heap = 0;
   }
 
     // If n_nodes >= max_nodes, free last node removed.
@@ -194,10 +193,10 @@ int primal_bound(char result[], int f1tr, int f2tr, int sumf2){
   // }
 
   if (first_bound < second_bound) {
-    // ++pb1_count;
+    ++pb1_count;
     return first_bound;
   } else {
-    // ++pb2_count;
+    ++pb2_count;
     return second_bound;
   }
 }

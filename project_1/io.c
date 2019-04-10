@@ -12,15 +12,15 @@ void read_input(char *args[]){
     instance = fopen(args[1], "r");
     parameters = fopen(args[2], "r");
 
-    fscanf(parameters, " %i \n %i", &max_nodes, &max_time);
+    if (fscanf(parameters, " %i \n %i", &max_nodes, &max_time) != 2) exit(0);
 
-    fscanf(instance, " %i", &n_tasks);
+    if (fscanf(instance, " %i", &n_tasks) != 1) exit(0);
     sorted_id = malloc(sizeof(task*)*n_tasks);
     sorted_dm1 = malloc(sizeof(task*)*n_tasks);
     sorted_dm2 = malloc(sizeof(task*)*n_tasks);
 
     for (i = 0; i < n_tasks; ++i){
-      fscanf(instance, " %i %i \n", &dm1, &dm2);
+      if (fscanf(instance, " %i %i \n", &dm1, &dm2) != 2) exit(0);
       sorted_id[i] = add_task((i+1), dm1, dm2);
       sorted_dm1[i] = sorted_id[i];
       sorted_dm2[i] = sorted_id[i];
@@ -36,16 +36,21 @@ void read_input(char *args[]){
 void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   int i;
 
-  // if (!schedule_check()) printf("-----\nERROR\n-----\n");
-
   for(i = 0; instance[i] != '/'; ++i);
   printf("%s,%d,%d,%d,%.2f,%.2f,%.2f,", &instance[++i], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
 
-  if (best_primal != best_node->primal) {
-    printf("FAILURE\n");
+  if (best_primal != best_node->primal) printf("FAILURE\n");
+  get_best_sched(best_node->result, best_node->f1tr, best_node->f2tr, best_node->sumf2);
+  if (!schedule_check()) printf("-----\nERROR\n-----\n");
+
+  printf("{");
+  for (i = 0; i < n_tasks; ++i){
+    printf("%i", best_node->result[i]);
+    if (i != n_tasks-1) printf(",");
+    else printf("}");
   }
 
-  // printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
+  printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
 
   printf("\n");
 
@@ -58,6 +63,7 @@ void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   free(sorted_id);
   free(sorted_dm1);
   free(sorted_dm2);
+  free(best_node);
 
   return;
 }
@@ -132,23 +138,26 @@ void get_best_sched(char result[], int f1tr, int f2tr, int sumf2) {
     for (i = 0; i < n_tasks; ++i)
       best_node->result[i] = second_sched[i];
   }
+
+  return;
 }
 
 int schedule_check(void) {
-  // int next, i, f1tr = 0, f2tr = 0, sumf2 = 0;
-  //
-  // for (next = 1; next <= n_tasks; ++next) {
-  //   for (i = 0; i < n_tasks && best_sched[i] != next; ++i);
-  //   f1tr += sorted_id[i]->dm1;
-  //   if (f1tr > f2tr) f2tr = f1tr + sorted_id[i]->dm2;
-  //   else f2tr += sorted_id[i]->dm2;
-  //   sumf2 += f2tr;
-  // }
-  //
-  // if (sumf2 == best_primal) return 1;
-  // else {
-  //   printf("got %i and expected %i!\n", sumf2, best_primal);
-  //   return 0;
-  // }
+  int next, i, f1tr = 0, f2tr = 0, sumf2 = 0;
+  char *best_sched = best_node->result;
+
+  for (next = 1; next <= n_tasks; ++next) {
+    for (i = 0; i < n_tasks && best_sched[i] != next; ++i);
+    f1tr += sorted_id[i]->dm1;
+    if (f1tr > f2tr) f2tr = f1tr + sorted_id[i]->dm2;
+    else f2tr += sorted_id[i]->dm2;
+    sumf2 += f2tr;
+  }
+
+  if (sumf2 == best_primal) return 1;
+  else {
+    printf("got %i and expected %i!\n", sumf2, best_primal);
+    return 0;
+  }
   return 1;
 }

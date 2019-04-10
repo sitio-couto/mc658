@@ -29,8 +29,9 @@ extern task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attribut
 extern float start_time, end_time;
 
 // Will change during execution
-// extern int pb1_count, pb2_count;           // Counts which primal bound was used
-extern node *best_node;                         // Points to the node with the best primal found
+extern int pb1_count, pb2_count;           // Counts which primal bound was used
+extern node *best_node;                     // Points to the node with the best primal found
+extern int in_heap;
 extern int best_dual, best_primal;         // best bounds found so far
 extern float t_best_dual, t_best_primal;   // time taken for each best bound
 
