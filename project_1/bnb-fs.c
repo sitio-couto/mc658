@@ -14,6 +14,7 @@
 
 #include "bnb-fs.h"
 
+int best_dual_opmality_prune = 0;
 int pb1_count = 0, pb2_count = 0, in_heap = 1;
 node *best_node = NULL;
 int best_dual = 0, best_primal = INT_MAX;
@@ -82,24 +83,25 @@ void bnb(int *n_nodes){
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
           if (best_node == new_node) in_heap = 0; // Checks if node is a new optimal
+          best_dual_opmality_prune = new_node->dual;
           continue;
         }
 
         // If is dominated by other node, do not insert
-        if (check_dominance(new_node)) {
-          (*n_nodes)++;
-          if (best_node == new_node) // If new node has already been alocated, insert
-            insert_heap(new_node, n_tasks);
-          else                       // otherwise, alocate and insert
-            insert_heap(alocate_node(new_node), n_tasks);
-        } else if (best_node == new_node) in_heap = 0; // If is dominated, but stil the best, singlize not in_heap
+        // if (check_dominance(new_node)) {
+        //   (*n_nodes)++;
+        //   if (best_node == new_node) // If new node has already been alocated, insert
+        //     insert_heap(new_node, n_tasks);
+        //   else                       // otherwise, alocate and insert
+        //     insert_heap(alocate_node(new_node), n_tasks);
+        // } else if (best_node == new_node) in_heap = 0; // If is dominated, but stil the best, singlize not in_heap
 
         // Whithout dominance
-        // (*n_nodes)++;
-        // if (best_node == new_node) // If new node has already been alocated, insert
-        //   insert_heap(new_node, n_tasks);
-        // else                       // otherwise, alocate and insert
-        //   insert_heap(alocate_node(new_node), n_tasks);
+        (*n_nodes)++;
+        if (best_node == new_node) // If new node has already been alocated, insert
+          insert_heap(new_node, n_tasks);
+        else                       // otherwise, alocate and insert
+          insert_heap(alocate_node(new_node), n_tasks);
       }
     }
 
@@ -108,6 +110,10 @@ void bnb(int *n_nodes){
     } else in_heap = 0;
   }
 
+    // Checks if there was no optimality prune which offered a better dual bound 
+    if (best_dual < best_dual_opmality_prune)
+      best_dual = best_dual_opmality_prune;
+    
     // If n_nodes >= max_nodes, free last node removed.
     // If NULL, nothing happens.
     if (min_node != NULL && min_node != best_node)
@@ -180,17 +186,17 @@ int primal_bound(char result[], usi f1tr, usi f2tr, usi sumf2){
   }
 
   // Calculate primal bound using sorted_dm2
-  // f1aux = f1tr;
-  // f2aux = f2tr;
-  // second_bound = sumf2;
-  // for (i = 0; i < n_tasks; ++i) {
-  //   if (result[sorted_dm2[i]->id-1] == 0) {
-  //     f1aux = f1aux + sorted_dm2[i]->dm1;
-  //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
-  //     else f2aux += sorted_dm2[i]->dm2;
-  //     second_bound += f2aux;
-  //   }
-  // }
+  f1aux = f1tr;
+  f2aux = f2tr;
+  second_bound = sumf2;
+  for (i = 0; i < n_tasks; ++i) {
+    if (result[sorted_dm2[i]->id-1] == 0) {
+      f1aux = f1aux + sorted_dm2[i]->dm1;
+      if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
+      else f2aux += sorted_dm2[i]->dm2;
+      second_bound += f2aux;
+    }
+  }
 
   if (first_bound < second_bound) {
     ++pb1_count;

@@ -50,7 +50,7 @@ void print_results(char* instance, int start_time, int end_time, int n_nodes) {
     else printf("}");
   }
 
-  // printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
+  printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
 
   printf("\n");
 
@@ -117,19 +117,19 @@ void get_best_sched(char result[], int f1tr, int f2tr, int sumf2) {
   }
 
   // Calculate primal bound using sorted_dm2
-  // k = r;
-  // f1aux = f1tr;
-  // f2aux = f2tr;
-  // second_bound = sumf2;
-  // for (i = 0; i < n_tasks; ++i) {
-  //   if (result[sorted_dm2[i]->id-1] == 0) {
-  //     second_sched[sorted_dm2[i]->id-1] = ++k;
-  //     f1aux = f1aux + sorted_dm2[i]->dm1;
-  //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
-  //     else f2aux += sorted_dm2[i]->dm2;
-  //     second_bound += f2aux;
-  //   }
-  // }
+  k = r;
+  f1aux = f1tr;
+  f2aux = f2tr;
+  second_bound = sumf2;
+  for (i = 0; i < n_tasks; ++i) {
+    if (result[sorted_dm2[i]->id-1] == 0) {
+      second_sched[sorted_dm2[i]->id-1] = ++k;
+      f1aux = f1aux + sorted_dm2[i]->dm1;
+      if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
+      else f2aux += sorted_dm2[i]->dm2;
+      second_bound += f2aux;
+    }
+  }
 
   if (first_bound < second_bound) {
     for (i = 0; i < n_tasks; ++i)
