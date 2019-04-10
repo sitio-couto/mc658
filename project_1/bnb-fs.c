@@ -14,10 +14,9 @@
 
 #include "bnb-fs.h"
 
-int pb1_count = 0, pb2_count = 0;
-node* best_node = NULL;
-int in_heap = 1;
-int best_dual = 0, best_primal = INT_MAX; // best bounds found so far
+int pb1_count = 0, pb2_count = 0, in_heap = 1;
+node *best_node = NULL;
+int best_dual = 0, best_primal = INT_MAX;
 float t_best_dual, t_best_primal;
 
 int main(int argc, char* argv[]){
@@ -40,7 +39,7 @@ int main(int argc, char* argv[]){
 }
 
 void bnb(int *n_nodes){
-  node *min_node, *new_node;
+  node *min_node, *new_node, *aux_node = malloc(sizeof(node));
   int i;
 
   // Get min from heap
@@ -63,22 +62,19 @@ void bnb(int *n_nodes){
     // Expand min_nodes child nodes
     for (i = 0; (i < n_tasks) && (*n_nodes < max_nodes); ++i) {
       if(min_node->result[i] == 0) { // if task (i+1) not part of solution yet, expand
-        new_node = add_node(min_node, i);
+        new_node = add_node(min_node, aux_node, i);
 
         // Limitant prunning
-        if (new_node->dual >= best_primal){
-          free(new_node);
-          continue;
-        }
+        if (new_node->dual >= best_primal) continue;
 
         // Check if has new optimal primal bound
         if (new_node->primal < best_primal) {
           best_primal = new_node->primal;
           t_best_primal = curr_time();
-          //TODO: DEBUG
-          if (best_node != NULL && !in_heap){
+
+          if (best_node != NULL && !in_heap)
             free(best_node);
-          }
+          new_node = alocate_node(new_node);
           best_node = new_node;
           in_heap = 1;
         }
@@ -86,9 +82,7 @@ void bnb(int *n_nodes){
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
           // TODO: DEBUG
-          if (best_node != new_node){
-            free(new_node);
-          } else in_heap = 0;
+          if (best_node == new_node) in_heap = 0; // Checks if node is a new optimal
           continue;
         }
 
@@ -100,7 +94,10 @@ void bnb(int *n_nodes){
 
         // Whithout dominance
         (*n_nodes)++;
-        insert_heap(new_node, n_tasks);
+        if (best_node == new_node) // If new node has already been alocated, insert
+          insert_heap(new_node, n_tasks);
+        else                       // otherwise, alocate and insert
+          insert_heap(alocate_node(new_node), n_tasks);
       }
     }
 
@@ -119,7 +116,7 @@ void bnb(int *n_nodes){
 // Calculates a certain inferior limitant for the node. The higher the inferior
 // limitan, the closer to the possible optimal solution it is, and more lilkely
 // to be punned as well.
-int dual_bound(char result[], int f1tr, int f2tr, int sumf2){
+int dual_bound(char result[], usi f1tr, usi f2tr, usi sumf2){
   int first_bound, second_bound; // dual bounds
   int i, r, k, d1tk, d2tk, aux;
 
@@ -161,7 +158,7 @@ int dual_bound(char result[], int f1tr, int f2tr, int sumf2){
 
 // Calculates a possible solution for the current node. If the calculated
 // solution is good, prunning is more likely.
-int primal_bound(char result[], int f1tr, int f2tr, int sumf2){
+int primal_bound(char result[], usi f1tr, usi f2tr, usi sumf2){
   int i;
   int f1aux, f2aux, first_bound = INT_MAX, second_bound = INT_MAX;
 

@@ -6,12 +6,14 @@
 #include <limits.h>
 #include <time.h>
 
+typedef unsigned short int usi;
+
 typedef struct{
-  int f1tr;       // End time of last task alocated in machine 1
-  int f2tr;       // End time of last task alocated in machine 2
-  int sumf2;      // Sum of end  times in M2 so far
-  int dual;
-  int primal;
+  usi f1tr;        // End time of last task alocated in machine 1
+  usi f2tr;        // End time of last task alocated in machine 2
+  usi sumf2;       // Sum of end  times in M2 so far
+  usi dual;        // Dual bound for the subproblem represented by the node
+  usi primal;      // Primal bound for the subproblem represented by the node
   char result[32]; // Indicates the resolved permutation of tasks (pos=task.id | val=first-second...)
 } node;
 
@@ -30,8 +32,8 @@ extern float start_time, end_time;
 
 // Will change during execution
 extern int pb1_count, pb2_count;           // Counts which primal bound was used
-extern node *best_node;                     // Points to the node with the best primal found
-extern int in_heap;
+extern node *best_node;                    // Node with the best primal so far
+extern int in_heap;                        // Flag which indicates if best_node is in the heap
 extern int best_dual, best_primal;         // best bounds found so far
 extern float t_best_dual, t_best_primal;   // time taken for each best bound
 
@@ -45,13 +47,15 @@ void read_input(char *args[]);
 // Branch-and-bound algorithm implementation.
 void bnb(int *n_nodes);
 
-int primal_bound(char result[], int f1tr, int f2tr, int sumf2);
+int primal_bound(char result[], usi f1tr, usi f2tr, usi sumf2);
 
-int dual_bound(char result[], int f1tr, int f2tr, int sumf2);
+int dual_bound(char result[], usi f1tr, usi f2tr, usi sumf2);
 
 task* add_task(int, int, int);
 
-node* add_node(node *parent, int id);
+node* add_node(node *parent, node *child, int id);
+
+node* alocate_node(node *values);
 
 node* make_root(void);
 
