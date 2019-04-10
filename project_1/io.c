@@ -39,9 +39,9 @@ void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   for(i = 0; instance[i] != '/'; ++i);
   printf("%s,%d,%d,%d,%.2f,%.2f,%.2f,", &instance[++i], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
 
-  if (best_primal != best_node->primal) printf("FAILURE\n");
+  if (best_primal != best_node->primal) printf("\n-----\nERROR\n-----\n");
   get_best_sched(best_node->result, best_node->f1tr, best_node->f2tr, best_node->sumf2);
-  if (!schedule_check()) printf("-----\nERROR\n-----\n");
+  if (!schedule_check()) printf("\n-----\nERROR\n-----\n");
 
   printf("{");
   for (i = 0; i < n_tasks; ++i){
@@ -50,7 +50,7 @@ void print_results(char* instance, int start_time, int end_time, int n_nodes) {
     else printf("}");
   }
 
-  printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
+  // printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
 
   printf("\n");
 
