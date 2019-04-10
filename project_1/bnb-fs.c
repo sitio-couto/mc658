@@ -81,25 +81,25 @@ void bnb(int *n_nodes){
 
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
-          // TODO: DEBUG
           if (best_node == new_node) in_heap = 0; // Checks if node is a new optimal
           continue;
         }
 
-        // If is dominated by other nodes, do not insert
-        if (check_dominance(new_node)) {
-          if (new_node != best_node)  // If not alocated yet
-            new_node = alocate_node(new_node);
-          (*n_nodes)++;
-          insert_heap(new_node, n_tasks);
-        }
+        // If is dominated by other node, do not insert
+        // if (check_dominance(new_node)) {
+        //   (*n_nodes)++;
+        //   if (best_node == new_node) // If new node has already been alocated, insert
+        //     insert_heap(new_node, n_tasks);
+        //   else                       // otherwise, alocate and insert
+        //     insert_heap(alocate_node(new_node), n_tasks);
+        // } else if (best_node == new_node) in_heap = 0; // If is dominated, but stil the best, singlize not in_heap
 
         // Whithout dominance
-        // (*n_nodes)++;
-        // if (best_node == new_node) // If new node has already been alocated, insert
-        //   insert_heap(new_node, n_tasks);
-        // else                       // otherwise, alocate and insert
-        //   insert_heap(alocate_node(new_node), n_tasks);
+        (*n_nodes)++;
+        if (best_node == new_node) // If new node has already been alocated, insert
+          insert_heap(new_node, n_tasks);
+        else                       // otherwise, alocate and insert
+          insert_heap(alocate_node(new_node), n_tasks);
       }
     }
 

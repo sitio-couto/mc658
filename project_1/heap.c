@@ -90,8 +90,8 @@ void remove_heap(int father){
 
   // Replace min node with node from botttom
   --size_used;
-  // if (min_heap[father] != best_node) 
-  free(min_heap[father]);
+  if (min_heap[father] != best_node) 
+    free(min_heap[father]);
   min_heap[father] = min_heap[size_used];
   min_heap[size_used] = NULL;
 
