@@ -83,7 +83,7 @@ void bnb(int *n_nodes){
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
           if (best_node == new_node) in_heap = 0; // Checks if node is a new optimal
-          best_dual_opmality_prune = new_node->dual;
+          if (best_dual_opmality_prune > new_node->dual) best_dual_opmality_prune = new_node->dual;
           continue;
         }
 
@@ -99,9 +99,9 @@ void bnb(int *n_nodes){
         // Whithout dominance
         (*n_nodes)++;
         if (best_node == new_node) // If new node has already been alocated, insert
-          insert_heap(new_node, n_tasks);
+            insert_heap(new_node, n_tasks);
         else                       // otherwise, alocate and insert
-          insert_heap(alocate_node(new_node), n_tasks);
+            insert_heap(alocate_node(new_node), n_tasks);
       }
     }
 
