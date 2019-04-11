@@ -28,4 +28,6 @@ if __name__ == "__main__" :
         print("Sum of all gaps in file {}: ".format(name), sum_gap)
         print("Average gap in file {}: ".format(name), sum_gap/len(l))
         print("Sum of total execution times in file {}: ".format(name), sum_time)
+        print("Average time in file {}: ".format(name), sum_time/len(l))
+        print()
         
