@@ -21,9 +21,11 @@ if __name__ == "__main__" :
     
         for i in range(len(l)):
             l[i] = l[i].split(',')
-            sum_gap+= int(l[i][1]) - int(l[i][2])
+            sum_gap+= (int(l[i][1]) - int(l[i][2]))/int(l[i][1])
             sum_time+= float(l[i][6])
         
+        
         print("Sum of all gaps in file {}: ".format(name), sum_gap)
+        print("Average gap in file {}: ".format(name), sum_gap/len(l))
         print("Sum of total execution times in file {}: ".format(name), sum_time)
         
