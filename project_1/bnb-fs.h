@@ -31,7 +31,6 @@ extern task **sorted_id, **sorted_dm1, **sorted_dm2; // tasks sorted by attribut
 extern float start_time, end_time;
 
 // Will change during execution
-extern int best_dual_opmality_prune;
 extern int pb1_count, pb2_count;           // Counts which primal bound was used
 extern node *best_node;                    // Node with the best primal so far
 extern int in_heap;                        // Flag which indicates if best_node is in the heap

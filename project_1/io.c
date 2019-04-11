@@ -131,12 +131,15 @@ void get_best_sched(char result[], int f1tr, int f2tr, int sumf2) {
     }
   }
 
-  if (first_bound < second_bound) {
+  if (first_bound == best_primal) {
     for (i = 0; i < n_tasks; ++i)
       best_node->result[i] = first_sched[i];
-  } else {
+  } else if (second_bound == best_primal) {
     for (i = 0; i < n_tasks; ++i)
       best_node->result[i] = second_sched[i];
+  } else {
+    printf("\n\nERROR: Schedule does not macth best primal\n\n");
+    exit(1);
   }
 
   return;

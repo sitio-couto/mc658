@@ -14,7 +14,6 @@
 
 #include "bnb-fs.h"
 
-int best_dual_opmality_prune = 0;
 int pb1_count = 0, pb2_count = 0, in_heap = 1;
 node *best_node = NULL;
 int best_dual = 0, best_primal = INT_MAX;
@@ -83,7 +82,6 @@ void bnb(int *n_nodes){
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
           if (best_node == new_node) in_heap = 0; // Checks if node is a new optimal
-          if (new_node->dual > best_dual_opmality_prune) best_dual_opmality_prune = new_node->dual;
           continue;
         }
 
@@ -110,9 +108,12 @@ void bnb(int *n_nodes){
     } else in_heap = 0;
   }
 
-    // Checks if there was no optimality prune which offered a better dual bound
-    if (best_dual < best_dual_opmality_prune)
-      best_dual = best_dual_opmality_prune;
+    // If min_node is null there are two possibilities: either ther tree was fully
+    // generated, meaning the best primal and dual bounds have already met, or the tree
+    // was completly pruned, meanining there is no better solution than ther current best
+    // primal bound.
+    if (min_node == NULL)
+      best_dual = best_primal;
 
     // If n_nodes >= max_nodes, free last node removed.
     // If NULL, nothing happens.
@@ -186,17 +187,17 @@ int primal_bound(char result[], usi f1tr, usi f2tr, usi sumf2){
   }
 
   // Calculate primal bound using sorted_dm2
-  f1aux = f1tr;
-  f2aux = f2tr;
-  second_bound = sumf2;
-  for (i = 0; i < n_tasks; ++i) {
-    if (result[sorted_dm2[i]->id-1] == 0) {
-      f1aux = f1aux + sorted_dm2[i]->dm1;
-      if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
-      else f2aux += sorted_dm2[i]->dm2;
-      second_bound += f2aux;
-    }
-  }
+  // f1aux = f1tr;
+  // f2aux = f2tr;
+  // second_bound = sumf2;
+  // for (i = 0; i < n_tasks; ++i) {
+  //   if (result[sorted_dm2[i]->id-1] == 0) {
+  //     f1aux = f1aux + sorted_dm2[i]->dm1;
+  //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
+  //     else f2aux += sorted_dm2[i]->dm2;
+  //     second_bound += f2aux;
+  //   }
+  // }
 
   if (first_bound < second_bound) {
     ++pb1_count;
