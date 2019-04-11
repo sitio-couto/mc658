@@ -50,7 +50,7 @@ void print_results(char* instance, int start_time, int end_time, int n_nodes) {
     else printf("}");
   }
 
-  // printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
+  printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
 
   printf("\n");
 
