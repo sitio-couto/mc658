@@ -187,17 +187,17 @@ int primal_bound(char result[], usi f1tr, usi f2tr, usi sumf2){
   }
 
   // Calculate primal bound using sorted_dm2
-  // f1aux = f1tr;
-  // f2aux = f2tr;
-  // second_bound = sumf2;
-  // for (i = 0; i < n_tasks; ++i) {
-  //   if (result[sorted_dm2[i]->id-1] == 0) {
-  //     f1aux = f1aux + sorted_dm2[i]->dm1;
-  //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
-  //     else f2aux += sorted_dm2[i]->dm2;
-  //     second_bound += f2aux;
-  //   }
-  // }
+  f1aux = f1tr;
+  f2aux = f2tr;
+  second_bound = sumf2;
+  for (i = 0; i < n_tasks; ++i) {
+    if (result[sorted_dm2[i]->id-1] == 0) {
+      f1aux = f1aux + sorted_dm2[i]->dm1;
+      if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
+      else f2aux += sorted_dm2[i]->dm2;
+      second_bound += f2aux;
+    }
+  }
 
   if (first_bound < second_bound) {
     ++pb1_count;
