@@ -88,7 +88,7 @@ void remove_heap(int father){
 
   if (size_used == 0) return; // checks if theres at least one to remove
 
-  // Replace min node with node from botttom
+  // Remove dominated node and free it (only if its not the current best_node) 
   --size_used;
   if (min_heap[father] != best_node) 
     free(min_heap[father]);

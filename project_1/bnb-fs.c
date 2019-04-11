@@ -71,30 +71,27 @@ void bnb(int *n_nodes){
         if (new_node->primal < best_primal) {
           best_primal = new_node->primal;
           t_best_primal = curr_time();
-
-          if (best_node != NULL && !in_heap)
+          // If it offers a better primal, it becomes the new best node
+          if (best_node != NULL && !in_heap)  // Free it only if best node exists and does not point to a heap element
             free(best_node);
           new_node = alocate_node(new_node);
           best_node = new_node;
           in_heap = 1;
         }
 
+        // If is dominated by other node, do not insert
+        // if (!check_dominance(new_node)) {
+        //   if (best_node == new_node) in_heap = 0; // If its dominated but still the best, singnalize not in_heap
+        //   continue;
+        // }
+
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
-          if (best_node == new_node) in_heap = 0; // Checks if node is a new optimal
+          if (best_node == new_node) in_heap = 0; // If its pruned but still the best, singnalize not in_heap
           continue;
         }
 
-        // If is dominated by other node, do not insert
-        // if (check_dominance(new_node)) {
-        //   (*n_nodes)++;
-        //   if (best_node == new_node) // If new node has already been alocated, insert
-        //     insert_heap(new_node, n_tasks);
-        //   else                       // otherwise, alocate and insert
-        //     insert_heap(alocate_node(new_node), n_tasks);
-        // } else if (best_node == new_node) in_heap = 0; // If is dominated, but stil the best, singlize not in_heap
-
-        // Whithout dominance
+        // Checks if node has already been alocated and insert it in the best bound min heap
         (*n_nodes)++;
         if (best_node == new_node) // If new node has already been alocated, insert
             insert_heap(new_node, n_tasks);
