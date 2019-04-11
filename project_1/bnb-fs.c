@@ -80,10 +80,10 @@ void bnb(int *n_nodes){
         }
 
         // Remove dominated nodes and, if node is dominated by other node, do not insert.
-        if (!check_dominance(new_node)) {
-          if (best_node == new_node) in_heap = 0; // If its dominated but still the best, singnalize not in_heap
-          continue;
-        }
+        // if (!check_dominance(new_node)) {
+        //   if (best_node == new_node) in_heap = 0; // If its dominated but still the best, singnalize not in_heap
+        //   continue;
+        // }
 
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
