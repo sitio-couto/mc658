@@ -83,7 +83,7 @@ void bnb(int *n_nodes){
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
           if (best_node == new_node) in_heap = 0; // Checks if node is a new optimal
-          if (best_dual_opmality_prune > new_node->dual) best_dual_opmality_prune = new_node->dual;
+          if (new_node->dual > best_dual_opmality_prune) best_dual_opmality_prune = new_node->dual;
           continue;
         }
 
@@ -110,10 +110,10 @@ void bnb(int *n_nodes){
     } else in_heap = 0;
   }
 
-    // Checks if there was no optimality prune which offered a better dual bound 
+    // Checks if there was no optimality prune which offered a better dual bound
     if (best_dual < best_dual_opmality_prune)
       best_dual = best_dual_opmality_prune;
-    
+
     // If n_nodes >= max_nodes, free last node removed.
     // If NULL, nothing happens.
     if (min_node != NULL && min_node != best_node)
