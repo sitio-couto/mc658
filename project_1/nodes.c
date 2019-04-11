@@ -41,6 +41,7 @@ node* add_node(node *parent, node *child, int idx){
   return child;
 }
 
+// add node to dynamic memory
 node* alocate_node(node *values) {
   int i;
   node *new_node = malloc(sizeof(node));

@@ -45,42 +45,31 @@ extern int size_used, heap_size;  // Alocated and used heap positions
 void read_input(char *args[]);
 
 // Branch-and-bound algorithm implementation.
+// bnb-fs.c signatures
 void bnb(int *n_nodes);
-
 int primal_bound(char result[], usi f1tr, usi f2tr, usi sumf2);
-
 int dual_bound(char result[], usi f1tr, usi f2tr, usi sumf2);
-
-task* add_task(int, int, int);
-
-node* add_node(node *parent, node *child, int id);
-
-node* alocate_node(node *values);
-
-node* make_root(void);
-
-void print_results(char*, int, int, int);
-
-void increase_heap(int n_tasks);
-
-void insert_heap(node *new_node, int n_tasks);
-
-node* remove_min(void);
-
-int heap_check(void);
-
-int schedule_check(void);
-
-void get_best_sched(char result[], int f1tr, int f2tr, int sumf2);
-
-float curr_time(void);
-
 int check_dominance(node*);
 
+// nodes.c signatures
+node* add_node(node *parent, node *child, int id);
+node* alocate_node(node *values);
+node* make_root(void);
+
+// heap.c signatures
+void increase_heap(int n_tasks);
+void insert_heap(node *new_node, int n_tasks);
+node* remove_min(void);
+int heap_check(void);
 void remove_heap(int);
 
+// io.c signatures
+void print_results(char*, int, int, int);
+task* add_task(int, int, int);
+int schedule_check(void);
+void get_best_sched(char result[], int f1tr, int f2tr, int sumf2);
+float curr_time(void);
 int cmp_dm1(const void*, const void*);
-
 int cmp_dm2(const void*, const void*);
 
 #endif

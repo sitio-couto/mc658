@@ -80,10 +80,10 @@ void bnb(int *n_nodes){
         }
 
         // Remove dominated nodes and, if node is dominated by other node, do not insert.
-        // if (!check_dominance(new_node)) {
-        //   if (best_node == new_node) in_heap = 0; // If its dominated but still the best, singnalize not in_heap
-        //   continue;
-        // }
+        if (!check_dominance(new_node)) {
+          if (best_node == new_node) in_heap = 0; // If its dominated but still the best, singnalize not in_heap
+          continue;
+        }
 
         // Optimality prunning
         if (new_node->primal == new_node->dual) {
@@ -184,17 +184,17 @@ int primal_bound(char result[], usi f1tr, usi f2tr, usi sumf2){
   }
 
   // Calculate primal bound using sorted_dm2
-  f1aux = f1tr;
-  f2aux = f2tr;
-  second_bound = sumf2;
-  for (i = 0; i < n_tasks; ++i) {
-    if (result[sorted_dm2[i]->id-1] == 0) {
-      f1aux = f1aux + sorted_dm2[i]->dm1;
-      if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
-      else f2aux += sorted_dm2[i]->dm2;
-      second_bound += f2aux;
-    }
-  }
+  // f1aux = f1tr;
+  // f2aux = f2tr;
+  // second_bound = sumf2;
+  // for (i = 0; i < n_tasks; ++i) {
+  //   if (result[sorted_dm2[i]->id-1] == 0) {
+  //     f1aux = f1aux + sorted_dm2[i]->dm1;
+  //     if (f1aux > f2aux) f2aux = f1aux + sorted_dm2[i]->dm2;
+  //     else f2aux += sorted_dm2[i]->dm2;
+  //     second_bound += f2aux;
+  //   }
+  // }
 
   if (first_bound < second_bound) {
     ++pb1_count;
@@ -219,13 +219,13 @@ int check_dominance(node *new_node){
       aux = aux ||  (new_node->result[j] != 0 && heap_node->result[j] != 0);
       c1 = (c1 && aux);
       if (!c1) break;
-    } 
-    // If new_node dominates, c2 and c3 must be true. 
+    }
+    // If new_node dominates, c2 and c3 must be true.
     c2 = new_node->sumf2 <= heap_node->sumf2; // Must have a smaler sum of finishing times on
-    c3 = new_node->f2tr <= heap_node->f2tr;   // Must have a smaller finishing time on machine 2 
+    c3 = new_node->f2tr <= heap_node->f2tr;   // Must have a smaller finishing time on machine 2
     // If heap_node dominates, c2 and c3 must be true.
     c4 = new_node->sumf2 >= heap_node->sumf2; // Must have a smaler sum of finishing times on
-    c5 = new_node->f2tr >= heap_node->f2tr;   // Must have a smaller finishing time on machine 2 
+    c5 = new_node->f2tr >= heap_node->f2tr;   // Must have a smaller finishing time on machine 2
 
     // Cond must be true for a dominance relation, it indicates if both nodes
     // have a permutation of the same set of alocated tasks so far.

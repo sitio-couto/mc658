@@ -36,23 +36,23 @@ void read_input(char *args[]){
 void print_results(char* instance, int start_time, int end_time, int n_nodes) {
   int i;
 
-  for(i = 0; instance[i] != '/'; ++i);
-  printf("%s,%d,%d,%d,%.2f,%.2f,%.2f,", &instance[++i], best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
+  printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", instance, best_primal, best_dual, n_nodes, t_best_primal, t_best_dual, (end_time-start_time)/(float)CLOCKS_PER_SEC);
 
-  if (best_primal != best_node->primal) printf("\n-----\nERROR\n-----\n");
-  get_best_sched(best_node->result, best_node->f1tr, best_node->f2tr, best_node->sumf2);
-  if (!schedule_check()) printf("\n-----\nERROR\n-----\n");
+  // Functions for checking and rertrieving the schedule for the best primal
+  // if (best_primal != best_node->primal) printf("\n-----\nERROR\n-----\n");
+  // get_best_sched(best_node->result, best_node->f1tr, best_node->f2tr, best_node->sumf2);
+  // if (!schedule_check()) printf("\n-----\nERROR\n-----\n");
 
-  printf("{");
-  for (i = 0; i < n_tasks; ++i){
-    printf("%i", best_node->result[i]);
-    if (i != n_tasks-1) printf(",");
-    else printf("}");
-  }
+  // print schedule obtained for the best primal_bound
+  // printf("{");
+  // for (i = 0; i < n_tasks; ++i){
+  //   printf("%i", best_node->result[i]);
+  //   if (i != n_tasks-1) printf(",");
+  //   else printf("}");
+  // }
 
-  printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
-
-  printf("\n");
+  // Percentage of primal_bound calculated using sorted_dm1 by the total amount of calculations
+  // printf(",%.2f%%", ((float)pb1_count)*100/((float)(pb2_count + pb1_count)));
 
   // Freeing EVERYTHING.
   for (i = 0; i < n_tasks; ++i)
