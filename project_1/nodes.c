@@ -9,11 +9,8 @@ node* make_root(void) {
 }
 
 // This function creates a child node acording to the parent info
-node* add_node(node *parent, int idx){
-  node *child;
+node* add_node(node *parent, node *child, int idx){
   int i, r;
-
-  child = malloc(sizeof(node));
 
   // Restriction: a task must wait other tasks in M1 (starts after parent-f1tr)
   child->f1tr = parent->f1tr + sorted_id[idx]->dm1;
@@ -42,4 +39,18 @@ node* add_node(node *parent, int idx){
   child->primal = primal_bound(child->result, child->f1tr, child->f2tr, child->sumf2);
 
   return child;
+}
+
+// add node to dynamic memory
+node* alocate_node(node *values) {
+  int i;
+  node *new_node = malloc(sizeof(node));
+  new_node->f1tr = values->f1tr;
+  new_node->f2tr = values->f2tr;
+  new_node->sumf2 = values->sumf2;
+  new_node->dual = values->dual;
+  new_node->primal = values->primal;
+  for (i = 0; i < n_tasks; ++i)
+    new_node->result[i] = values->result[i];
+  return new_node;
 }
