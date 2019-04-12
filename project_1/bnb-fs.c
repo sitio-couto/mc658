@@ -1,7 +1,5 @@
-/* Victor Ferreira Ferrari  - RA 187890
- * Vinícius Couto Espindola - RA 188815
- *
- * MC658 - T1 - Exact Branch-and-Bound algorithm for solving FSP.
+/* MC658 (Algorithms III) - T1 - Exact Branch-and-Bound algorithm for solving FSP for 2 machines.
+ * FSP: https://en.wikipedia.org/wiki/Flow_shop_scheduling.
  *
  * Receives the instance to be solved, and some extra parameters:
  *  - Maximum execution time for that instance.
@@ -9,8 +7,21 @@
  *
  * The returned values may not be the optimal, depending on these parameters.
  *
- * TODO: Adicionar descrição do algoritmo.
- */
+ * Uses best bound strategy, with a heap priority queue to implement it.
+ * Explores a state space tree, calculating superior (primal) and inferior (dual) estimates for the solution.
+ * 
+ * Prunes certain paths if the optimal solution cannot be found there (dual > best primal) 
+ * or if the best solution for that path has been found (dual = primal)
+ * 
+ * Implements a dominance rule for helping prune other paths.
+ * 
+ * Stops when the entire tree has been pruned/explored, when the optimal solution is found, or when the time/node ceiling is reached.
+ *
+ * Authors:
+ * Victor Ferreira Ferrari  - RA 187890
+ * Vinícius Couto Espindola - RA 188815
+ * University of Campinas - 11/04/2019
+*/
 
 #include "bnb-fs.h"
 

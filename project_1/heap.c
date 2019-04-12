@@ -29,8 +29,8 @@ void insert_heap(node *new_node, int n_tasks){
   child = size_used-1;
   min_heap[child] = new_node;
 
-	while(child != 0){      // Havent reached the root
-		father = (child-1)/2; //get father pos
+    while(child != 0){      // Havent reached the root
+        father = (child-1)/2; //get father pos
     f = min_heap[father]->dual;
     c = min_heap[child]->dual;
     if(c < f) {
@@ -41,11 +41,11 @@ void insert_heap(node *new_node, int n_tasks){
     } else break;
   }
 
-	return;
+    return;
 }
 
 node* remove_min(void){
-	int father = 0, left = 1, right = 2;
+    int father = 0, left = 1, right = 2;
   node *aux, *min_node = min_heap[father];
   int f, l, r;
 
@@ -56,7 +56,7 @@ node* remove_min(void){
   min_heap[0] = min_heap[size_used];
   min_heap[size_used] = NULL;
 
-	while(left < size_used) {
+    while(left < size_used) {
     f = min_heap[father]->dual;
     l = min_heap[left]->dual;
     if (right < size_used) r = min_heap[right]->dual;
@@ -78,11 +78,11 @@ node* remove_min(void){
     right = 2*father+2;
   }
 
-	return min_node;
+    return min_node;
 }
 
 void remove_heap(int father){
-	int left = 2*father+1, right = 2*father+2;
+    int left = 2*father+1, right = 2*father+2;
   node *aux;
   int f, l, r;
 
@@ -95,7 +95,7 @@ void remove_heap(int father){
   min_heap[father] = min_heap[size_used];
   min_heap[size_used] = NULL;
 
-	while(left < size_used) {
+    while(left < size_used) {
     f = min_heap[father]->dual;
     l = min_heap[left]->dual;
     if (right < size_used) r = min_heap[right]->dual;
@@ -117,7 +117,7 @@ void remove_heap(int father){
     right = 2*father+2;
   }
 
-	return;
+    return;
 }
 
 int heap_check(void){
