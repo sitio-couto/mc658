@@ -39,8 +39,9 @@ end
 # display(P)
 # print("\n")
 
+# Start model build and execution
 let
-    For all existing edge, create a variable e_ij
+    # For all existing edge, create a variable e_ij
     edges = Array{Tuple{Int64,Int64}}(undef,m)
     i = 1
     for u = 1:n
@@ -56,32 +57,41 @@ let
     gt54 = Model(solver=GurobiSolver())
     # Setting variables
     @variable(gt54, x[1:n], Bin)
-    @variable(gt54, e[i in edges], bin)
+    @variable(gt54, e[i in edges], Bin)
     # objective function
-    @objective(gt54, Min, sum(P[i,j]*e[i,j] for (i,j) in edges))
+    @objective(gt54, Min, sum(P[i,j]*e[(i,j)] for (i,j) in edges))
 
     # CONSTRAINTS
     # The starting and ending vertices must be a part of the solution
-    @constraint(gt54, x[s] = 1)
-    @constraint(gt54, x[t] = 1)
+    @constraint(gt54, x[s] == 1)
+    @constraint(gt54, x[t] == 1)
+
     # Pairs contained in C must no be a part of the solution
     for (a_i, b_i) in C
         @constraint(gt54, x[a_i]+x[b_i] <= 1)
     end
+
     # If an edge is a part of the solution, so are its vertices
     for (i,j) in edges
         @constraint(gt54, x[i]+x[j]-2*e[(i,j)] >= 0)
     end
+
     # Iterate through every vertex and apply constraints
     for i = 1:n
         # For every vertice (except t), if its a part of the solution, exit degree must be 1
         if i != t 
-            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if u==i) = 1)
+            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if u==i) == 1)
         end
+
         # For every vertice (except s), if its a part of the solution, entry degree must be 1
         if i != s
-            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if v==i) = 1)
+            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if v==i) == 1)
         end
     end
 
-end # Fim do bloco let
+    print(gt54)
+    status = solve(gt54)
+    println("The solution status is: $status")
+    obj = getobjectivevalue(gt54)
+
+end # end model building and execution
