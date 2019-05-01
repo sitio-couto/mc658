@@ -6,7 +6,7 @@
 # Importando pacotes
 using JuMP, Gurobi, Printf
 
-nome_arq = "Instancias/mn27/mn27."*ARGS[1]*".instance"
+nome_arq = "Instancias/mn27."*ARGS[1]*".instance"
 
 # Debug
 println(nome_arq)
