@@ -1,0 +1,22 @@
+# --------------------------------------------------------------------
+# Exemplos usando Julia, a biblioteca JuMP e o resolvedor PLI Gurobi 
+#                                                         (ou CPLEX)
+# Preparado por Cid C. de Souza [IC-Unicamp-2019s1] 
+# --------------------------------------------------------------------
+
+Modelos disponibilizados: 
+
+- BANDWIDTH-model.jl: minimizar a largura de banda de um grafo
+- BANDWIDTH-alternative-model.jl: idem (formulação alternativa)
+- CLIQUE-model.jl: encontrar a clique máxima de um grafo
+- CV-model.jl: encontrar a cobertura mínima de um grafo
+- flowshop-model.jl: flowshop em duas máquinas minimizando a soma 
+                     dos tempos de término das tarefas na máquina 2
+- tsp-model.jl: implementação do modelo MTZ (compacto) para o TSP.
+
+
+Instancias: (diretório com o mesmo nome): 
+
+- grafo*.txt: entrada dos modelos CV, CLIQUE e BANDWIDTH.
+- flow*.txt:  entrada do modelo FLOWSHOP.
+- k*.txt:  entrada do modelo TSP (grafo completo).
