@@ -66,7 +66,7 @@ let
     @constraint(gt54, x[s] == 1)
     @constraint(gt54, x[t] == 1)
 
-    # Pairs contained in C must no be a part of the solution
+    # Pairs contained in C must not be a part of the solution
     for (a_i, b_i) in C
         @constraint(gt54, x[a_i]+x[b_i] <= 1)
     end
