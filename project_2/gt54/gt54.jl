@@ -80,12 +80,12 @@ let
     for i = 1:n
         # For every vertice (except t), if its a part of the solution, exit degree must be 1
         if i != t 
-            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if u==i) == 1)
+            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if u==i) == 0)
         end
 
         # For every vertice (except s), if its a part of the solution, entry degree must be 1
         if i != s
-            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if v==i) == 1)
+            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if v==i) == 0)
         end
     end
 
@@ -93,5 +93,10 @@ let
     status = solve(gt54)
     println("The solution status is: $status")
     obj = getobjectivevalue(gt54)
+    println("The optimal objective function value is = $obj")
+    x_star = getvalue(x)
+    e_star = getvalue(e)
+    println("vertices = {$x_star}")
+    println("edges = {$e_star}")
 
 end # end model building and execution
