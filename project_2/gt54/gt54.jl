@@ -54,7 +54,8 @@ let
     end
   
     # Creating model
-    gt54 = Model(solver=GurobiSolver())
+    TL = parse(Int64, ARGS[2])
+    gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
     @variable(gt54, x[1:n], Bin)
     @variable(gt54, e[i in edges], Bin)
@@ -89,14 +90,41 @@ let
         end
     end
 
-    print(gt54)
+    #print(gt54)
     status = solve(gt54)
-    println("The solution status is: $status")
-    obj = getobjectivevalue(gt54)
-    println("The optimal objective function value is = $obj")
-    x_star = getvalue(x)
-    e_star = getvalue(e)
-    println("vertices = {$x_star}")
-    println("edges = {$e_star}")
+    #println("The solution status is: $status")
+    #obj = getobjectivevalue(gt54)
+    #println("The optimal objective function value is = $obj")
+    #x_star = getvalue(x)
+    #e_star = getvalue(e)
+    #println("vertices = {$x_star}")
+    #println("edges = {$e_star}")
 
+    # --------------------------------------------------------------------
+
+    # Relatório
+    println("========================================================================")
+    if status == :Optimal
+      println("Solução ótima encontrada.")
+    elseif status == :Unbounded
+      println("Problema é ilimitado.")
+    elseif status == :Infeasible
+      println("Problema é inviável.")
+    elseif status == :UserLimit
+      println("Parado por limite de tempo ou iterações.")
+    elseif status == :Error
+      println("Erro do resolvedor.")
+    else
+      println("Não resolvido.")
+    end
+
+    println("Número de nós explorados: ", getnodecount(CLIQUE::Model))
+    D = getobjbound(CLIQUE::Model)
+    P = getobjectivevalue(CLIQUE::Model)
+    @printf("Melhor limitante dual: %.2f\n", D)
+    @printf("Melhor limitante primal: %.2f\n", P)
+    Gap = (abs( D - P )/P)*100
+    @printf("Gap de otimalidade: %.2f\n", Gap)
+    @printf("Tempo de execução: %.2f\n", getsolvetime(CLIQUE::Model))
+    
 end # end model building and execution
