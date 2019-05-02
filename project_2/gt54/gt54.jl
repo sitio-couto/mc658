@@ -60,7 +60,7 @@ let
             end
         end
     end
-    
+  
     # Creating model
     gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
