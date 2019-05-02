@@ -1,43 +1,44 @@
 # Victor Ferreira Ferrari,  RA 187890
 # Vinícius Couto Espindola, RA 188115
 
-# Importando pacotes
+# VARIABLES DESCRIPTION
+# n = Amount of nodes in instance
+# m = Amount of edges in instance| c = |C|)
+# s = Starting vertex
+# t = Ending vertex
+# c = Cardinality of C set
+# C = C set (vertex pairs restrictions) represented by an array of tuples
+# W = Adjacency matrix with wheights representing the instance graph 
+
+# Importing packages
 using JuMP, Gurobi, Printf
+file_name = "Instancias/gt54."*ARGS[1]*".instance"
 
-nome_arq = "Instancias/gt54."*ARGS[1]*".instance"
-
-# Leitura da entrada e montagem da representacao dos dados
-n,c,m,s,t,C,P = open(nome_arq) do file
-    data = readlines(file) # Le a entrada inteira e pariciona em linhas
+# Input data processing and representation
+n,m,c,s,t,C,W = open(file_name) do file
+    data = readlines(file) # Reads whole input line by line
     (n,c,m) = map(x->parse(Int64,x), split(data[1]))
     (s,t) = map(x->parse(Int64,x), split(data[2]))
-    C = Array{Tuple{Int64, Int64}}(undef,c) # Estrutura para armazenar os pares de C
-    P = zeros(Int64,(n,n)) # Estrutura para representar o grafo G(V,A)
+    C = Array{Tuple{Int64, Int64}}(undef,c) # Tuples to keep C set values
+    W = zeros(Int64,(n,n)) # Adjacency matrix with wheights representing the G(V,A) graph
 
-    # Le os pares contidos em C e os aloca em uma matriz C = (|C|,2)
-    # Assim temos que um par (ai,bi) de c sao os elementos da linha i de C
+    # Reads the pair contained in the C set and places then in an array of tuples
+    # Each element (a_i,b_i) from the array C are a element from the C set
     for (i, pair) in enumerate(data[3:(2+c)])
         C[i] = Tuple(map(x->parse(Int64,x), split(pair)))
     end
 
-    # Le as arestas presentes no grafo e seus respectivos pesos
-    # Usa os vertices para indexar a matrix de adjacencia P, de forma
-    # que P[i,j] guarde o custo da aresta (i,j), ou zero se inexistente
+    # Reads the edges presented in the input and its respectives weights
+    # The matrix is accesed by W[i,j] = w, which means we are accessing the
+    # edge from i to j with weight w (if w=0 theres no (i,j) edge) 
     for edge in data[(3+c):(2+c+m)]
-        (u,v,c_uv) = map(x->parse(Int64,x), split(edge))
-        P[u,v] = c_uv
+        (u,v,w_uv) = map(x->parse(Int64,x), split(edge))
+        W[u,v] = w_uv
     end
 
-    # Retorna os valores estruturados
-    (n,c,m,s,t,C,P)
+    # Returns the structured data
+    (n,m,c,s,t,C,W)
 end
-
-# Checking input
-# print("$n|$c|$m\n$s|$t\n")
-# display(C)
-# print("\n")
-# display(P)
-# print("\n")
 
 # Start model build and execution
 let
@@ -46,7 +47,7 @@ let
     i = 1
     for u = 1:n
         for v = 1:n
-            if P[u,v] != 0
+            if W[u,v] != 0
                 edges[i] = (u,v)
                 i+=1
             end
@@ -59,7 +60,7 @@ let
     @variable(gt54, x[1:n], Bin)
     @variable(gt54, e[i in edges], Bin)
     # objective function
-    @objective(gt54, Min, sum(P[i,j]*e[(i,j)] for (i,j) in edges))
+    @objective(gt54, Min, sum(W[i,j]*e[(i,j)] for (i,j) in edges))
 
     # CONSTRAINTS
     # The starting and ending vertices must be a part of the solution
@@ -89,14 +90,14 @@ let
         end
     end
 
-    print(gt54)
+    # print(gt54)
     status = solve(gt54)
     println("The solution status is: $status")
     obj = getobjectivevalue(gt54)
     println("The optimal objective function value is = $obj")
-    x_star = getvalue(x)
-    e_star = getvalue(e)
-    println("vertices = {$x_star}")
-    println("edges = {$e_star}")
+    # x_star = getvalue(x)
+    # e_star = getvalue(e)
+    # println("vertices = {$x_star}")
+    # println("edges = {$e_star}")
 
 end # end model building and execution
