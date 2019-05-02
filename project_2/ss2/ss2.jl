@@ -12,6 +12,13 @@
 using JuMP, Gurobi, Printf
 nome_arq = "Instancias/ss2."*ARGS[1]*".instance"
 
+# Time Limit
+if length(ARGS) > 1
+  TL = parse(Int64, ARGS[2])
+else
+  TL = 100000
+end
+
 # Input data processing and representation
 nt,s,S,T,D = open(nome_arq) do file
     data = readlines(file) # Reads whole input line by line
@@ -43,7 +50,8 @@ end
 
 # Start model building and execution
 let
-    # Create combination N X N for ordering variables
+    # Create combination (i,j)|N X N for ordering variables removing cases where
+    # i == j, since such cases are incoherent for the variables purpose. 
     ordering = Array{Tuple{Int64,Int64}}(undef,nt*nt - nt)
     k = 1
     for i = 1:nt
@@ -56,9 +64,9 @@ let
     end
 
     # Creating model
-    ss2 = Model(solver=GurobiSolver())
+    ss2 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
-    @variable(ss2, y[pair in ordering], Bin)
+    @variable(ss2, y[ordering], Bin)
     @variable(ss2, sig[1:nt], Int)
     @variable(ss2, x[1:nt], Bin)
     # Setting constant big M
