@@ -54,8 +54,15 @@ let
         end
     end
   
+    # Time Limit
+    if length(ARGS) > 1
+        TL = parse(Int64, ARGS[2])
+    else
+        TL = 100000
+    end
+    
     # Creating model
-    gt54 = Model(solver=GurobiSolver())
+    gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
     @variable(gt54, x[1:n], Bin)
     @variable(gt54, e[i in edges], Bin)
@@ -90,14 +97,41 @@ let
         end
     end
 
-    # print(gt54)
+    #print(gt54)
     status = solve(gt54)
-    println("The solution status is: $status")
-    obj = getobjectivevalue(gt54)
-    println("The optimal objective function value is = $obj")
-    # x_star = getvalue(x)
-    # e_star = getvalue(e)
-    # println("vertices = {$x_star}")
-    # println("edges = {$e_star}")
+    #println("The solution status is: $status")
+    #obj = getobjectivevalue(gt54)
+    #println("The optimal objective function value is = $obj")
+    #x_star = getvalue(x)
+    #e_star = getvalue(e)
+    #println("vertices = {$x_star}")
+    #println("edges = {$e_star}")
 
+    # --------------------------------------------------------------------
+
+    # Relatório
+    println("========================================================================")
+    if status == :Optimal
+      println("Solução ótima encontrada.")
+    elseif status == :Unbounded
+      println("Problema é ilimitado.")
+    elseif status == :Infeasible
+      println("Problema é inviável.")
+    elseif status == :UserLimit
+      println("Parado por limite de tempo ou iterações.")
+    elseif status == :Error
+      println("Erro do resolvedor.")
+    else
+      println("Não resolvido.")
+    end
+
+    println("Número de nós explorados: ", getnodecount(gt54::Model))
+    D = getobjbound(gt54::Model)
+    Pi = getobjectivevalue(gt54::Model)
+    @printf("Melhor limitante dual: %.2f\n", D)
+    @printf("Melhor limitante primal: %.2f\n", Pi)
+    Gap = (abs( D - Pi )/Pi)*100
+    @printf("Gap de otimalidade: %.2f\n", Gap)
+    @printf("Tempo de execução: %.2f\n", getsolvetime(gt54::Model))
+    
 end # end model building and execution
