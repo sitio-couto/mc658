@@ -53,8 +53,14 @@ let
         end
     end
   
+    # Time Limit
+    if length(ARGS) > 1
+        TL = parse(Int64, ARGS[2])
+    else
+        TL = 100000
+    end
+    
     # Creating model
-    TL = parse(Int64, ARGS[2])
     gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
     @variable(gt54, x[1:n], Bin)
@@ -118,13 +124,13 @@ let
       println("Não resolvido.")
     end
 
-    println("Número de nós explorados: ", getnodecount(CLIQUE::Model))
-    D = getobjbound(CLIQUE::Model)
-    P = getobjectivevalue(CLIQUE::Model)
+    println("Número de nós explorados: ", getnodecount(gt54::Model))
+    D = getobjbound(gt54::Model)
+    Pi = getobjectivevalue(gt54::Model)
     @printf("Melhor limitante dual: %.2f\n", D)
-    @printf("Melhor limitante primal: %.2f\n", P)
-    Gap = (abs( D - P )/P)*100
+    @printf("Melhor limitante primal: %.2f\n", Pi)
+    Gap = (abs( D - Pi )/Pi)*100
     @printf("Gap de otimalidade: %.2f\n", Gap)
-    @printf("Tempo de execução: %.2f\n", getsolvetime(CLIQUE::Model))
+    @printf("Tempo de execução: %.2f\n", getsolvetime(gt54::Model))
     
 end # end model building and execution

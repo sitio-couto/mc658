@@ -48,8 +48,14 @@ let
 		end
 	end
 
+	# Time Limit
+	if length(ARGS) > 1
+		TL = parse(Int64, ARGS[2])
+	else
+		TL = 100000
+	end
+
 	# Model
-	TL = parse(Int64, ARGS[2])
 	mn27 = Model(solver=GurobiSolver(TimeLimit=TL))
 
 	# Variables
