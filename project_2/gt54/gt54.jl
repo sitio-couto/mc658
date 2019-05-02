@@ -14,6 +14,13 @@
 using JuMP, Gurobi, Printf
 file_name = "Instancias/gt54."*ARGS[1]*".instance"
 
+# Time Limit
+if length(ARGS) > 1
+    TL = parse(Int64, ARGS[2])
+else
+    TL = 100000
+end
+
 # Input data processing and representation
 n,m,c,s,t,C,W = open(file_name) do file
     data = readlines(file) # Reads whole input line by line
@@ -54,13 +61,6 @@ let
         end
     end
   
-    # Time Limit
-    if length(ARGS) > 1
-        TL = parse(Int64, ARGS[2])
-    else
-        TL = 100000
-    end
-    
     # Creating model
     gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
