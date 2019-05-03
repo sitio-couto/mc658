@@ -5,13 +5,18 @@
 
 # Importando pacotes
 using JuMP, Gurobi, Printf
+file_name = "Instancias/mn27."*ARGS[1]*".instance"
 
-nome_arq = "Instancias/mn27."*ARGS[1]*".instance"
-
+# Time Limit
+if length(ARGS) > 1
+	TL = parse(Int64, ARGS[2])
+else
+	TL = 100000
+end
 
 # n = number of vertices
 # m = number of edges
-n,m,edges = open(nome_arq, "r") do file
+n,m,edges = open(file_name, "r") do file
 	data  = readlines(file)
 
 	# n,m in first line
@@ -30,14 +35,8 @@ n,m,edges = open(nome_arq, "r") do file
 	
 end # End of open block
 
-# Checking input (debug)
-# println("$n|$m")
-# display(edges)
-# println()
-
 # Start model build and execution
 let
-
 	# V X V combination for color j for each vertex i
 	colorVertex = Array{Tuple{Int64, Int64}}(undef, n*n)
 	k=1
@@ -46,13 +45,6 @@ let
 			colorVertex[k]=(i,j)
 			k+=1
 		end
-	end
-
-	# Time Limit
-	if length(ARGS) > 1
-		TL = parse(Int64, ARGS[2])
-	else
-		TL = 100000
 	end
 
 	# Model
@@ -84,9 +76,6 @@ let
 		@constraint(mn27, n*y[m] - sum(x[(i,m)] for i=1:n) >= 0)
 	end
 
-	# Printing model (debug)
-#	print(mn27)
-
 	# Solving model
 	status = solve(mn27)
 
@@ -106,15 +95,15 @@ let
 	  println("Erro do resolvedor.")
 	else
 	  println("Não resolvido.")
-    end
+  end
 
-    println("Número de nós explorados: ", getnodecount(mn27::Model))
-    D = getobjbound(mn27::Model)
-    P = getobjectivevalue(mn27::Model)
-    @printf("Melhor limitante dual: %.2f\n", D)
-    @printf("Melhor limitante primal: %.2f\n", P)
-    Gap = (abs( D - P )/P)*100
-    @printf("Gap de otimalidade: %.2f\n", Gap)
-    @printf("Tempo de execução: %.2f\n", getsolvetime(mn27::Model))
+	println("Número de nós explorados: ", getnodecount(mn27::Model))
+	D = getobjbound(mn27::Model)
+	P = getobjectivevalue(mn27::Model)
+	@printf("Melhor limitante dual: %.2f\n", D)
+	@printf("Melhor limitante primal: %.2f\n", P)
+	Gap = (abs( D - P )/P)*100
+	@printf("Gap de otimalidade: %.2f\n", Gap)
+	@printf("Tempo de execução: %.2f\n", getsolvetime(mn27::Model))
 	            
 end

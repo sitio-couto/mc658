@@ -64,9 +64,9 @@ let
     # Creating model
     gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
-    @variable(gt54, x[1:n], Bin)
-    @variable(gt54, e[i in edges], Bin)
-    # objective function
+    @variable(gt54, x[1:n], Bin)        # Represents if vertex i is in the current path
+    @variable(gt54, e[i in edges], Bin) # Represents if edge (i,j) is in the current path
+    # objective function: minimize path wheight (sum of the edges wheights in the path)
     @objective(gt54, Min, sum(W[i,j]*e[(i,j)] for (i,j) in edges))
 
     # CONSTRAINTS
