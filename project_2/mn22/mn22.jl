@@ -96,8 +96,8 @@ let
     @variable(mn22, t[E], Bin)       # Indicates if machine-part (i,j) share a room
     
     # Objective function: if machine-part pair (i,j) do not share a room, include transport cost.
-    @objective(mn22, Min, sum( (1-t[E[i]])*C[i] for i = 1:m) )
-
+    @objective(mn22, Min, sum(t[E[i]]*C[i] for i = 1:m))
+    
     # CONSTRAINTS
     # Each machine i must be in exactly one room
     for i = 1:cv
@@ -123,11 +123,20 @@ let
     # dependence, iterating every room r. Such constraint allows t[(i,j)] to
     # indicate if machine i and part j share any of the r rooms.
     for (i,j) in E
-        @constraint(mn22, t[(i,j)] == sum(l[(i,j,r)] for r = 1:max_r))
+        @constraint(mn22, t[(i,j)] == 1 - sum(l[(i,j,r)] for r = 1:max_r))
     end
 
     status = solve(mn22)
- 
+    # print(mn22)
+    # val_v = getvalue(v)
+    # val_u = getvalue(u)
+    # val_l = getvalue(l)
+    # val_t = getvalue(t)
+    # println("v = $val_v")
+    # println("u = $val_u")
+    # println("l = $val_l")
+    # println("t = $val_t")
+
     # --------------------------------------------------------------------
 
     # Relatório
