@@ -7,6 +7,11 @@
 using JuMP, Gurobi, Printf
 file_name = "Instancias/mn27."*ARGS[1]*".instance"
 
+<<<<<<< HEAD
+=======
+file_name = "Instancias/mn27."*ARGS[1]*".instance"
+
+>>>>>>> f7f82834b068b42fbb6b4519f843e128d866f3a5
 # Time Limit
 if length(ARGS) > 1
 	TL = parse(Int64, ARGS[2])
