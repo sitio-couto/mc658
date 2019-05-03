@@ -11,7 +11,7 @@
 # W = Adjacency matrix with wheights representing the instance graph 
 
 # Importing packages
-using JuMP, Gurobi
+using JuMP, Gurobi, Printf
 file_name = "Instancias/gt54."*ARGS[1]*".instance"
 
 # Time Limit
