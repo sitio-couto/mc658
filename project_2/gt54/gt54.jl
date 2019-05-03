@@ -11,7 +11,7 @@
 # W = Adjacency matrix with wheights representing the instance graph 
 
 # Importing packages
-using JuMP, Gurobi, Printf
+using JuMP, Gurobi
 file_name = "Instancias/gt54."*ARGS[1]*".instance"
 
 # Time Limit
@@ -96,17 +96,9 @@ let
             @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if v==i) == 0)
         end
     end
-
-    #print(gt54)
+    
     status = solve(gt54)
-    #println("The solution status is: $status")
-    #obj = getobjectivevalue(gt54)
-    #println("The optimal objective function value is = $obj")
-    #x_star = getvalue(x)
-    #e_star = getvalue(e)
-    #println("vertices = {$x_star}")
-    #println("edges = {$e_star}")
-
+   
     # --------------------------------------------------------------------
 
     # Relatório
