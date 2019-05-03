@@ -11,7 +11,7 @@
 
 # Importing packages
 using JuMP, Gurobi, Printf
-nome_arq = "Instancias/ss5."*ARGS[1]*".instance"
+file_name = "Instancias/ss5."*ARGS[1]*".instance"
 
 # Time Limit
 if length(ARGS) > 1
@@ -21,7 +21,7 @@ else
 end
 
 # Input data processing and representation
-n,T,D,P = open(nome_arq) do file
+n,T,D,P = open(file_name) do file
     data = readlines(file)     # Reads whole input line by line
     n = parse(Int64, data[1])  # Reads number indicating amount of tasks
     T = Array{Int64}(undef,n)  # task duration times data representation
@@ -36,11 +36,6 @@ n,T,D,P = open(nome_arq) do file
     # Return structured input
     (n,T,D,P)
 end
-
-# # Checking input
-# print("$n\n")
-# display([T D P])
-# print("\n")
 
 # Start model building and execution
 let
@@ -60,19 +55,15 @@ let
     # Creating model
     ss5 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
-    @variable(ss5, y[ordering], Bin) # y[(i,j)] indicates if task i comes before j
-    @variable(ss5, sig[1:n], Int)           # sig[i] indicates starting time for task i        
-    @variable(ss5, m[1:n], Int)             # m[i] indicates the amount of time task i is delayed
+    @variable(ss5, y[ordering], Bin)   # y[(i,j)] indicates if task i comes before j
+    @variable(ss5, sig[1:n] >= 0, Int) # sig[i] (non-negative) indicates starting time for task i        
+    @variable(ss5, m[1:n] >= 0, Int)   # m[i] (non-negative) indicates the amount of time task i is delayed
     # Setting constant big M
     M = sum(T)
     # Objective function
     @objective(ss5, Min, sum(m .* P))
 
     # CONSTRAINTS
-    # Aplying non-negative variables restriction
-    @constraint(ss5, sig .>= 0) # Ensures non-negative start times
-    @constraint(ss5, m .>= 0)   # Ensures non-negative delays
-
     # Precedence conditions: if i before j, then j not before i. 
     for (i,j) in ordering 
         @constraint(ss5, y[(i,j)] + y[(j,i)] == 1)
@@ -87,18 +78,10 @@ let
     end
 
     status = solve(ss5)
-    # print(ss5)
-    # println("The solution status is: $status")
-    # obj = getobjectivevalue(ss5)
-    # println("The optimal objective function value is = $obj")
-    # sig_star = getvalue(sig)
-    # delays = getvalue(m)
-    # println("start_times = {$sig_star}")
-    # println("tasks_delays = {$delays}")
 
-    # # --------------------------------------------------------------------
+    #--------------------------------------------------------------------
 
-    # Relatório
+    # Report
     println("========================================================================")
     if status == :Optimal
       println("Solução ótima encontrada.")
