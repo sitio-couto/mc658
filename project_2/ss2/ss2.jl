@@ -41,13 +41,6 @@ nt,s,S,T,D = open(nome_arq) do file
     (nt,s,S,T,D)
 end
 
-# Checking input
-# print("$nt|$s\n")
-# display([T D])
-# print("\n")
-# display(S)
-# print("\n")
-
 # Start model building and execution
 let
     # Create combination (i,j)|N X N for ordering variables removing cases where
@@ -67,7 +60,7 @@ let
     ss2 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
     @variable(ss2, y[ordering], Bin)
-    @variable(ss2, sig[1:nt], Int)
+    @variable(ss2, sig[1:nt] >= 0, Int) # Ensures non-negative start times
     @variable(ss2, x[1:nt], Bin)
     # Setting constant big M
     M = sum(T)
@@ -87,23 +80,12 @@ let
     for (i,j) in ordering
         @constraint(ss2, sig[i] + T[i] <= sig[j] + (1 - y[(i,j)])*M)
     end
-    # For every task i applies constraint
+    # Ensures that delayed tasks are tagged as such
     for i = 1:nt
-        # Ensures non-negative start times
-        @constraint(ss2, sig[i] >= 0) 
-        # Ensures that delayed tasks are tagged as such
         @constraint(ss2, sig[i] + T[i] <= D[i] + M*x[i])
     end
 
-    # print(ss2)
     status = solve(ss2)
-    # println("The solution status is: $status")
-    # obj = getobjectivevalue(ss2)
-    # println("The optimal objective function value is = $obj")
-    # sig_star = getvalue(sig)
-    # delays = getvalue(x)
-    # println("start_times = {$sig_star}")
-    # println("dlayed_tasks = {$delays}")
 
     # --------------------------------------------------------------------
 
