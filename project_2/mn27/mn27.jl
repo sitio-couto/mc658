@@ -6,12 +6,18 @@
 # Importando pacotes
 using JuMP, Gurobi, Printf
 
-nome_arq = "Instancias/mn27."*ARGS[1]*".instance"
+file_name = "Instancias/mn27."*ARGS[1]*".instance"
 
+# Time Limit
+if length(ARGS) > 1
+	TL = parse(Int64, ARGS[2])
+else
+	TL = 100000
+end
 
 # n = number of vertices
 # m = number of edges
-n,m,edges = open(nome_arq, "r") do file
+n,m,edges = open(file_name, "r") do file
 	data  = readlines(file)
 
 	# n,m in first line
@@ -46,13 +52,6 @@ let
 			colorVertex[k]=(i,j)
 			k+=1
 		end
-	end
-
-	# Time Limit
-	if length(ARGS) > 1
-		TL = parse(Int64, ARGS[2])
-	else
-		TL = 100000
 	end
 
 	# Model
