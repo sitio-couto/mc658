@@ -42,9 +42,9 @@ cv,cu,m,K,E,C = open(file_name) do file
 end
 
 # Checking input
-println("$cv|$cu|$m|$K")
-display([E C])
-print("\n")
+# println("$cv|$cu|$m|$K")
+# display([E C])
+# print("\n")
 
 let 
     # NOTE: in the worst distribution case, there will be one machine per
