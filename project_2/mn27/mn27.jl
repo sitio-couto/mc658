@@ -1,7 +1,13 @@
 # Victor Ferreira Ferrari,  RA 187890
 # Vinícius Couto Espindola, RA 188115
 
-# K-Coloração de grafos para k mínimo, PLI
+# PROBLEM [mn27]
+# Minimize the number o k colors necessary for coloring a graph
+
+# VARIABLES DESCRIPTION
+# n = number of vertices
+# m = number of edges
+# edges = Array o tuples (i,j) representing the edges
 
 # Importando pacotes
 using JuMP, Gurobi, Printf
@@ -14,8 +20,7 @@ else
 	TL = 100000
 end
 
-# n = number of vertices
-# m = number of edges
+# INPUT: data processing and representation block
 n,m,edges = open(file_name, "r") do file
 	data  = readlines(file)
 
@@ -35,8 +40,9 @@ n,m,edges = open(file_name, "r") do file
 	
 end # End of open block
 
-# Start model build and execution
+# MODEL: building and execution block
 let
+	# COMBINATIONS FOR THE MODEL
 	# V X V combination for color j for each vertex i
 	colorVertex = Array{Tuple{Int64, Int64}}(undef, n*n)
 	k=1
@@ -47,7 +53,9 @@ let
 		end
 	end
 
-	# Model
+	#--------------------------------------------------------------------
+
+	# MODEL BUILDING
 	mn27 = Model(solver=GurobiSolver(TimeLimit=TL))
 
 	# Variables
@@ -79,9 +87,9 @@ let
 	# Solving model
 	status = solve(mn27)
 
-	# --------------------------------------------------------------------
+	#--------------------------------------------------------------------
 
-	# Relatório
+	# REPORT
 	println("========================================================================")
 	if status == :Optimal
 	  println("Solução ótima encontrada.")

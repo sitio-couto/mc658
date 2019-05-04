@@ -20,12 +20,10 @@ else
     TL = 100000
 end
 
-# Input data processing and representation
+# INPUT: data processing and representation block
 cv,cu,m,K,E,C = open(file_name) do file
     data = readlines(file)  # Reads whole input line by line
     (cv,cu,m,K) = map(x->parse(Int64,x), split(data[1])) # Reads cardinalities (u,v and m) and bounds (k)
-    V = Array{Int64}(undef,cv) # Contains nodes representing machines
-    U = Array{Int64}(undef,cu) # Contains nodes representing parts
     E = Array{Tuple{Int64,Int64}}(undef,m) # Contains edges representations
     C = Array{Int64}(undef,m)              # Contains edges costs
 
@@ -41,11 +39,7 @@ cv,cu,m,K,E,C = open(file_name) do file
     (cv,cu,m,K,E,C)
 end
 
-# Checking input
-# println("$cv|$cu|$m|$K")
-# display([E C])
-# print("\n")
-
+# MODEL: building and execution block
 let 
     # NOTE: in the worst distribution case, there will be one machine per
     # room, therefore the maximum amount of rooms is at most the same as 
@@ -84,9 +78,9 @@ let
         end
     end
 
-    #-----------------------------------------------------------------------------------
+    #--------------------------------------------------------------------
 
-    # Creating model
+    # MODEL BUILDING
     mn22 = Model(solver=GurobiSolver(TimeLimit=TL))
     
     # Setting variables
@@ -127,19 +121,10 @@ let
     end
 
     status = solve(mn22)
-    # print(mn22)
-    # val_v = getvalue(v)
-    # val_u = getvalue(u)
-    # val_l = getvalue(l)
-    # val_t = getvalue(t)
-    # println("v = $val_v")
-    # println("u = $val_u")
-    # println("l = $val_l")
-    # println("t = $val_t")
 
-    # --------------------------------------------------------------------
+    #--------------------------------------------------------------------
 
-    # Relatório
+    # REPORT
     println("========================================================================")
     if status == :Optimal
       println("Solução ótima encontrada.")

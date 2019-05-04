@@ -1,6 +1,9 @@
 # Victor Ferreira Ferrari,  RA 187890
 # Vinícius Couto Espindola, RA 188115
 
+# PROBLEM [gt27]
+# Find minimum path between two vertices given certain restrictions
+
 # VARIABLES DESCRIPTION
 # n = Amount of nodes in instance
 # m = Amount of edges in instance| c = |C|)
@@ -21,7 +24,7 @@ else
     TL = 100000
 end
 
-# Input data processing and representation
+# INPUT: data processing and representation block
 n,m,c,s,t,C,W = open(file_name) do file
     data = readlines(file) # Reads whole input line by line
     (n,c,m) = map(x->parse(Int64,x), split(data[1]))
@@ -47,8 +50,9 @@ n,m,c,s,t,C,W = open(file_name) do file
     (n,m,c,s,t,C,W)
 end
 
-# Start model build and execution
+# MODEL: building and execution block
 let
+    # COMBINATIONS FOR THE MODEL
     # For all existing edge, create a variable e_ij
     edges = Array{Tuple{Int64,Int64}}(undef,m)
     i = 1
@@ -61,11 +65,15 @@ let
         end
     end
   
-    # Creating model
+    #--------------------------------------------------------------------
+
+    # MODEL BUILDING
     gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
+
     # Setting variables
     @variable(gt54, x[1:n], Bin)        # Represents if vertex i is in the current path
     @variable(gt54, e[i in edges], Bin) # Represents if edge (i,j) is in the current path
+    
     # objective function: minimize path wheight (sum of the edges wheights in the path)
     @objective(gt54, Min, sum(W[i,j]*e[(i,j)] for (i,j) in edges))
 
@@ -99,9 +107,9 @@ let
     
     status = solve(gt54)
    
-    # --------------------------------------------------------------------
+    #--------------------------------------------------------------------
 
-    # Relatório
+    # REPORT
     println("========================================================================")
     if status == :Optimal
       println("Solução ótima encontrada.")

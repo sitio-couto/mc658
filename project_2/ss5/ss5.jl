@@ -6,8 +6,6 @@
 # T = Tasks durations (T[i] = t_i <duration of task i>)
 # D = Tasks deadlines (D[i] = d_i <deadline of task i>)
 # P = Tasks delays cost by time unit (P[i] = p_i <cost of task i delay>)
-# NOTE: the ".X" syntax (using the dot before the operation) applies the operation 'X'
-#       by element within the vectors used, removing the need for certain loops.
 
 # Importing packages
 using JuMP, Gurobi, Printf
@@ -20,7 +18,7 @@ else
     TL = 100000
 end
 
-# Input data processing and representation
+# INPUT: data processing and representation block
 n,T,D,P = open(file_name) do file
     data = readlines(file)     # Reads whole input line by line
     n = parse(Int64, data[1])  # Reads number indicating amount of tasks
@@ -37,8 +35,9 @@ n,T,D,P = open(file_name) do file
     (n,T,D,P)
 end
 
-# Start model building and execution
+# MODEL: building and execution block
 let
+    # COMBINATIONS FOR THE MODEL
     # Create combination (i,j)|N X N for ordering variables removing cases where
     # i == j, since such cases are incoherent for the variables purpose. 
     ordering = Array{Tuple{Int64,Int64}}(undef, n*n - n)
@@ -52,7 +51,9 @@ let
         end
     end
 
-    # Creating model
+    #--------------------------------------------------------------------
+
+    # MODEL BUILDING
     ss5 = Model(solver=GurobiSolver(TimeLimit=TL))
     # Setting variables
     @variable(ss5, y[ordering], Bin)   # y[(i,j)] indicates if task i comes before j
@@ -81,7 +82,7 @@ let
 
     #--------------------------------------------------------------------
 
-    # Report
+    # REPORT
     println("========================================================================")
     if status == :Optimal
       println("Solução ótima encontrada.")

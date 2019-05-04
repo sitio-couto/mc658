@@ -1,6 +1,9 @@
 # Victor Ferreira Ferrari,  RA 187890
 # Vinícius Couto Espindola, RA 188115
 
+# PROBLEM [ss2]
+# Minimize the amount of delayed tasks given durations and deadlines
+
 # VARIABLES DESCRIPTION
 # nt = Amount of tasks in instance (|T| or |D|)
 # T  = Set containing times for the tasks durations
@@ -19,7 +22,7 @@ else
   TL = 100000
 end
 
-# Input data processing and representation
+# INPUT: data processing and representation block
 nt,s,S,T,D = open(nome_arq) do file
     data = readlines(file) # Reads whole input line by line
     (nt,s) = map(x->parse(Int64,x), split(data[1]))
@@ -41,8 +44,9 @@ nt,s,S,T,D = open(nome_arq) do file
     (nt,s,S,T,D)
 end
 
-# Start model building and execution
+# MODEL: building and execution block
 let
+    # COMBINATIONS FOR THE MODEL
     # Create combination (i,j)|N X N for ordering variables removing cases where
     # i == j, since such cases are incoherent for the variables purpose. 
     ordering = Array{Tuple{Int64,Int64}}(undef,nt*nt - nt)
@@ -56,14 +60,19 @@ let
         end
     end
 
-    # Creating model
+    #--------------------------------------------------------------------
+
+   # MODEL BUILDING
     ss2 = Model(solver=GurobiSolver(TimeLimit=TL))
+
     # Setting variables
     @variable(ss2, y[ordering], Bin)
     @variable(ss2, sig[1:nt] >= 0, Int) # Ensures non-negative start times
     @variable(ss2, x[1:nt], Bin)
+
     # Setting constant big M
     M = sum(T)
+    
     # Objective function
     @objective(ss2, Min, sum(x))
 
@@ -87,9 +96,9 @@ let
 
     status = solve(ss2)
 
-    # --------------------------------------------------------------------
+    #--------------------------------------------------------------------
 
-    # Relatório
+    # REPORT
     println("========================================================================")
     if status == :Optimal
       println("Solução ótima encontrada.")
