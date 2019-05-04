@@ -1,6 +1,9 @@
 # Victor Ferreira Ferrari,  RA 187890
 # Vinícius Couto Espindola, RA 188115
 
+# PROBLEM [ss5]
+# Minimize the total cost due to delayed tasks given durations and deadlines
+
 # VARIABLES DESCRIPTION
 # n = Amount of tasks in instance (|T|, |D| or |P|)
 # T = Tasks durations (T[i] = t_i <duration of task i>)

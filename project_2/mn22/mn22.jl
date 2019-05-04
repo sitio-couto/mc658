@@ -1,6 +1,9 @@
 # Victor Ferreira Ferrari,  RA 187890
 # Vinícius Couto Espindola, RA 188115
 
+# PROBLEM [mn22]
+# Minimize transportation costs of parts to machines in different rooms
+
 # Given a bipartite graph G(V,U,E), we define the variables:
 # E  = Array of edges in bipartite graph G(V,U,E)
 # C  = Array of costs for each respective edge in E 
