@@ -1,0 +1,24 @@
+========================================================================
+[ss2]
+Parado por limite de tempo ou iterações.
+Número de nós explorados: 8742664
+Melhor limitante dual: 7.0
+Melhor limitante primal: 11.0
+Gap de otimalidade: 36.36363636363637
+Tempo de execução: 6000.007618188858
+========================================================================
+[ss5]
+Parado por limite de tempo ou iterações.
+Número de nós explorados: 12297220
+Melhor limitante dual: 0.0
+Melhor limitante primal: 73920.0
+Gap de otimalidade: 100.0
+Tempo de execução: 6000.004554986954
+========================================================================
+[mn22]
+Parado por limite de tempo ou iterações.
+Número de nós explorados: 19387
+Melhor limitante dual: 1638.0
+Melhor limitante primal: 3796.0
+Gap de otimalidade: 56.849315068493155
+Tempo de execução: 6000.005379915237
