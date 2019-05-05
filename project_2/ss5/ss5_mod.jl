@@ -43,14 +43,10 @@ let
     # COMBINATIONS FOR THE MODEL
     # Create combination (i,j)|N X N for ordering variables removing cases where
     # i == j, since such cases are incoherent for the variables purpose. 
-    ordering = Array{Tuple{Int64,Int64}}(undef, n*n - n)
-    k = 1
+    ordering = Array{Tuple{Int64,Int64}}(undef, 0)
     for i = 1:n
-        for j = 1:n
-            if i != j
-                ordering[k] = (i,j)
-                k += 1
-            end
+        for j = (i+1):n
+            ordering = vcat(ordering, (i,j))
         end
     end
 
@@ -68,13 +64,10 @@ let
     @objective(ss5, Min, sum(m .* P))
 
     # CONSTRAINTS
-    # Precedence conditions: if i before j, then j not before i. 
-    for (i,j) in ordering 
-        @constraint(ss5, y[(i,j)] + y[(j,i)] == 1)
-    end
     # Ensures ordering between tasks without overlaps
     for (i,j) in ordering
         @constraint(ss5, sig[i] + T[i] <= sig[j] + (1 - y[(i,j)])*M)
+        @constraint(ss5, sig[j] + T[j] <= sig[i] + y[(i,j)]*M)
     end
     # Forces m to be equal to the delay time (or to 0 if no delay)
     for i = 1:n
