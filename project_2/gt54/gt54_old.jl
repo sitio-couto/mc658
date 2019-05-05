@@ -12,10 +12,6 @@
 # c = Cardinality of C set
 # C = C set (vertex pairs restrictions) represented by an array of tuples
 # W = Adjacency matrix with wheights representing the instance graph 
-# NOTE: The adjacency W was used along side with the edges list E in this 
-# particular exercise due to the last two restrictions (entry/exit degree).
-# Using only the list E, it took several minutes for the model to be built,
-# so the matrix was used to reduce the amount of comparations done per vertex.
 
 # Importing packages
 using JuMP, Gurobi, Printf
@@ -29,12 +25,11 @@ else
 end
 
 # INPUT: data processing and representation block
-n,m,c,s,t,C,E,W = open(file_name) do file
+n,m,c,s,t,C,W = open(file_name) do file
     data = readlines(file) # Reads whole input line by line
     (n,c,m) = map(x->parse(Int64,x), split(data[1]))
     (s,t) = map(x->parse(Int64,x), split(data[2]))
     C = Array{Tuple{Int64, Int64}}(undef,c) # Tuples to keep C set values
-    E = Array{Tuple{Int64, Int64}}(undef,m) # Tuples representing existing edges
     W = zeros(Int64,(n,n)) # Adjacency matrix with wheights representing the G(V,A) graph
 
     # Reads the pair contained in the C set and places then in an array of tuples
@@ -46,27 +41,41 @@ n,m,c,s,t,C,E,W = open(file_name) do file
     # Reads the edges presented in the input and its respectives weights
     # The matrix is accesed by W[i,j] = w, which means we are accessing the
     # edge from i to j with weight w (if w=0 theres no (i,j) edge) 
-    for (i,edge) in enumerate(data[(3+c):(2+c+m)])
-        (v,u,w_vu) = map(x->parse(Int64,x), split(edge))
-        E[i] = (v,u)
-        W[v,u] = w_vu
+    for edge in data[(3+c):(2+c+m)]
+        (u,v,w_uv) = map(x->parse(Int64,x), split(edge))
+        W[u,v] = w_uv
     end
 
     # Returns the structured data
-    (n,m,c,s,t,C,E,W)
+    (n,m,c,s,t,C,W)
 end
 
 # MODEL: building and execution block
 let
+    # COMBINATIONS FOR THE MODEL
+    # For all existing edge, create a variable e_ij
+    edges = Array{Tuple{Int64,Int64}}(undef,m)
+    i = 1
+    for u = 1:n
+        for v = 1:n
+            if W[u,v] != 0
+                edges[i] = (u,v)
+                i+=1
+            end
+        end
+    end
+  
+    #--------------------------------------------------------------------
+
     # MODEL BUILDING
     gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
 
     # Setting variables
     @variable(gt54, x[1:n], Bin)        # Represents if vertex i is in the current path
-    @variable(gt54, e[i in E], Bin) # Represents if edge (i,j) is in the current path
+    @variable(gt54, e[i in edges], Bin) # Represents if edge (i,j) is in the current path
     
     # objective function: minimize path wheight (sum of the edges wheights in the path)
-    @objective(gt54, Min, sum(W[i,j]*e[(i,j)] for (i,j) in E))
+    @objective(gt54, Min, sum(W[i,j]*e[(i,j)] for (i,j) in edges))
 
     # CONSTRAINTS
     # The starting and ending vertices must be a part of the solution
@@ -79,23 +88,23 @@ let
     end
 
     # If an edge is a part of the solution, so are its vertices
-    for (i,j) in E
+    for (i,j) in edges
         @constraint(gt54, x[i]+x[j]-2*e[(i,j)] >= 0)
     end
-    
+    println("Will halt for several minutes here...")
     # Iterate through every vertex and apply constraints
     for i = 1:n
         # For every vertice (except t), if its a part of the solution, exit degree must be 1
         if i != t 
-            @constraint(gt54, x[i] - sum(e[(i,u)] for u = 1:n if W[i,u] != 0) == 0)
+            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if u==i) == 0)
         end
 
         # For every vertice (except s), if its a part of the solution, entry degree must be 1
         if i != s
-            @constraint(gt54, x[i] - sum(e[(v,i)] for v = 1:n if W[v,i] != 0) == 0)
+            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if v==i) == 0)
         end
     end
-    
+    println("Finally done!")
     status = solve(gt54)
    
     #--------------------------------------------------------------------
