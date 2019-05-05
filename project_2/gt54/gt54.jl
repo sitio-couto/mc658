@@ -11,8 +11,8 @@
 # t = Ending vertex
 # c = Cardinality of C set
 # C = C set (vertex pairs restrictions) represented by an array of tuples
-# W = Adjacency matrix with wheights representing the instance graph 
-# NOTE: The adjacency W was used along side with the edges list E in this 
+# W = Adjacency matrix with weights representing the instance graph 
+# NOTE: The adjacency W was used alongside the edges list E in this 
 # particular exercise due to the last two restrictions (entry/exit degree).
 # Using only the list E, it took several minutes for the model to be built,
 # so the matrix was used to reduce the amount of comparations done per vertex.
@@ -35,7 +35,7 @@ n,m,c,s,t,C,E,W = open(file_name) do file
     (s,t) = map(x->parse(Int64,x), split(data[2]))
     C = Array{Tuple{Int64, Int64}}(undef,c) # Tuples to keep C set values
     E = Array{Tuple{Int64, Int64}}(undef,m) # Tuples representing existing edges
-    W = zeros(Int64,(n,n)) # Adjacency matrix with wheights representing the G(V,A) graph
+    W = zeros(Int64,(n,n)) # Adjacency matrix with weights representing the G(V,A) graph
 
     # Reads the pair contained in the C set and places then in an array of tuples
     # Each element (a_i,b_i) from the array C are a element from the C set
@@ -65,7 +65,7 @@ let
     @variable(gt54, x[1:n], Bin)        # Represents if vertex i is in the current path
     @variable(gt54, e[i in E], Bin) # Represents if edge (i,j) is in the current path
     
-    # objective function: minimize path wheight (sum of the edges wheights in the path)
+    # objective function: minimize path wheight (sum of the edges weights in the path)
     @objective(gt54, Min, sum(W[i,j]*e[(i,j)] for (i,j) in E))
 
     # CONSTRAINTS
