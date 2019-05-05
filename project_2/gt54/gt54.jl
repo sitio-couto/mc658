@@ -91,17 +91,17 @@ let
     for (i,j) in edges
         @constraint(gt54, x[i]+x[j]-2*e[(i,j)] >= 0)
     end
-
+    
     # Iterate through every vertex and apply constraints
     for i = 1:n
         # For every vertice (except t), if its a part of the solution, exit degree must be 1
         if i != t 
-            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if u==i) == 0)
+            @constraint(gt54, x[i] - sum(e[(i,u)] for u = 1:n if W[i,u] != 0) == 0)
         end
 
         # For every vertice (except s), if its a part of the solution, entry degree must be 1
         if i != s
-            @constraint(gt54, x[i] - sum(e[(u,v)] for (u,v) in edges if v==i) == 0)
+            @constraint(gt54, x[i] - sum(e[(v,i)] for v = 1:n if W[v,i] != 0) == 0)
         end
     end
     
