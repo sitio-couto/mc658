@@ -4,8 +4,8 @@
 # PROBLEM [mn22]
 # Minimize transportation costs of parts to machines in different rooms
 
-# Given a bipartite graph G(V,U,E), we define the variables:
-# E  = Array of edges in bipartite graph G(V,U,E)
+# VARIABLES DESCRIPTION
+# E  = Array of edges in the bipartite graph G(V,U,E)
 # C  = Array of costs for each respective edge in E 
 # cv = Cardinality of V (|V| = amount of machines)
 # cu = Cardinality of U (|U| = amount of parts)
@@ -14,6 +14,8 @@
 
 # Importando pacotes
 using JuMP, Gurobi, Printf
+
+# Instance path
 file_name = "Instancias/mn22."*ARGS[1]*".instance"
 
 # Time Limit
@@ -30,10 +32,9 @@ cv,cu,m,K,E,C = open(file_name) do file
     E = Array{Tuple{Int64,Int64}}(undef,m) # Contains edges representations
     C = Array{Int64}(undef,m)              # Contains edges costs
 
-    # Reads vertices, edges and costs and places then proper structures
+    # Reads vertices, edges and costs and places then in the proper structures
     for (i, edges) in enumerate(data[2:(1+m)])
         (v,u,c_vu) = map(x->parse(Int64,x), split(edges))
-        # Adds edge representation and its cost to structures
         E[i] = (v,u) # Tuple (v,u) representing an edge i where "v" is a machine and "u" a part
         C[i] = c_vu  # Cost c of edge i represented in E
     end
@@ -50,7 +51,7 @@ let
     max_r = cv
 
     # COMBINATIONS FOR THE MODEL
-    # Create a combination M x R: all dependence machine-part (i,j) paired with
+    # Create a combination M x R: every machine-part dependence (i,j) paired with
     # every r room possible.
     count = 1
     lambdas = Array{Tuple{Int64,Int64,Int64}}(undef,m*max_r)
@@ -100,14 +101,17 @@ let
     for i = 1:cv
         @constraint(mn22, sum(v[(i,r)] for r = 1:max_r) == 1)
     end
+
     # Each part j must be in exactly one room
     for j = 1:cu
         @constraint(mn22, sum(u[(j,r)] for r = 1:max_r) == 1)
     end
+
     # Each room r may have at most K machines
     for r = 1:max_r
         @constraint(mn22, sum(v[(i,r)] for i = 1:cv) <= K)
     end
+
     # Logical "and" operator for the proposition: v_ir and u_jr == l_ijr.
     # Meaning that, if <machine i in room r> and <part j in room r>, then 
     # i and j are in the same room r (l_ijr == 1).
@@ -116,6 +120,7 @@ let
         @constraint(mn22, l[(i,j,r)] <= u[(j,r)])
         @constraint(mn22, l[(i,j,r)] >= v[(i,r)] + u[(j,r)] - 1)    
     end
+    
     # Variable t (theta) must be the sum of lambdas for a given machine-part
     # dependence, iterating every room r. Such constraint allows t[(i,j)] to
     # indicate if machine i and part j share any of the r rooms.
