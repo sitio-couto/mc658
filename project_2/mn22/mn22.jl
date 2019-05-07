@@ -12,7 +12,7 @@
 # m  = Amount of edges between machines and parts (|E|)
 # K  = Maximum amount of machines that can fit in a room
 
-# Importando pacotes
+# Importing packages
 using JuMP, Gurobi, Printf
 
 # Instance path

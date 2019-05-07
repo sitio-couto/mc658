@@ -9,7 +9,7 @@
 # m = number of edges
 # E = Array o tuples (i,j) representing the edges
 
-# Importando pacotes
+# Importing packages
 using JuMP, Gurobi, Printf
 
 # Instance path
