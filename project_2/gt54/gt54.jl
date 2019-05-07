@@ -6,19 +6,23 @@
 
 # VARIABLES DESCRIPTION
 # n = Amount of nodes in instance
-# m = Amount of edges in instance| c = |C|)
+# m = Amount of edges in instance
 # s = Starting vertex
 # t = Ending vertex
 # c = Cardinality of C set
 # C = C set (vertex pairs restrictions) represented by an array of tuples
+# E = Array of tuples representing the existing edges in the graph 
 # W = Adjacency matrix with weights representing the instance graph 
-# NOTE: The adjacency W was used alongside the edges list E in this 
+# NOTE: The adjacency matrix W was used alongside the edges list E in this 
 # particular exercise due to the last two restrictions (entry/exit degree).
 # Using only the list E, it took several minutes for the model to be built,
-# so the matrix was used to reduce the amount of comparations done per vertex.
+# so the matrix was used to reduce the amount of operation done per vertex
+# when creating the last two restrictions.
 
 # Importing packages
 using JuMP, Gurobi, Printf
+
+# Instance path
 file_name = "Instancias/gt54."*ARGS[1]*".instance"
 
 # Time Limit
@@ -30,9 +34,9 @@ end
 
 # INPUT: data processing and representation block
 n,m,c,s,t,C,E,W = open(file_name) do file
-    data = readlines(file) # Reads whole input line by line
-    (n,c,m) = map(x->parse(Int64,x), split(data[1]))
-    (s,t) = map(x->parse(Int64,x), split(data[2]))
+    data = readlines(file)
+    (n,c,m) = map(x->parse(Int64,x), split(data[1])) # Parse |V|, |C| and |E|
+    (s,t) = map(x->parse(Int64,x), split(data[2]))   # Parse origin and destination
     C = Array{Tuple{Int64, Int64}}(undef,c) # Tuples to keep C set values
     E = Array{Tuple{Int64, Int64}}(undef,m) # Tuples representing existing edges
     W = zeros(Int64,(n,n)) # Adjacency matrix with weights representing the G(V,A) graph
@@ -45,8 +49,8 @@ n,m,c,s,t,C,E,W = open(file_name) do file
 
     # Reads the edges presented in the input and its respectives weights
     # The matrix is accesed by W[i,j] = w, which means we are accessing the
-    # edge from i to j with weight w (if w=0 theres no (i,j) edge) 
-    for (i,edge) in enumerate(data[(3+c):(2+c+m)])
+    # directed edge, from i to j, with weight w (if w=0 theres no such edge) 
+    for (i,edge) in enumerate(dat1a[(3+c):(2+c+m)])
         (v,u,w_vu) = map(x->parse(Int64,x), split(edge))
         E[i] = (v,u)
         W[v,u] = w_vu
@@ -62,8 +66,8 @@ let
     gt54 = Model(solver=GurobiSolver(TimeLimit=TL))
 
     # Setting variables
-    @variable(gt54, x[1:n], Bin)        # Represents if vertex i is in the current path
-    @variable(gt54, e[i in E], Bin) # Represents if edge (i,j) is in the current path
+    @variable(gt54, x[1:n], Bin)    # Represents if vertex i is in the current path
+    @variable(gt54, e[E], Bin)      # Represents if edge (i,j) is in the current path
     
     # objective function: minimize path wheight (sum of the edges weights in the path)
     @objective(gt54, Min, sum(W[i,j]*e[(i,j)] for (i,j) in E))
@@ -73,7 +77,7 @@ let
     @constraint(gt54, x[s] == 1)
     @constraint(gt54, x[t] == 1)
 
-    # Pairs contained in C must not be a part of the solution
+    # Pairs contained in C must have at most one vertex in the solution
     for (a_i, b_i) in C
         @constraint(gt54, x[a_i]+x[b_i] <= 1)
     end
