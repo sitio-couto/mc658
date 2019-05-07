@@ -15,7 +15,7 @@
 using JuMP, Gurobi, Printf
 
 # Instance path
-nome_arq = "Instancias/ss2."*ARGS[1]*".instance"
+file_name = "Instancias/ss2."*ARGS[1]*".instance"
 
 # Time Limit
 if length(ARGS) > 1
@@ -25,7 +25,7 @@ else
 end
 
 # INPUT: data processing and representation block
-n,s,S,T,D = open(nome_arq) do file
+n,s,S,T,D = open(file_name) do file
     data = readlines(file) # Reads whole input line by line
     (n,s) = map(x->parse(Int64,x), split(data[1])) # Parse amount of tasks (|T|) and |S|
     S = Array{Tuple{Int64, Int64}}(undef,s)        # Data representation for pairs in S
