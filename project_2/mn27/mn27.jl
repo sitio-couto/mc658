@@ -7,7 +7,7 @@
 # VARIABLES DESCRIPTION
 # n = number of vertices
 # m = number of edges
-# edges = Array o tuples (i,j) representing the edges
+# E = Array o tuples (i,j) representing the edges
 
 # Importando pacotes
 using JuMP, Gurobi, Printf
@@ -21,22 +21,22 @@ else
 end
 
 # INPUT: data processing and representation block
-n,m,edges = open(file_name, "r") do file
+n,m,E = open(file_name, "r") do file
 	data  = readlines(file)
 
 	# n,m in first line
 	(n,m) = map(x->parse(Int64,x), split(data[1]))
 
 	# Creating edge array
-	edges = Array{Tuple{Int64, Int64}}(undef,m)
+	E = Array{Tuple{Int64, Int64}}(undef,m)
 	
 	# Reading edges
 	for (i, edge) in enumerate(data[2:m+1])
-		edges[i] = Tuple(map(x->parse(Int64,x), split(edge)))
+		E[i] = Tuple(map(x->parse(Int64,x), split(edge)))
 	end
 
 	# Return structured values
-	(n,m,edges)
+	(n,m,E)
 	
 end # End of open block
 
@@ -60,7 +60,7 @@ let
 
 	# Variables
 	@variable(mn27, y[1:n], Bin)				# If color i is used
-	@variable(mn27, x[i in colorVertex], Bin)	# If vertex i is coloured by color m
+	@variable(mn27, x[colorVertex], Bin)# If vertex i is coloured by color m
 
 	# Objective Function
 	@objective(mn27, Min, sum(y))
@@ -72,7 +72,7 @@ let
 	end
 
 	# The head and tail of an edge can't have the same color
-	for (i,j) in edges
+	for (i,j) in E
 		for m = 1:n
 			@constraint(mn27, x[(i,m)] + x[(j,m)] <= 1)
 		end
