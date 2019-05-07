@@ -11,6 +11,8 @@
 
 # Importando pacotes
 using JuMP, Gurobi, Printf
+
+# Instance path
 file_name = "Instancias/mn27."*ARGS[1]*".instance"
 
 # Time Limit
