@@ -6,8 +6,8 @@
 
 # VARIABLES DESCRIPTION
 # n = Amount of tasks in instance (|T|)
-# T = Set containing times for the tasks durations
-# D = Set containing times for the tasks deadlines
+# T = Tasks durations (T[i] = t_i <duration of task i>)
+# D = Tasks deadlines (D[i] = d_i <deadline of task i>)
 # S = Set containing precedence relations in pairs ((i,j)=>task i before j)
 # s = Amount of precedence relations in instance (|S|)
 

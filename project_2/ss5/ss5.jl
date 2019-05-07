@@ -5,13 +5,15 @@
 # Minimize the total cost due to delayed tasks given durations and deadlines
 
 # VARIABLES DESCRIPTION
-# n = Amount of tasks in instance (|T|, |D| or |P|)
+# n = Amount of tasks in instance (|T|)
 # T = Tasks durations (T[i] = t_i <duration of task i>)
 # D = Tasks deadlines (D[i] = d_i <deadline of task i>)
-# P = Tasks delays cost by time unit (P[i] = p_i <cost of task i delay>)
+# P = Tasks delays cost by time unit (P[i] = p_i <cost/time for task's i delay>)
 
 # Importing packages
 using JuMP, Gurobi, Printf
+
+# Instance path
 file_name = "Instancias/ss5."*ARGS[1]*".instance"
 
 # Time Limit
@@ -24,12 +26,12 @@ end
 # INPUT: data processing and representation block
 n,T,D,P = open(file_name) do file
     data = readlines(file)     # Reads whole input line by line
-    n = parse(Int64, data[1])  # Reads number indicating amount of tasks
+    n = parse(Int64, data[1])  # Parse number indicating amount of tasks
     T = Array{Int64}(undef,n)  # task duration times data representation
     D = Array{Int64}(undef,n)  # task deadline times data representation
     P = Array{Int64}(undef,n)  # task delay cost data representation
 
-    # Reads tasks and places duration and deadline in a list of tuples
+    # Reads tasks durations, deadlines and costs 
     for (i, times) in enumerate(data[2:(1+n)])
         (T[i],D[i],P[i]) = map(x->parse(Int64,x), split(times))
     end
@@ -58,25 +60,30 @@ let
 
     # MODEL BUILDING
     ss5 = Model(solver=GurobiSolver(TimeLimit=TL))
+
     # Setting variables
     @variable(ss5, y[ordering], Bin)   # y[(i,j)] indicates if task i comes before j
     @variable(ss5, sig[1:n] >= 0, Int) # sig[i] (non-negative) indicates starting time for task i        
     @variable(ss5, m[1:n] >= 0, Int)   # m[i] (non-negative) indicates the amount of time task i is delayed
+    
     # Setting constant big M
     M = sum(T)
+    
     # Objective function
     @objective(ss5, Min, sum(m .* P))
 
     # CONSTRAINTS
-    # Precedence conditions: if i before j, then j not before i. 
+    # Precedence conditions: either i before j, or j before i. 
     for (i,j) in ordering 
         @constraint(ss5, y[(i,j)] + y[(j,i)] == 1)
     end
-    # Ensures ordering between tasks without overlaps
+
+    # Ensures tasks alocations without overlaps
     for (i,j) in ordering
         @constraint(ss5, sig[i] + T[i] <= sig[j] + (1 - y[(i,j)])*M)
     end
-    # Forces m to be equal to the delay time (or to 0 if no delay)
+    
+    # Forces m[i] to be equal to the delay time of task i (or to 0 if no delay)
     for i = 1:n
         @constraint(ss5, sig[i] + T[i] - D[i] - m[i]<= 0)
     end
