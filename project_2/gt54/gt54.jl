@@ -50,7 +50,7 @@ n,m,c,s,t,C,E,W = open(file_name) do file
     # Reads the edges presented in the input and its respectives weights
     # The matrix is accesed by W[i,j] = w, which means we are accessing the
     # directed edge, from i to j, with weight w (if w=0 theres no such edge) 
-    for (i,edge) in enumerate(dat1a[(3+c):(2+c+m)])
+    for (i,edge) in enumerate(data[(3+c):(2+c+m)])
         (v,u,w_vu) = map(x->parse(Int64,x), split(edge))
         E[i] = (v,u)
         W[v,u] = w_vu
