@@ -2,7 +2,7 @@
 # Vinícius Couto Espindola, RA 188115
 
 # PROBLEM [mn22]
-# Minimize transportation costs of parts to machines in different rooms
+# Minimize transportation costs of parts to machines in different rooms by choosing the best partition of parts and machines in rooms.
 
 # VARIABLES DESCRIPTION
 # E  = Array of edges in the bipartite graph G(V,U,E)

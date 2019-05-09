@@ -2,7 +2,7 @@
 # Vinícius Couto Espindola, RA 188115
 
 # PROBLEM [ss5]
-# Minimize the total cost due to delayed tasks given durations and deadlines
+# Minimize the total cost due to delayed tasks in a single processor given durations and deadlines
 
 # VARIABLES DESCRIPTION
 # n = Amount of tasks in instance (|T|)

@@ -2,7 +2,7 @@
 # Vinícius Couto Espindola, RA 188115
 
 # PROBLEM [ss2]
-# Minimize the amount of delayed tasks given durations and deadlines
+# Minimize the amount of delayed tasks in a single processor given durations, deadlines and some precedence relations.
 
 # VARIABLES DESCRIPTION
 # n = Amount of tasks in instance (|T|)

@@ -2,7 +2,7 @@
 # Vinícius Couto Espindola, RA 188115
 
 # PROBLEM [gt27]
-# Find minimum path between two vertices given certain restrictions
+# Find minimum path between two vertices in which there are at most one vertex from each pair in a set C.
 
 # VARIABLES DESCRIPTION
 # n = Amount of nodes in instance

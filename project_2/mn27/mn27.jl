@@ -2,7 +2,7 @@
 # Vinícius Couto Espindola, RA 188115
 
 # PROBLEM [mn27]
-# Minimize the number o k colors necessary for coloring a graph
+# Find the minimum amount k of colors necessary for a simple graph.
 
 # VARIABLES DESCRIPTION
 # n = number of vertices
