@@ -30,7 +30,7 @@ end
 #    máquina 2.
 
 Le_nome_arquivo(ARGS)
-nome_arq="Instancias/flow"*ARGS[1]*".txt"
+nome_arq="Instances/flow"*ARGS[1]*".txt"
 println(nome_arq)
 f = open(nome_arq,"r")
 

@@ -14,8 +14,8 @@
 using JuMP, Gurobi, Printf
 
 # Instance path
-#file_name = "Instancias/ss5."*ARGS[1]*".instance"
-file_name = ARGS[1]
+file_name = "Instances/ss5."*ARGS[1]*".instance"
+#file_name = ARGS[1]
 
 # Time Limit
 if length(ARGS) > 1

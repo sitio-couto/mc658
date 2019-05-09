@@ -19,7 +19,7 @@ end
 # --------------------------------------------------------------------
 
 Le_nome_arquivo(ARGS)
-nome_arq="Instancias/grafo"*ARGS[1]*".txt"
+nome_arq="Instances/grafo"*ARGS[1]*".txt"
 println(nome_arq)
 
 f = open(nome_arq,"r")
