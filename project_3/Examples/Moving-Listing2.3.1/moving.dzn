@@ -1,0 +1,11 @@
+
+MOVEIS = { piano, geladeira, camaCasal, camaSolteiro, 
+           armario, cadeira, poltrona, mesa };
+duracao      = [60, 45, 30, 30, 20, 15, 15, 15];
+carregadores = [ 3,  2,  2,  1,  2,  1,  1,  2];
+carrinhos    = [ 2,  1,  2,  2,  2,  0,  0,  1];
+total_de_tempo = 180;
+total_de_carregadores = 4;
+total_de_carrinhos = 3;
+
+

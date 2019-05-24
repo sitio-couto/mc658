@@ -1,0 +1,6 @@
+ITEM = 1..5;
+BINS = 1..2;
+
+capacity = [10, 14];
+weights = [2, 4, 5, 3, 9];
+alpha = [19, 23]

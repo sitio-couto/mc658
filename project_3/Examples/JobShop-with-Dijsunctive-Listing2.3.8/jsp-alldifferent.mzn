@@ -1,0 +1,1 @@
+jobshop-CID-alldiff.mzn
