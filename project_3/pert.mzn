@@ -21,12 +21,32 @@ array [JOB] of int: trab;           % Demand of workers for each jobs.
 int: nprec;                         % Amount of precedence relations between jobs of different orders
 array [1..nprec,1..2] of int: prec; % Precedence relations between jobs of different orders.
 
+% BOUNDS:
+% Lower bound for end time: all orders run in parallel. No worker or precedence restrictions. 
+% Max order duration.
+int: end_min = max(i in ORDER)(djo[i]*njo[i]);
+
+% Upper bound for end time: all jobs run sequentially.
+int: end_max = sum(i in ORDER)(djo[i]*njo[i]);
+
+% Upper bound for start time: last job with all sequential.
+int: start_max = end_max - min(djo);
+
+int: digs = ceil(log(10.0,end_max));
+
 % VARIABLES:
+% Start time of each job.
+array [JOB] of var 0..start_max: start;
+
 % The objective (last completion time)
-var 0..1000: end;
+var end_min..end_max: end;
 
 % CONSTRAINTS:
 
+% Solving
+solve :: int_search(start, first_fail, indomain_min, complete)
+      minimize end;
+
 % OUTPUT:
-output [show_int(2,end) ++ "\n"];
-output [show_int(2,i) ++ "  " ++ "0\n" | i in JOB];
+output [show_int(digs,end) ++ "\n"];
+output [show_int(digs,i) ++ " " ++ show_int(digs,start[i]) ++ "\n" | i in JOB];
