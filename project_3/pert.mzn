@@ -59,10 +59,6 @@ array [TIME] of var 0..L: workers;
 var end_min..end_max: end;
 
 % CONSTRAINTS:
-% End time (better than maintaining end times?)
-% Objective function.
-constraint end = max(start) + djo[j_order[arg_max(start)]];
-
 % Precedence: second has to start after first ends.
 constraint 
     forall(i in PRECS)(
@@ -109,11 +105,19 @@ constraint
   forall(i in ORDER,j in TIME)(
     workload[i,j] = sum(k in 1..min(j+1,djo[i]))(flags[i,j+1-k]*trab[task_costs[i][k]])
   );
+  
+constraint
+  forall(t in TIME)(
+    workers[t] = sum(i in ORDER)(workload[i,t])
+  );
+  
+constraint end = max([start[i]+djo[j_order[i]] | i in JOB]);
 
-output ["TEST:\n\(trab)\n\(task_costs[1][1])\n"];
+output ["tasks costs:\n\(trab)\n"];
 output ["start times:\n\(start)\n"];
 output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
 output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
+output ["total workforce:\n\(workers)\n"];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
