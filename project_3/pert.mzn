@@ -93,16 +93,32 @@ constraint
 % Dual Modelling: Não dá para fazer "qual job começou nesse instante" pq pode ter job em paralelo 
 % Tempo gasto nisso =~20min
 
-%%% TESTS %%%
+%%%% TESTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 array [ORDER,TIME] of var {0,1}: flags;
+array [ORDER,TIME] of var int: workload;
+
+array [1..(no+1)] of int: split = [0,djo[1]]++[sum(k in 1..(i-1))(djo[k])+djo[i] | i in 2..no];
+array [ORDER] of set of int: task_costs = [(split[i]+1)..split[i+1] | i in ORDER];
 
 constraint 
   forall(j in JOB)(
-    flags[j_order[j],start[j]+1] = 1
+    flags[j_order[j],start[j]] = 1
+  );
+  
+constraint
+  forall(i in ORDER,j in TIME)(
+    if j >= djo[i]-1 then 
+      workload[i,j] = sum(k in 1..djo[i])(flags[i,j+1-k]*trab[task_costs[i][k]])
+    else
+      workload[i,j] = sum(k in 1..(j+1))(flags[i,j+1-k]*trab[task_costs[i][k]])
+    endif
   );
 
+output ["TEST:\n\(trab)\n\(task_costs[1][1])\n"];
 output ["start times:\n\(start)\n"];
-output ["testing flags table:\n\(flags[1,JOB])\n\(flags[2,JOB])\n\(flags[3,JOB])\n"];
+output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
+output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
 solve :: int_search(start, first_fail, indomain_min, complete)
