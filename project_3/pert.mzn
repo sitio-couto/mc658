@@ -93,6 +93,17 @@ constraint
 % Dual Modelling: Não dá para fazer "qual job começou nesse instante" pq pode ter job em paralelo 
 % Tempo gasto nisso =~20min
 
+%%% TESTS %%%
+array [ORDER,TIME] of var {0,1}: flags;
+
+constraint 
+  forall(j in JOB)(
+    flags[j_order[j],start[j]+1] = 1
+  );
+
+output ["start times:\n\(start)\n"];
+output ["testing flags table:\n\(flags[1,JOB])\n\(flags[2,JOB])\n\(flags[3,JOB])\n"];
+
 % Solving
 solve :: int_search(start, first_fail, indomain_min, complete)
       minimize end;
