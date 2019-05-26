@@ -71,8 +71,8 @@ constraint
 
 % Order: job i+1 only starts after job i, if both are in the same order.
 constraint
-    forall(i in 1..jobs-1)(
-        if j_order[i] == j_order[i+1] then start[i+1] >= start[i] + djo[j_order[i]] endif
+    forall(i in 1..jobs-1 where j_order[i] == j_order[i+1])(
+        start[i+1] >= start[i] + djo[j_order[i]]
     );
 
 % TODO: worker constraints
