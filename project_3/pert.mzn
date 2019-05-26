@@ -107,11 +107,7 @@ constraint
   
 constraint
   forall(i in ORDER,j in TIME)(
-    if j >= djo[i]-1 then 
-      workload[i,j] = sum(k in 1..djo[i])(flags[i,j+1-k]*trab[task_costs[i][k]])
-    else
-      workload[i,j] = sum(k in 1..(j+1))(flags[i,j+1-k]*trab[task_costs[i][k]])
-    endif
+    workload[i,j] = sum(k in 1..min(j+1,djo[i]))(flags[i,j+1-k]*trab[task_costs[i][k]])
   );
 
 output ["TEST:\n\(trab)\n\(task_costs[1][1])\n"];
