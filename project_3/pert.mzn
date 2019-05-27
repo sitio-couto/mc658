@@ -6,8 +6,9 @@
 
 % University of Campinas - 30/05/2019
 
-%include "globals.mzn";
-include "arg_max.mzn";
+include "globals.mzn";
+%include "maximum.mzn";
+%include "disjunctive.mzn";
 
 % INPUT:
 int: L;                             % Available workers
@@ -44,6 +45,10 @@ int: start_max = end_max - min(djo);
 array [JOB] of var ORDER: j_order;
 constraint forall(i in ORDER, j in 1..njo[i])(j_order[sum(k in 1..i-1)(njo[k])+j] = i);
 
+% Duration of each job.
+%array [JOB] of var min(djo)..max(djo): durations;
+%constraint forall(i in JOB, j in ORDER where j_order[i] == j)(durations[i] = djo[j]);
+
 % MISC:
 int: digs = ceil(log(10.0,end_max));
 
@@ -64,6 +69,12 @@ constraint
     forall(i in PRECS)(
         start[prec[i,2]] >= start[prec[i,1]] + djo[j_order[prec[i,1]]]
     );
+    
+% Global constraint version (WORSE)
+%constraint
+%    forall(i in PRECS)(
+%        disjunctive([start[prec[i,1]],start[prec[i,2]]], [djo[j_order[prec[i,1]]],djo[j_order[prec[i,2]]]])
+%    );
 
 % Order: job i+1 only starts after job i, if both are in the same order.
 constraint
@@ -71,17 +82,11 @@ constraint
         start[i+1] >= start[i] + djo[j_order[i]]
     );
 
-% TODO: worker constraints
-% Todo instante de tempo tem um numero de trabalhadores trabalhando
-% O numero de trabalhadores em um instante é a soma de todos os tasks que estão rodando naquela hora
-% não tem preempção, então se um job começar, tem que terminar
-% ainda assim, pode começar um job no meio de outro, se der para os trabalhadores conviverem juntos.
-% TLDR: não dá para associar trabalhadores a jobs, tem que considerar cada task dentro deles.
-% Mas não pode considerar demais, pq não pode parar um job no meio.
-% Não precisa usar L, pq já está no bound da variável.
-
-% When a job starts, the first task starts (wrong: accounts for only one job starting).
-%constraint forall(i in JOB)(workers[start[i]] = trab[sum(k in 1..j_order[i])(djo[k])]);
+% Global constraint version (doesn't work, and is worse when fixed).
+%constraint
+%    forall(i in ORDER)(
+%        disjunctive([start[j] | j in JOB where j_order[j] == i], [djo[i] | k in 1..njo[i]])
+%    );
 
 % BAITS COMUNS:
 % Cumulative: como os trabalhadores são por task, não dá para fazer isso com jobs (sem criatividade)
@@ -91,7 +96,7 @@ constraint
 
 %%%% TESTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 array [ORDER,TIME] of var {0,1}: flags;
-array [ORDER,TIME] of var int: workload;
+array [ORDER,TIME] of var 0..L: workload;
 
 array [1..(no+1)] of int: split = [0,djo[1]]++[sum(k in 1..(i-1))(djo[k])+djo[i] | i in 2..no];
 array [ORDER] of set of int: task_costs = [(split[i]+1)..split[i+1] | i in ORDER];
@@ -111,17 +116,17 @@ constraint
     workers[t] = sum(i in ORDER)(workload[i,t])
   );
   
-constraint end = max([start[i]+djo[j_order[i]] | i in JOB]);
+constraint maximum(end, [start[i]+djo[j_order[i]] | i in JOB]);
 
-output ["tasks costs:\n\(trab)\n"];
-output ["start times:\n\(start)\n"];
-output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
-output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
-output ["total workforce:\n\(workers)\n"];
+%output ["tasks costs:\n\(trab)\n"];
+%output ["start times:\n\(start)\n"];
+%output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
+%output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
+%output ["total workforce:\n\(workers)\n"];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
-solve :: int_search(start, first_fail, indomain_min, complete)
+solve :: int_search(start, most_constrained, indomain_min, complete)
       minimize end;
 
 % OUTPUT:
