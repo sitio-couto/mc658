@@ -153,7 +153,7 @@ output ["total workforce:\n\(workers)\n"];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
-solve :: int_search(start,smallest, indomainindomain_mine)
+solve :: int_search(start, holymolly, itactualwork, complete)
       minimize end;
 
 % OUTPUT:
