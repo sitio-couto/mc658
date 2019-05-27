@@ -9,6 +9,8 @@
 include "globals.mzn";
 %include "maximum.mzn";
 %include "disjunctive.mzn";
+include "exactly.mzn";
+include "count_geq.mzn";
 
 % INPUT:
 int: L;                             % Available workers
@@ -105,24 +107,49 @@ constraint
   forall(j in JOB)(
     flags[j_order[j],start[j]] = 1
   );
-  
+
+
+%%%% EXTRA CONSTRAINTS FOR FLAGS TABLE %%%%%%%%%%%
+% Ensures that exactly njo[i] jobs are scheduled for the i-th order
+constraint
+  forall(i in ORDER)(
+    exactly(njo[i], flags[i,TIME], 1)
+  );
+
+% Ensures each starting flag in the i-th order will be spaced by, at least, 
+% (djo[i]-1) 0 values. Implying no overlaps between same order jobs.
+constraint forall(i in ORDER, j in TIME)(
+    if j <= (end_max+1)-djo[i] then 
+      count_geq(flags[i,j..(j+djo[i]-1)], 1, 1)
+    endif
+  );
+
+%%%% EXTRA CONSTRAINTS FOR WORKLOAD TABLE %%%%%%%%
+% Ensures the workforce does not exceeds at any moment the given limit
+% constraint
+%   forall(j in TIME)(
+%     sum(L, array [int] of var int: bin, array [int] of int: w)
+%   );
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+      
 constraint
   forall(i in ORDER,j in TIME)(
     workload[i,j] = sum(k in 1..min(j+1,djo[i]))(flags[i,j+1-k]*trab[task_costs[i][k]])
   );
   
 constraint
-  forall(t in TIME)(
-    workers[t] = sum(i in ORDER)(workload[i,t])
+  forall(j in TIME)(
+    workers[j] = sum(i in ORDER)(workload[i,j])
   );
-  
+
 constraint maximum(end, [start[i]+djo[j_order[i]] | i in JOB]);
 
-%output ["tasks costs:\n\(trab)\n"];
-%output ["start times:\n\(start)\n"];
-%output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
-%output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
-%output ["total workforce:\n\(workers)\n"];
+output ["tasks costs:\n\(trab)\n"];
+output ["start times:\n\(start)\n"];
+output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
+output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
+output ["total workforce:\n\(workers)\n"];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
