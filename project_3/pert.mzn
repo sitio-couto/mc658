@@ -44,8 +44,7 @@ int: start_max = end_max - min(djo);
 
 % CONSTANTS:
 % Order of each job.
-array [JOB] of var ORDER: j_order;
-constraint forall(i in ORDER, j in 1..njo[i])(j_order[sum(k in 1..i-1)(njo[k])+j] = i);
+array [JOB] of var ORDER: j_order = [i | i in ORDER, j in 1..njo[i]];
 
 % Duration of each job.
 %array [JOB] of var min(djo)..max(djo): durations;
@@ -89,12 +88,6 @@ constraint
 %    forall(i in ORDER)(
 %        disjunctive([start[j] | j in JOB where j_order[j] == i], [djo[i] | k in 1..njo[i]])
 %    );
-
-% BAITS COMUNS:
-% Cumulative: como os trabalhadores são por task, não dá para fazer isso com jobs (sem criatividade)
-% Tempo gasto nisso >1h
-% Dual Modelling: Não dá para fazer "qual job começou nesse instante" pq pode ter job em paralelo 
-% Tempo gasto nisso =~20min
 
 %%%% TESTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 array [ORDER,TIME] of var {0,1}: flags;
@@ -145,11 +138,11 @@ constraint
 
 constraint maximum(end, [start[i]+djo[j_order[i]] | i in JOB]);
 
-output ["tasks costs:\n\(trab)\n"];
-output ["start times:\n\(start)\n"];
-output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
-output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
-output ["total workforce:\n\(workers)\n"];
+%output ["tasks costs:\n\(trab)\n"];
+%output ["start times:\n\(start)\n"];
+%output ["testing flags table:\n\(flags[1,0..end_max])\n\(flags[2,TIME])\n\(flags[3,TIME])\n"];
+%output ["testing costs table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n"];
+%output ["total workforce:\n\(workers)\n"];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
