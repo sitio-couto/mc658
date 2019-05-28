@@ -1,1 +1,898 @@
-echo"
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: smallest 0
+INSTANCE: Ins_3o_7j_A.dzn
+10
+ 1  0
+ 2  4
+ 3  4
+ 4  6
+ 5  8
+ 6  0
+ 7  6
+----------
+==========
+%%%mzn-stat initTime=0.00398
+%%%mzn-stat solveTime=0.000233
+%%%mzn-stat solutions=1
+%%%mzn-stat variables=269
+%%%mzn-stat propagators=273
+%%%mzn-stat propagations=664
+%%%mzn-stat nodes=28
+%%%mzn-stat failures=4
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=27
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: first_fail 0
+INSTANCE: Ins_3o_7j_A.dzn
+10
+ 1  0
+ 2  4
+ 3  4
+ 4  6
+ 5  8
+ 6  0
+ 7  6
+----------
+==========
+%%%mzn-stat initTime=0.004355
+%%%mzn-stat solveTime=0.000434
+%%%mzn-stat solutions=1
+%%%mzn-stat variables=269
+%%%mzn-stat propagators=273
+%%%mzn-stat propagations=675
+%%%mzn-stat nodes=27
+%%%mzn-stat failures=4
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=26
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: dom_w_deg 0
+INSTANCE: Ins_3o_7j_A.dzn
+10
+ 1  0
+ 2  4
+ 3  4
+ 4  6
+ 5  8
+ 6  0
+ 7  6
+----------
+==========
+%%%mzn-stat initTime=0.004207
+%%%mzn-stat solveTime=0.000343
+%%%mzn-stat solutions=1
+%%%mzn-stat variables=269
+%%%mzn-stat propagators=273
+%%%mzn-stat propagations=668
+%%%mzn-stat nodes=24
+%%%mzn-stat failures=3
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=23
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: most_constrained 0
+INSTANCE: Ins_3o_7j_A.dzn
+10
+ 1  0
+ 2  4
+ 3  4
+ 4  6
+ 5  8
+ 6  0
+ 7  6
+----------
+==========
+%%%mzn-stat initTime=0.003006
+%%%mzn-stat solveTime=0.000248
+%%%mzn-stat solutions=1
+%%%mzn-stat variables=269
+%%%mzn-stat propagators=273
+%%%mzn-stat propagations=667
+%%%mzn-stat nodes=24
+%%%mzn-stat failures=3
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=23
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: smallest 0
+INSTANCE: Ins_4o_21j_A.dzn
+ 82
+  1   0
+  2   6
+  3  12
+  4  18
+  5  24
+  6  30
+  7  18
+  8  25
+  9  32
+ 10  41
+ 11  50
+ 12  32
+ 13  41
+ 14  50
+ 15  59
+ 16  68
+ 17  40
+ 18  49
+ 19  58
+ 20  67
+ 21  76
+----------
+%%%mzn-stat initTime=0.026958
+%%%mzn-stat solveTime=10.0005
+%%%mzn-stat solutions=5
+%%%mzn-stat variables=2478
+%%%mzn-stat propagators=2485
+%%%mzn-stat propagations=43545924
+%%%mzn-stat nodes=153128
+%%%mzn-stat failures=76514
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=132
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: first_fail 0
+INSTANCE: Ins_4o_21j_A.dzn
+ 82
+  1   0
+  2   6
+  3  12
+  4  18
+  5  24
+  6  30
+  7  18
+  8  25
+  9  32
+ 10  41
+ 11  50
+ 12  32
+ 13  41
+ 14  50
+ 15  59
+ 16  68
+ 17  40
+ 18  49
+ 19  58
+ 20  67
+ 21  76
+----------
+==========
+%%%mzn-stat initTime=0.02631
+%%%mzn-stat solveTime=0.137564
+%%%mzn-stat solutions=4
+%%%mzn-stat variables=2478
+%%%mzn-stat propagators=2485
+%%%mzn-stat propagations=544332
+%%%mzn-stat nodes=1713
+%%%mzn-stat failures=816
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=116
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: dom_w_deg 0
+INSTANCE: Ins_4o_21j_A.dzn
+ 82
+  1   0
+  2   6
+  3  12
+  4  18
+  5  24
+  6  30
+  7  18
+  8  25
+  9  32
+ 10  41
+ 11  50
+ 12  32
+ 13  41
+ 14  50
+ 15  59
+ 16  68
+ 17  40
+ 18  49
+ 19  58
+ 20  67
+ 21  76
+----------
+==========
+%%%mzn-stat initTime=0.026224
+%%%mzn-stat solveTime=0.141958
+%%%mzn-stat solutions=4
+%%%mzn-stat variables=2478
+%%%mzn-stat propagators=2485
+%%%mzn-stat propagations=647576
+%%%mzn-stat nodes=1956
+%%%mzn-stat failures=951
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=52
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: most_constrained 0
+INSTANCE: Ins_4o_21j_A.dzn
+ 82
+  1   0
+  2   6
+  3  12
+  4  18
+  5  24
+  6  30
+  7  18
+  8  25
+  9  32
+ 10  41
+ 11  50
+ 12  32
+ 13  41
+ 14  50
+ 15  59
+ 16  68
+ 17  40
+ 18  49
+ 19  58
+ 20  67
+ 21  76
+----------
+==========
+%%%mzn-stat initTime=0.025598
+%%%mzn-stat solveTime=0.07243
+%%%mzn-stat solutions=4
+%%%mzn-stat variables=2478
+%%%mzn-stat propagators=2485
+%%%mzn-stat propagations=303939
+%%%mzn-stat nodes=917
+%%%mzn-stat failures=427
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=54
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: smallest 0
+INSTANCE: Ins_4o_23j_A.dzn
+ 69
+  1   0
+  2   4
+  3   9
+  4  13
+  5  17
+  6  21
+  7  30
+  8   6
+  9  26
+ 10  35
+ 11  41
+ 12  50
+ 13  12
+ 14  20
+ 15  29
+ 16  44
+ 17  53
+ 18  61
+ 19   0
+ 20   9
+ 21  16
+ 22  29
+ 23  44
+----------
+%%%mzn-stat initTime=0.027249
+%%%mzn-stat solveTime=10.0005
+%%%mzn-stat solutions=3
+%%%mzn-stat variables=2484
+%%%mzn-stat propagators=2493
+%%%mzn-stat propagations=42470714
+%%%mzn-stat nodes=161308
+%%%mzn-stat failures=80592
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=161
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: first_fail 0
+INSTANCE: Ins_4o_23j_A.dzn
+ 58
+  1   3
+  2   7
+  3  15
+  4  19
+  5  25
+  6  34
+  7  43
+  8   0
+  9  12
+ 10  21
+ 11  30
+ 12  39
+ 13   6
+ 14  15
+ 15  24
+ 16  33
+ 17  42
+ 18  50
+ 19   3
+ 20  16
+ 21  24
+ 22  33
+ 23  42
+----------
+==========
+%%%mzn-stat initTime=0.030276
+%%%mzn-stat solveTime=0.038737
+%%%mzn-stat solutions=5
+%%%mzn-stat variables=2484
+%%%mzn-stat propagators=2493
+%%%mzn-stat propagations=118314
+%%%mzn-stat nodes=590
+%%%mzn-stat failures=222
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=139
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: dom_w_deg 0
+INSTANCE: Ins_4o_23j_A.dzn
+ 58
+  1   3
+  2   7
+  3  15
+  4  19
+  5  25
+  6  34
+  7  43
+  8   0
+  9  12
+ 10  21
+ 11  30
+ 12  39
+ 13   6
+ 14  15
+ 15  24
+ 16  33
+ 17  42
+ 18  50
+ 19   3
+ 20  16
+ 21  24
+ 22  33
+ 23  42
+----------
+==========
+%%%mzn-stat initTime=0.027143
+%%%mzn-stat solveTime=0.026811
+%%%mzn-stat solutions=7
+%%%mzn-stat variables=2484
+%%%mzn-stat propagators=2493
+%%%mzn-stat propagations=74375
+%%%mzn-stat nodes=456
+%%%mzn-stat failures=145
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=76
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: most_constrained 0
+INSTANCE: Ins_4o_23j_A.dzn
+ 58
+  1   3
+  2   7
+  3  15
+  4  19
+  5  25
+  6  34
+  7  43
+  8   0
+  9  12
+ 10  21
+ 11  30
+ 12  39
+ 13   6
+ 14  15
+ 15  24
+ 16  33
+ 17  42
+ 18  50
+ 19   3
+ 20  16
+ 21  24
+ 22  33
+ 23  42
+----------
+==========
+%%%mzn-stat initTime=0.02671
+%%%mzn-stat solveTime=0.014995
+%%%mzn-stat solutions=3
+%%%mzn-stat variables=2484
+%%%mzn-stat propagators=2493
+%%%mzn-stat propagations=44523
+%%%mzn-stat nodes=244
+%%%mzn-stat failures=81
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=80
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: smallest 0
+INSTANCE: Ins_4o_24j_A.dzn
+ 71
+  1   0
+  2   7
+  3  18
+  4  31
+  5  49
+  6  56
+  7  63
+  8   2
+  9  11
+ 10  22
+ 11  46
+ 12   5
+ 13  20
+ 14  38
+ 15  13
+ 16  24
+ 17  29
+ 18  34
+ 19  39
+ 20  44
+ 21  51
+ 22  56
+ 23  61
+ 24  66
+----------
+%%%mzn-stat initTime=0.029919
+%%%mzn-stat solveTime=10.0006
+%%%mzn-stat solutions=11
+%%%mzn-stat variables=2793
+%%%mzn-stat propagators=2795
+%%%mzn-stat propagations=42481130
+%%%mzn-stat nodes=149585
+%%%mzn-stat failures=74703
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=168
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: first_fail 0
+INSTANCE: Ins_4o_24j_A.dzn
+ 74
+  1  16
+  2  23
+  3  30
+  4  37
+  5  53
+  6  60
+  7  67
+  8  28
+  9  41
+ 10  50
+ 11  65
+ 12   0
+ 13   8
+ 14  39
+ 15   8
+ 16  13
+ 17  18
+ 18  23
+ 19  32
+ 20  43
+ 21  48
+ 22  55
+ 23  60
+ 24  69
+----------
+%%%mzn-stat initTime=0.028847
+%%%mzn-stat solveTime=10.0005
+%%%mzn-stat solutions=3
+%%%mzn-stat variables=2793
+%%%mzn-stat propagators=2795
+%%%mzn-stat propagations=46930867
+%%%mzn-stat nodes=146332
+%%%mzn-stat failures=73127
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=155
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: dom_w_deg 0
+INSTANCE: Ins_4o_24j_A.dzn
+ 79
+  1  24
+  2  31
+  3  43
+  4  50
+  5  58
+  6  65
+  7  72
+  8  38
+  9  47
+ 10  56
+ 11  70
+ 12   0
+ 13   8
+ 14  16
+ 15   8
+ 16  13
+ 17  18
+ 18  23
+ 19  28
+ 20  33
+ 21  38
+ 22  60
+ 23  65
+ 24  74
+----------
+%%%mzn-stat initTime=0.03039
+%%%mzn-stat solveTime=10.0006
+%%%mzn-stat solutions=2
+%%%mzn-stat variables=2793
+%%%mzn-stat propagators=2795
+%%%mzn-stat propagations=46920796
+%%%mzn-stat nodes=148068
+%%%mzn-stat failures=74006
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=84
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: most_constrained 0
+INSTANCE: Ins_4o_24j_A.dzn
+ 74
+  1  16
+  2  23
+  3  30
+  4  37
+  5  53
+  6  60
+  7  67
+  8  28
+  9  41
+ 10  50
+ 11  65
+ 12   0
+ 13   8
+ 14  39
+ 15   8
+ 16  13
+ 17  18
+ 18  23
+ 19  32
+ 20  43
+ 21  48
+ 22  55
+ 23  60
+ 24  69
+----------
+%%%mzn-stat initTime=0.03139
+%%%mzn-stat solveTime=10.0004
+%%%mzn-stat solutions=6
+%%%mzn-stat variables=2793
+%%%mzn-stat propagators=2795
+%%%mzn-stat propagations=41501473
+%%%mzn-stat nodes=132314
+%%%mzn-stat failures=66133
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=94
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: smallest 0
+INSTANCE: Ins_4o_24j_B.dzn
+ 73
+  1   0
+  2   8
+  3  17
+  4  27
+  5  37
+  6  47
+  7   0
+  8   4
+  9  10
+ 10  56
+ 11  62
+ 12  67
+ 13   2
+ 14  17
+ 15  27
+ 16  37
+ 17  62
+ 18  13
+ 19  23
+ 20  33
+ 21  43
+ 22  52
+ 23  58
+ 24  69
+----------
+%%%mzn-stat initTime=0.024776
+%%%mzn-stat solveTime=10.0004
+%%%mzn-stat solutions=1
+%%%mzn-stat variables=2368
+%%%mzn-stat propagators=2378
+%%%mzn-stat propagations=47000357
+%%%mzn-stat nodes=192327
+%%%mzn-stat failures=96110
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=163
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: first_fail 0
+INSTANCE: Ins_4o_24j_B.dzn
+ 76
+  1   0
+  2   7
+  3  14
+  4  21
+  5  28
+  6  45
+  7   0
+  8   5
+  9  10
+ 10  55
+ 11  61
+ 12  65
+ 13   9
+ 14  17
+ 15  25
+ 16  45
+ 17  62
+ 18  33
+ 19  37
+ 20  41
+ 21  51
+ 22  57
+ 23  68
+ 24  72
+----------
+%%%mzn-stat initTime=0.026141
+%%%mzn-stat solveTime=10.0003
+%%%mzn-stat solutions=4
+%%%mzn-stat variables=2368
+%%%mzn-stat propagators=2378
+%%%mzn-stat propagations=44847778
+%%%mzn-stat nodes=175939
+%%%mzn-stat failures=87929
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=139
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: dom_w_deg 0
+INSTANCE: Ins_4o_24j_B.dzn
+ 79
+  1   0
+  2   7
+  3  14
+  4  21
+  5  28
+  6  35
+  7   0
+  8   5
+  9   9
+ 10  42
+ 11  64
+ 12  68
+ 13  11
+ 14  19
+ 15  27
+ 16  35
+ 17  65
+ 18  44
+ 19  48
+ 20  52
+ 21  56
+ 22  60
+ 23  71
+ 24  75
+----------
+%%%mzn-stat initTime=0.023884
+%%%mzn-stat solveTime=10.0004
+%%%mzn-stat solutions=2
+%%%mzn-stat variables=2368
+%%%mzn-stat propagators=2378
+%%%mzn-stat propagations=53270624
+%%%mzn-stat nodes=229587
+%%%mzn-stat failures=114778
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=68
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: most_constrained 0
+INSTANCE: Ins_4o_24j_B.dzn
+ 79
+  1   0
+  2   7
+  3  14
+  4  21
+  5  28
+  6  35
+  7   0
+  8   5
+  9   9
+ 10  42
+ 11  64
+ 12  68
+ 13  11
+ 14  19
+ 15  27
+ 16  35
+ 17  65
+ 18  44
+ 19  48
+ 20  52
+ 21  56
+ 22  60
+ 23  71
+ 24  75
+----------
+%%%mzn-stat initTime=0.024547
+%%%mzn-stat solveTime=10.0004
+%%%mzn-stat solutions=2
+%%%mzn-stat variables=2368
+%%%mzn-stat propagators=2378
+%%%mzn-stat propagations=49092023
+%%%mzn-stat nodes=226543
+%%%mzn-stat failures=113253
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=77
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: smallest 0
+INSTANCE: Ins_4o_27j_A.dzn
+ 67
+  1   0
+  2   9
+  3  18
+  4  27
+  5  48
+  6  56
+  7   6
+  8  13
+  9  22
+ 10  31
+ 11  38
+ 12  44
+ 13  53
+ 14   4
+ 15  14
+ 16  23
+ 17  32
+ 18  39
+ 19  45
+ 20  60
+ 21   4
+ 22  14
+ 23  23
+ 24  32
+ 25  42
+ 26  52
+ 27  60
+----------
+%%%mzn-stat initTime=0.030406
+%%%mzn-stat solveTime=10.0005
+%%%mzn-stat solutions=4
+%%%mzn-stat variables=2870
+%%%mzn-stat propagators=2886
+%%%mzn-stat propagations=29453412
+%%%mzn-stat nodes=126092
+%%%mzn-stat failures=62982
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=187
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: first_fail 0
+INSTANCE: Ins_4o_27j_A.dzn
+ 69
+  1   0
+  2  25
+  3  32
+  4  41
+  5  56
+  6  64
+  7   6
+  8  12
+  9  20
+ 10  29
+ 11  38
+ 12  47
+ 13  53
+ 14   4
+ 15  10
+ 16  16
+ 17  22
+ 18  36
+ 19  45
+ 20  60
+ 21   4
+ 22  13
+ 23  21
+ 24  36
+ 25  45
+ 26  52
+ 27  60
+----------
+%%%mzn-stat initTime=0.031701
+%%%mzn-stat solveTime=10.0006
+%%%mzn-stat solutions=5
+%%%mzn-stat variables=2870
+%%%mzn-stat propagators=2886
+%%%mzn-stat propagations=41628564
+%%%mzn-stat nodes=107580
+%%%mzn-stat failures=53755
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=167
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: dom_w_deg 0
+INSTANCE: Ins_4o_27j_A.dzn
+ 69
+  1   0
+  2  24
+  3  33
+  4  42
+  5  56
+  6  64
+  7   5
+  8  14
+  9  20
+ 10  30
+ 11  39
+ 12  47
+ 13  53
+ 14   4
+ 15  10
+ 16  21
+ 17  28
+ 18  37
+ 19  46
+ 20  60
+ 21   6
+ 22  13
+ 23  20
+ 24  28
+ 25  37
+ 26  52
+ 27  60
+----------
+%%%mzn-stat initTime=0.031425
+%%%mzn-stat solveTime=10.0004
+%%%mzn-stat solutions=7
+%%%mzn-stat variables=2870
+%%%mzn-stat propagators=2886
+%%%mzn-stat propagations=25246822
+%%%mzn-stat nodes=126791
+%%%mzn-stat failures=63371
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=94
+%%%mzn-stat-end
+\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%
+PARAMS: most_constrained 0
+INSTANCE: Ins_4o_27j_A.dzn
+ 69
+  1   0
+  2  24
+  3  33
+  4  42
+  5  56
+  6  64
+  7   5
+  8  14
+  9  20
+ 10  30
+ 11  39
+ 12  47
+ 13  53
+ 14   4
+ 15  10
+ 16  21
+ 17  28
+ 18  37
+ 19  46
+ 20  60
+ 21   6
+ 22  13
+ 23  20
+ 24  28
+ 25  37
+ 26  52
+ 27  60
+----------
+%%%mzn-stat initTime=0.030983
+%%%mzn-stat solveTime=10.0006
+%%%mzn-stat solutions=8
+%%%mzn-stat variables=2870
+%%%mzn-stat propagators=2886
+%%%mzn-stat propagations=29412532
+%%%mzn-stat nodes=124357
+%%%mzn-stat failures=62142
+%%%mzn-stat restarts=0
+%%%mzn-stat peakDepth=94
+%%%mzn-stat-end
