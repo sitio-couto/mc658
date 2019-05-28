@@ -1,5 +1,18 @@
 from sys import argv
 
+# PASS THE FOLLOWING PARAMETERS:
+# <time_limit>  = given in seconds
+# <output_file> = name of file to print results
+# <type_gen>    = how to combine varchoice and contraintchoice
+#  type_gen = 1 => only change varchoice in the given scope 
+#  type_gen = 2 => only change contraintchoice in the given scope 
+#  type_gen = 3 => combine var and contraintchoice in their given scopes 
+
+# Select how many elements from the list od all possible choices 
+# will be chosen to iterate.
+VS = 4
+CS = 4
+
 # Lists with all possible values for var and contraint choice
 varchoice = ["smallest","first_fail","dom_w_deg","most_constrained",
              "input_order","occurrence","anti_first_fail","impact",
@@ -36,9 +49,9 @@ command = "minizinc "+file_name+" -s -t "+str(time_limit)
 
 vcs = []
 ccs = []
-for vc in varchoice[:4]:
+for vc in varchoice[:VS]:
     vcs.append(vc)
-for cc in constchoice[:4]:
+for cc in constchoice[:CS]:
     ccs.append(cc)
 
 output = []
