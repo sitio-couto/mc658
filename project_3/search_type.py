@@ -16,7 +16,7 @@ elif len(argv) < 3:
     print("ERROR: Missing arguments for search_type.py")
 else:
     
-    for i in range(1,3):
+    for i in [1,2]:
         s = [start-1]
         s += [start+j for j,x in enumerate(content[start:end]) if x == ","]
         s += [end]
@@ -24,15 +24,6 @@ else:
         # Change var choice
         if argv[i] != '0':
             content = content[:s[i]+1]+" "+argv[i]+content[s[i+1]:]
-
-    # print(content[start:end])
-    # print(list(map(lambda x : content[x],s)))
-    # print(content[s[1]+1:s[2]])
-    # print(content[s[2]+1:s[3]])
-
-    
-    
-    
 
 test.write(content)
 code.close()
