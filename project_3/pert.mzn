@@ -44,7 +44,7 @@ int: start_max = end_max - min(djo);
 
 % CONSTANTS:
 % Order of each job.
-array [JOB] of var ORDER: j_order = [i | i in ORDER, j in 1..njo[i]];
+array [JOB] of int: j_order = [i | i in ORDER, j in 1..njo[i]];
 
 % Duration of each job.
 %array [JOB] of var min(djo)..max(djo): durations;
