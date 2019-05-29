@@ -86,6 +86,7 @@ elif (argv[3]=="3"):
     
 
 script = open(script_name,"w")
-map(script.write,output)
+for i in output:
+    script.write(i)    
 script.write("\n")
 script.close()
