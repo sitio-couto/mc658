@@ -6,11 +6,9 @@
 
 % University of Campinas - 30/05/2019
 
-include "globals.mzn";
-%include "maximum.mzn";
-%include "disjunctive.mzn";
-%include "exactly.mzn";
-%include "count_geq.mzn";
+include "maximum.mzn";
+include "exactly.mzn";
+include "count_geq.mzn";
 
 %%%% INPUT %%%%
 int: L;                             % Available workers
@@ -19,38 +17,48 @@ array [ORDER] of int: njo;          % Amount of jobs per order
 array [ORDER] of int: djo;          % Duration of jobs per order AKA amount of tasks per job.
 array [1..tasks] of int: trab;      % Demand of workers for each task.
 int: nprec;                         % Amount of precedence relations between jobs of different orders
-array [1..nprec,1..2] of int: prec; % Precedence relations between jobs of different orders.
+array [PRECS,1..2] of int: prec;    % Precedence relations between jobs of different orders.
 
 %%%% STRUCTURING INPUT DATA %%%%
 % Constants:
 int: digs = ceil(log(10.0,end_max));  % format output (amount of digits)
 int: jobs = sum(i in ORDER)(njo[i]);  % Amount of jobs
 int: tasks = sum(i in ORDER)(djo[i]); % Amount of tasks
+
 % Sets:
 set of int: ORDER = 1..no;    % Set of orders indexes
 set of int: JOB = 1..jobs;    % Set of jobs indexes
 set of int: PRECS = 1..nprec; % Set of different order precedences indexes
 
+
 %%%% ASSETS %%%%
 % JOB ORDER ARRAY: Given a job index, returns its order
 array [JOB] of int: j_ord = [o | o in ORDER, n in 1..njo[o]];
+
 % JOB DURATION ARRAY: Given a job index, returns its duration.
 array [JOB] of int: djj = [djo[j_ord[j]] | j in JOB];
-% BOUNDS: Value which will be the minimization target
+
+% BOUNDS:
 int: end_min = max(i in ORDER)(djo[i]*njo[i]); % Lower bound: all orders run in parallel. 
 int: end_max = sum(i in ORDER)(djo[i]*njo[i]); % Upper bound: all jobs run sequentially.
-int: start_max = end_max - min(djo); % Start time upper bound: last job with all sequential.
+int: start_max = end_max - min(djo);           % Start time upper bound: last job with all sequential.
+
 % SETS:
-set of int: TIME = 0..end_max; % Set of time indexes (each values is a moment)
+set of int: TIME = 0..end_max; % Set of time indexes (each value is a moment)
+
 
 %%%% VARIABLES %%%%
 var end_min..end_max: end;
+
 % Search scope: Start times of each job.
 array [JOB] of var 0..start_max: start;
-% Table indicating the moment 't' where e job within order 'o' starts
+
+% Table indicating the moment 't' where A job within order 'o' starts
 array [ORDER,TIME] of var 0..1: flag;       % Job of order 'o' starts on 't', then flag[o,t] = 1
+
 % Table which calculates workload per order 'o' for each instant 't'.
-array [ORDER,TIME] of var 0..L: workload;   % workload[o,t] = <workload o jobs in order o at instant t>
+array [ORDER,TIME] of var 0..L: workload;   % workload[o,t] = <workload of jobs in order o at instant t>
+
 
 %%%% PRECEDENCE CONSTRAINTS %%%%
 % Given the list os precedences (prec) for jobs in different orders, ensures the
@@ -60,21 +68,24 @@ constraint
         start[prec[p,2]] >= start[prec[p,1]] + djj[prec[p,1]]
     );
 
-% Ensures that jobs within the same order are schedulede according to its index,
+% Ensures that jobs within the same order are scheduled according to its index,
 % meaning job i+1 only starts after job i, if both are in the same order.
 constraint
     forall(j in 1..(jobs-1) where j_ord[j] == j_ord[j+1])(
         start[j+1] >= start[j] + djj[j]
     );
 
+
 %%%% STRUCTURING TASK COSTS %%%%%
 % First, an array with indexes indicating the index slices of the tasks cost of each
 % order within the trab array (slice[i]+1..slice[i+1] = i-th order tasks costs indexes)
 array [1..(no+1)] of int: slice = [0,djo[1]]++[sum(k in 1..(i-1))(djo[k])+djo[i] | i in 2..no];
+
 % Second, an array of sets where the i-th array position has the set of indexes which
 % point the task costs of the i-th order. Therefore, task_cost[i][k] holds the index 
 % of the k-th task from the i-th order, which can be passed to trab, obtaining the cost.
 array [ORDER] of set of int: task_costs = [(slice[i]+1)..slice[i+1] | i in ORDER];
+
 
 %%%% FLAG TABLE CONSTRAINTS %%%%
 % Ensures that if a job from order 'o' starts at time 't', then the 
@@ -100,8 +111,9 @@ constraint forall(i in ORDER, j in TIME)(
     endif
   );
 
+
 %%%% WORKLOAD TABLE CONSTRAINTS %%%%
-% Ensures the assingment of the tasks costs to the workload table. To do so, it
+% Ensures the assignment of the tasks costs to the workload table. To do so, it
 % uses the flag table to identify where a task of a certain order starts, and 
 % then applies the cost profile of that order starting from the instant pointed
 % by the flag.
@@ -116,6 +128,7 @@ constraint
   forall(t in TIME)(
     sum(workload[ORDER,t]) <= L
   );
+
 
 %%%% OBJECTIVE CONSTRAINT %%%%
 % Attributes to end var the current makespan
