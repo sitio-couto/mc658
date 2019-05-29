@@ -7,7 +7,7 @@
 % University of Campinas - 30/05/2019
 
 include "globals.mzn";
-%include "maximum.mzn";
+include "maximum.mzn";
 %include "disjunctive.mzn";
 include "exactly.mzn";
 include "count_geq.mzn";
@@ -146,7 +146,7 @@ constraint maximum(end, [start[i]+djo[j_order[i]] | i in JOB]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
-solve :: int_search(start, most_constrained, indomain_min, complete)
+solve :: int_search(start, first_fail, indomain_min, complete)
       minimize end;
 
 % OUTPUT:

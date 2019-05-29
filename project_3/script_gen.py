@@ -10,11 +10,11 @@ from sys import argv
 
 # Select how many elements from the list od all possible choices 
 # will be chosen to iterate.
-VS = 4
-CS = 4
+VS = 2
+CS = 2
 
 # Lists with all possible values for var and contraint choice
-varchoice = ["smallest","first_fail","dom_w_deg","most_constrained",
+varchoice = ["first_fail","dom_w_deg","smallest","most_constrained",
              "input_order","occurrence","anti_first_fail","impact",
              "largest","max_regret"]
 constchoice = ["indomain_min","indomain_median","indomain_random",

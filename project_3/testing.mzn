@@ -146,7 +146,7 @@ constraint maximum(end, [start[i]+djo[j_order[i]] | i in JOB]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Solving
-solve :: int_search(start, most_constrained, indomain_split, complete)
+solve :: int_search(start, dom_w_deg, indomain_median, complete)
       minimize end;
 
 % OUTPUT:
