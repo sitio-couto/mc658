@@ -6,6 +6,10 @@
 
 % University of Campinas - 30/05/2019
 
+include "disjunctive.mzn";
+include "alldifferent.mzn";
+include "increasing.mzn";
+include "member.mzn";
 include "maximum.mzn";
 include "exactly.mzn";
 include "count_geq.mzn";
@@ -68,12 +72,12 @@ constraint
         start[prec[p,2]] >= start[prec[p,1]] + djj[prec[p,1]]
     );
 
-% Ensures that jobs within the same order are scheduled according to its index,
-% meaning job i+1 only starts after job i, if both are in the same order.
-constraint
-    forall(j in 1..(jobs-1) where j_ord[j] == j_ord[j+1])(
-        start[j+1] >= start[j] + djj[j]
-    );
+% % Ensures that jobs within the same order are scheduled according to its index,
+% % meaning job i+1 only starts after job i, if both are in the same order.
+% constraint
+%     forall(j in 1..(jobs-1) where j_ord[j] == j_ord[j+1])(
+%         start[j+1] >= start[j] + djj[j]
+%     );
 
 
 %%%% STRUCTURING TASK COSTS %%%%%
@@ -129,6 +133,46 @@ constraint
     sum(workload[ORDER,t]) <= L
   );
 
+
+%%%% TESTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+array [1..(no+1)] of int: os = [1]++[sum(k in 1..o)(njo[k])+1 | o in ORDER];
+array [ORDER,TIME] of var TIME: start_times;
+
+% Ensures precedence relations between jobs of the same order:
+% The start times of higher index jobs must be greater than
+constraint
+    forall(o in ORDER)(
+      increasing(start[os[o]..(os[o+1]-1)])
+    );
+
+% TWO WAYS: Use alldifferent to ensure that the increasing constrain cannot allow 
+% duplicates, or simply use disjunctive adding a layer of redundancy on the restriction
+% of non-overlapping time for jobs whithin the same order
+constraint
+  forall(o in ORDER)(
+    disjunctive(start[os[o]..(os[o+1]-1)],djj[os[o]..(os[o+1]-1)])
+  );
+% constraint
+%   forall(o in ORDER)(
+%     alldifferent(start[order_split[o]..(order_split[o+1]-1)])
+%   );
+
+constraint
+  forall(o in ORDER, t in TIME)(
+    start_times[o,t] = flag[o,t]*t
+  );
+
+constraint
+  forall(j in JOB)(
+    member(start_times[j_ord[j],TIME], start[j])
+  );
+
+% output ["\nTesting splitter:\n\(os)"];
+% output ["\nTesting flags table:\n\(flag[1,TIME])\n\(flag[2,TIME])\n\(flag[3,TIME])"];
+% output ["\nTesting start times table:\n\(start_times[1,TIME])\n\(start_times[2,TIME])\n\(start_times[3,TIME])"];
+% output ["\nTesting start times table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n\n"];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% OBJECTIVE CONSTRAINT %%%%
 % Attributes to end var the current makespan
