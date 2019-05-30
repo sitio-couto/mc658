@@ -55,8 +55,15 @@ for cc in constchoice[:CS]:
     ccs.append(cc)
 
 output = []
-# Generate only chaging varchoices
-if (argv[3]=="1"):
+# generate whithout changing var/contraintchoices
+if (argv[3]=="0"):
+    for i in small:
+        output.append('\necho "'+splitter+'"'+" >> "+out_file)
+        output.append("\necho 'PARAMS: 0 0' >> "+out_file)
+        output.append('\necho "'+'INSTANCE: '+i+'" >> '+out_file)
+        output.append("\n"+command+" Instances/"+i+" >> "+out_file)
+# Generate only chaging varchoices    
+elif (argv[3]=="1"):
     for i in small:
         for vc in vcs:
             output.append("\npython search_type.py "+vc+" "+cc)
