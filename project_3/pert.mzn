@@ -42,6 +42,9 @@ array [JOB] of int: j_ord = [o | o in ORDER, n in 1..njo[o]];
 % JOB DURATION ARRAY: Given a job index, returns its duration.
 array [JOB] of int: djj = [djo[j_ord[j]] | j in JOB];
 
+% ORDER SPLIT INDEX ARRAY: Indicates de job where the i-th order starts (order_split[o] = <first job>)
+array [1..(no+1)] of int: ord_split = [1]++[sum(k in 1..o)(njo[k])+1 | o in ORDER];
+
 % BOUNDS:
 int: end_min = max(i in ORDER)(djo[i]*njo[i]); % Lower bound: all orders run in parallel. 
 int: end_max = sum(i in ORDER)(djo[i]*njo[i]); % Upper bound: all jobs run sequentially.
@@ -63,6 +66,9 @@ array [ORDER,TIME] of var 0..1: flag;       % Job of order 'o' starts on 't', th
 % Table which calculates workload per order 'o' for each instant 't'.
 array [ORDER,TIME] of var 0..L: workload;   % workload[o,t] = <workload of jobs in order o at instant t>
 
+% Table with the starting time of every job per order
+array [ORDER,TIME] of var TIME: start_times;
+
 
 %%%% PRECEDENCE CONSTRAINTS %%%%
 % Given the list os precedences (prec) for jobs in different orders, ensures the
@@ -74,11 +80,25 @@ constraint
 
 % % Ensures that jobs within the same order are scheduled according to its index,
 % % meaning job i+1 only starts after job i, if both are in the same order.
-% constraint
-%     forall(j in 1..(jobs-1) where j_ord[j] == j_ord[j+1])(
-%         start[j+1] >= start[j] + djj[j]
-%     );
+constraint
+    forall(j in 1..(jobs-1) where j_ord[j] == j_ord[j+1])(
+        start[j+1] >= start[j] + djj[j]
+    );
 
+% EXTRA CONSTRAINTS:
+% (Redundant)Ensures precedence relations between jobs of the same order:
+% Start times of jobs within the same order must not overlap
+constraint
+  forall(o in ORDER)(
+    disjunctive(start[ord_split[o]..(ord_split[o+1]-1)],djj[ord_split[o]..(ord_split[o+1]-1)])
+  );
+
+% (Redundant)Ensures precedence relations between jobs of the same order:
+% The start times of higher index jobs must be greater than jobs with a lower index within the same order
+constraint
+    forall(o in ORDER)(
+      increasing(start[ord_split[o]..(ord_split[o+1]-1)])
+    );
 
 %%%% STRUCTURING TASK COSTS %%%%%
 % First, an array with indexes indicating the index slices of the tasks cost of each
@@ -93,21 +113,21 @@ array [ORDER] of set of int: task_costs = [(slice[i]+1)..slice[i+1] | i in ORDER
 
 %%%% FLAG TABLE CONSTRAINTS %%%%
 % Ensures that if a job from order 'o' starts at time 't', then the 
-% flag[o,t] shall be set to 1 indicating the jobs schedule
+% flag[o,t] shall be set to 1 indicating the jobs schedule.
 constraint
   forall(j in JOB)(
     flag[j_ord[j],start[j]] = 1
   );
 
 % Ensures that exactly njo[i] (amount jobs of the i-th order) jobs are 
-% scheduled (flag set as 1).
+% scheduled (njo[i] flags set as 1 within the row 'i' of the flags table).
 constraint
   forall(i in ORDER)(
     exactly(njo[i], flag[i,TIME], 1)
   );
 
 % EXTRA CONSTRAINTS:
-% Ensures each starting flag in the i-th order will be spaced by, at least, 
+% (redundant) Ensures each starting flag in the i-th order will be spaced by, at least, 
 % (djo[i]-1) 0 values. Implying no overlaps between same order jobs.
 constraint forall(i in ORDER, j in TIME)(
     if j <= (end_max+1)-djo[i] then 
@@ -133,53 +153,27 @@ constraint
     sum(workload[ORDER,t]) <= L
   );
 
-
-%%%% TESTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-array [1..(no+1)] of int: os = [1]++[sum(k in 1..o)(njo[k])+1 | o in ORDER];
-array [ORDER,TIME] of var TIME: start_times;
-
-% Ensures precedence relations between jobs of the same order:
-% The start times of higher index jobs must be greater than
-constraint
-    forall(o in ORDER)(
-      increasing(start[os[o]..(os[o+1]-1)])
-    );
-
-% TWO WAYS: Use alldifferent to ensure that the increasing constrain cannot allow 
-% duplicates, or simply use disjunctive adding a layer of redundancy on the restriction
-% of non-overlapping time for jobs whithin the same order
-constraint
-  forall(o in ORDER)(
-    disjunctive(start[os[o]..(os[o+1]-1)],djj[os[o]..(os[o+1]-1)])
-  );
-% constraint
-%   forall(o in ORDER)(
-%     alldifferent(start[order_split[o]..(order_split[o+1]-1)])
-%   );
-
+%%%% START_TIMES TABLE CONSTRAINTS %%%%
+% Ensures that if a job of order 'o' starts at the a moment 't', then start_times[o,t] = t, 
+% implying that each row 'o' from starting_times contains the start time of all jobs of order 'o'.
 constraint
   forall(o in ORDER, t in TIME)(
     start_times[o,t] = flag[o,t]*t
   );
 
+% Ensures that a job 'j' of order 'o' has a starting time 'start[j]' which is a member of the row
+% 'o' of the start_times table. This restricts the possible times which a job can start. 
 constraint
   forall(j in JOB)(
     member(start_times[j_ord[j],TIME], start[j])
   );
-
-% output ["\nTesting splitter:\n\(os)"];
-% output ["\nTesting flags table:\n\(flag[1,TIME])\n\(flag[2,TIME])\n\(flag[3,TIME])"];
-% output ["\nTesting start times table:\n\(start_times[1,TIME])\n\(start_times[2,TIME])\n\(start_times[3,TIME])"];
-% output ["\nTesting start times table:\n\(workload[1,TIME])\n\(workload[2,TIME])\n\(workload[3,TIME])\n\n"];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% OBJECTIVE CONSTRAINT %%%%
 % Attributes to end var the current makespan
 constraint maximum(end, [start[i]+djj[i] | i in JOB]);
 
 % SOLVING
-solve :: int_search(start, dom_w_deg, indomain_min, complete)
+solve :: int_search(start, most_constrained, indomain_min, complete)
       minimize end;
 
 % OUTPUT:
