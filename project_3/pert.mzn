@@ -7,7 +7,6 @@
 % University of Campinas - 30/05/2019
 
 include "disjunctive.mzn";
-include "alldifferent.mzn";
 include "increasing.mzn";
 include "member.mzn";
 include "maximum.mzn";
@@ -153,7 +152,7 @@ constraint
     sum(workload[ORDER,t]) <= L
   );
 
-%%%% START_TIMES TABLE CONSTRAINTS %%%%
+%%%% START_TIMES REDUNDANT TABLE CONSTRAINTS %%%%
 % Ensures that if a job of order 'o' starts at the a moment 't', then start_times[o,t] = t, 
 % implying that each row 'o' from starting_times contains the start time of all jobs of order 'o'.
 constraint
