@@ -1,1 +1,0 @@
-jobshop-CID-globalConsts.mzn

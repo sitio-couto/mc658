@@ -1,1 +1,0 @@
-jobshop-min-avg-completion-time.mzn
