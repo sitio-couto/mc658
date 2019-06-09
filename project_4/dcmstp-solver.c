@@ -14,24 +14,34 @@
 
 int main(int argc, char *argv[]){
     graph *g;
+    struct out *o;
     
     // Verifying arguments
     if (argc < 4){
-        printf("Usage: dcmstp-solver <instance> <time> <method>\n");
+        printf("Usage: dcmstp-solver <instance> <max_time> <method>\n");
         return 1;
     }
     
     g = read_input(argv[1]);
     
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
-    if (argv[3][0] == 'l')
+    if (argv[3][0] == 'l'){
         printf("Lagrangian\n");
-    else if (argv[3][0] == 'm')
+        o = lagrangian_heuristic(g, atoi(argv[2]));
+        //printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
+    }
+    else if (argv[3][0] == 'm'){
         printf("Metaheuristics\n");
-    else
+        o = metaheuristic(g, atoi(argv[2]));
+        //printf("%s,%lf\n", argv[1], o->primal);
+    }
+    else{
         printf("Invalid method.\nMethods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic\n");
-        
-    print_graph(g);
+        return 1;
+    }
+    
+    generate_out_file(argv[1], o);
+    //print_graph(g);
     free_graph(g);
     return 0;
 }

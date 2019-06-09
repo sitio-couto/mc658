@@ -1,5 +1,5 @@
 CFLAGS = -Wall -pedantic -std=c99 -O3
-FILES = dcmstp-solver.c io.c
+FILES = dcmstp-solver.c io.c lagrangian.c metaheuristic.c
 
 .PHONY: dcmstp-solver clean
 

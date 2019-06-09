@@ -40,6 +40,13 @@ graph *read_input(char *filename){
 }
 
 /**
+ * Function that generates .out file with the edges of the best tree found.
+ */
+void generate_out_file(char *filename, struct out *ans){
+    printf("Answer here\n");
+}
+
+/**
  * Auxiliary function: prints current graph.
  */
 void print_graph(graph *g){
@@ -76,4 +83,12 @@ void free_graph(graph *g){
     
     free(g->list);
     free(g);
+}
+
+/**
+ * Calculates elapsed time in seconds.
+ * @param start_time. Clock value from start of execution.
+ */
+double curr_time(time_t start_time){
+    return (clock() - start_time)/((double)CLOCKS_PER_SEC);
 }
