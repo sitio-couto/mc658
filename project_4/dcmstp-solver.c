@@ -10,15 +10,18 @@
  * University of Campinas - 26/06/2019
 */
 
-#include "dcmstp-solver.h";
+#include "dcmstp-solver.h"
 
 int main(int argc, char *argv[]){
+    graph *g;
     
     // Verifying arguments
     if (argc < 4){
         printf("Usage: dcmstp-solver <instance> <time> <method>\n");
         return 1;
     }
+    
+    g = read_input(argv[1]);
     
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l')
@@ -28,5 +31,7 @@ int main(int argc, char *argv[]){
     else
         printf("Invalid method.\nMethods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic\n");
         
+    print_graph(g);
+    free_graph(g);
     return 0;
 }

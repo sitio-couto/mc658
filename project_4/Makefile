@@ -1,9 +1,13 @@
-CFLAGS = -Wall -pedantic -std=C99 -O3
+CFLAGS = -Wall -pedantic -std=c99 -O3
+FILES = dcmstp-solver.c io.c
 
 .PHONY: dcmstp-solver clean
 
 dcmstp-solver:
-	gcc $(CFLAGS) dcmstp-solver.c -o dcmstp-solver
+	gcc $(CFLAGS) $(FILES) -o dcmstp-solver
+
+debug:
+	gcc -g $(CFLAGS) $(FILES) -o dcmstp-solver
 
 clean:
 	rm -f dcmstp-solver
