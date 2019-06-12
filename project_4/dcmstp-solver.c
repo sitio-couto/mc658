@@ -13,7 +13,8 @@
 #include "dcmstp-solver.h"
 
 int main(int argc, char *argv[]){
-    graph *g;
+    //graph *g;
+    mat_graph *g;
     struct out *o;
     
     // Verifying arguments
@@ -22,7 +23,8 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    g = read_input(argv[1]);
+    //g = read_input_list(argv[1]);
+    g = read_input_matrix(argv[1]);
     
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
@@ -41,7 +43,10 @@ int main(int argc, char *argv[]){
     }
     
     generate_out_file(argv[1], o);
-    //print_graph(g);
-    free_graph(g);
+    //print_graph_list(g);
+    //print_graph_matrix(g);
+    //free_graph_list(g);
+    free_graph_matrix(g);
+    
     return 0;
 }
