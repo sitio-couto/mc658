@@ -24,13 +24,14 @@ typedef struct{
     node *list;
 } graph;
 
-// Lagrangian Output
+// Output (primal, lagrangian dual, tree)
 struct out{
     double primal;
     double dual;
     // Add tree edges here
 };
 
+// Adjacency Matrix
 typedef struct{
     int n,m;
     int *deg;
@@ -54,7 +55,7 @@ void generate_out_file(char *filename, struct out *ans);
 
 /* LAGRANGIAN HEURISTIC */
 struct out *lagrangian_heuristic(mat_graph *g, int max_time);
-
+void mst_prim(int **g);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
