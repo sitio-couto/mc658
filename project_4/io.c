@@ -88,6 +88,11 @@ mat_graph *read_input_matrix(char *filename){
  */
 void generate_out_file(char *filename, struct out *ans){
     printf("Answer here\n");
+    
+    if (ans)
+		free(ans->mst);
+		
+    free(ans);
 }
 
 /**
@@ -154,6 +159,16 @@ void free_graph_matrix(mat_graph *g){
         free(g->mat[i]);
     free(g->mat);
     free(g);
+}
+
+/**
+ * Auxiliary function to print found MST to stdout.
+ */
+void print_mst(int *mst, int size, int **g){
+	int i;
+	for(i=1; i<size; i++){
+		printf("%d %d %d\n", i+1, mst[i]+1, g[i][mst[i]]);
+	}
 }
 
 /**

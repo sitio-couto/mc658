@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <limits.h>
 
 // Graph edge
 typedef struct edge{
@@ -28,7 +29,7 @@ typedef struct{
 struct out{
     double primal;
     double dual;
-    // Add tree edges here
+	int *mst;
 };
 
 // Adjacency Matrix
@@ -51,11 +52,12 @@ void print_graph_matrix(mat_graph *g);
 
 // Out
 void generate_out_file(char *filename, struct out *ans);
-
+void print_mst(int *mst, int size, int **g);
 
 /* LAGRANGIAN HEURISTIC */
 struct out *lagrangian_heuristic(mat_graph *g, int max_time);
-void mst_prim(int **g);
+int* mst_prim(int **g, int size);
+int min_value(int *values, char *mst_flag, int size);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
