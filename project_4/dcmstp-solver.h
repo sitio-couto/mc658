@@ -6,6 +6,12 @@
 #include <time.h>
 #include <limits.h>
 
+// Graph edge with vertex index
+typedef struct edge2vert{
+    int a, b;
+    int cost;
+} edge2vert;
+
 // Graph edge
 typedef struct edge{
     int idx;
@@ -61,6 +67,9 @@ int min_value(int *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
 
+/* HEURISTIC */
+int first_primal(mat_graph *g);
+
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
 
@@ -70,5 +79,6 @@ double curr_time(time_t start_time);
 int min(int a, int b);
 double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
+int compare(const void * a, const void * b);
 
 #endif

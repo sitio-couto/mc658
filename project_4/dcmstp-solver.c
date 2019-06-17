@@ -26,6 +26,8 @@ int main(int argc, char *argv[]){
     //g = read_input_list(argv[1]);
     g = read_input_matrix(argv[1]);
     
+    first_primal(g);
+
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
         printf("Lagrangian\n");
@@ -49,4 +51,62 @@ int main(int argc, char *argv[]){
     free_graph_matrix(g);
     
     return 0;
+}
+
+int first_primal(mat_graph *g) {
+    int c1, c2;
+    int i, j, k, primal = 0;
+    int qnt_e = (g->n*g->n - g->n)/2;
+    int v[g->n];
+    int deg[g->n];
+    edge2vert e[qnt_e];
+
+    k = 0;
+    for(i=0; i < g->n; ++i) {
+        v[i] = 0;
+        deg[i] = g->deg[i];
+        for(j=i+1; j < g->n; ++j) {
+            e[k].a = i;
+            e[k].b = j; 
+            e[k].cost = g->mat[i][j];
+            ++k;
+        }
+    }
+
+    qsort(e, qnt_e, sizeof(edge2vert), compare);
+
+    k = 0;
+    for (i=0; i < qnt_e; ++i) {
+        // printf("(%d,%d)->%d\n",e[i].a,e[i].b,e[i].cost);
+        c1 = (!v[e[i].a] || !v[e[i].b]);
+        c2 = ((deg[e[i].a] > 0 && deg[e[i].b] > 0));
+
+        if (c1 && c2) {
+            if (!v[e[i].a]) {
+                v[e[i].a] = 1;
+                ++k;
+            }
+            if (!v[e[i].b]){
+                v[e[i].b] = 1;
+                ++k;
+            }
+            --deg[e[i].a]; 
+            --deg[e[i].b];
+
+            primal += e[i].cost;
+        }
+        
+        if (k == g->n) break;
+    }
+
+    printf("(%d)\n", primal);
+    for (i=0; i < g->n; ++i){
+        if(v[i] == 0 || deg[i] < 0) printf("FLAWED!!\n");
+    }
+    
+    return primal;
+}
+
+int compare(const void * a, const void * b) { 
+    return (((edge2vert*)a)->cost - ((edge2vert*)b)->cost); 
 }
