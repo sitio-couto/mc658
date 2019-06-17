@@ -13,28 +13,47 @@
  */
 struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     double step = INIT_STEP;
-    int i, iter = 0;  
+    int i, j, iter = 0;
+    float *mult;			// Lagrange Multipliers.
+    float **lg;				// Lagrangian Graph
+    int *mst = NULL;		// Minimum spanning tree: mst[i] is the parent of vertex i.
     struct out *ans;
-	int **lg;				//Lagrangian Graph
-    int *mst;				// Minimum spanning tree: mst[i] is the parent of vertex i.
-    
+	
     // Initializing
     time_t start_time = clock();
     ans = malloc(sizeof(struct out));
     
-    // Allocating lagrangian graph.
+    // Allocating lagrangian graph and multiplier array.
+    mult = malloc(sizeof(double)*g->n);
     lg = malloc(sizeof(int*)*g->n);
     for(i=0; i<g->n; i++)
         lg[i] = malloc(sizeof(int)*g->n);
     
-    //while (step > MIN_STEP && curr_time(start_time) < max_time){
-		mst = mst_prim(g->mat, g->n);
-    //}
+    // Initializing lagrange multipliers.
+    for(i=0; i<g->n; i++)
+		mult[i]=1;
     
-    // Freeing lagrangian graph
+    while (step > MIN_STEP && curr_time(start_time) < max_time){
+		
+		//Generating lagrangian costs
+		for (i=0; i<g->n; i++){
+			for(j=0; j<g->n; j++){	
+				lg[i][j] = g->mat[i][j] + mult[i] + mult[j];
+			}
+		}
+		
+		// Solving Lagrangian Primal Problem
+		// 1- Solving MST for the lagrangian graph.
+		// 2- Calculating dual solution value (MST + mult*deg)
+		mst = mst_prim(lg, g->n);
+		ans->dual = mst_value(mst, g->n, lg) + mult_deg(mult, g->deg, g->n);
+    }
+    
+    // Freeing lagrangian graph and multiplier array.
     for(i=0; i<g->n; i++)
 		free(lg[i]);
 	free(lg);
+	free(mult);
 	
 	//print_mst(mst, g->n, g->mat);
 	ans->mst = mst;
@@ -48,7 +67,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
  * @param g Graph to generate tree from.
  * @return Minimum spanning tree for graph g.
  */
-int* mst_prim(int **g, int size){
+int* mst_prim(float **g, int size){
 	
 	// Parents[i] has the index of the parent of vertex i in the MST.
 	int *parents = malloc(sizeof(int)*size);
@@ -89,6 +108,7 @@ int* mst_prim(int **g, int size){
 }
 
 /**
+ * 
  * Finds index of the minimum value in an array if the corresponding vertex is not in the MST.
  * @param values Comparison values for the graph.
  * @param mst_flag Flags that indicate if each vertex is in the MST.
@@ -105,4 +125,19 @@ int min_value(int *values, char *mst_flag, int size){
 		}
 	}
 	return idx;
+}
+
+/**
+ * Calculates independent term in the primal lagrangian problem.
+ * Multiplies the lagrangian terms by the degree constraints for each vertex.
+ */
+float mult_deg(float *mult, int *deg, int size){
+	float res=0;
+	int i;
+	
+	for (i=0; i<size; i++){
+		res+=mult[i]*deg[i];
+	}
+	
+	return res;
 }

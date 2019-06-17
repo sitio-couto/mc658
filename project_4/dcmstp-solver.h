@@ -56,8 +56,9 @@ void print_mst(int *mst, int size, int **g);
 
 /* LAGRANGIAN HEURISTIC */
 struct out *lagrangian_heuristic(mat_graph *g, int max_time);
-int* mst_prim(int **g, int size);
+int* mst_prim(float **g, int size);
 int min_value(int *values, char *mst_flag, int size);
+float mult_deg(float *mult, int *deg, int size);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
@@ -67,5 +68,6 @@ struct out *metaheuristic(mat_graph *g, int max_time);
 double curr_time(time_t start_time);
 int min(int a, int b);
 int max(int a, int b);
+float mst_value(int *mst, int size, float **g);
 
 #endif

@@ -170,25 +170,3 @@ void print_mst(int *mst, int size, int **g){
 		printf("%d %d %d\n", i+1, mst[i]+1, g[i][mst[i]]);
 	}
 }
-
-/**
- * Calculates elapsed time in seconds.
- * @param start_time. Clock value from start of execution.
- */
-double curr_time(time_t start_time){
-    return (clock() - start_time)/((double)CLOCKS_PER_SEC);
-}
-
-/**
- * Returns minimum value between a and b.
- */
-int min(int a, int b){
-    return ((a < b) ? a:b);
-}
-
-/**
- * Returns maximum value between a and b.
- */
-int max(int a, int b){
-    return ((a >= b) ? a:b);
-}
