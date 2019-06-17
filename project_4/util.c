@@ -18,7 +18,7 @@ int min(int a, int b){
 /**
  * Returns maximum value between a and b.
  */
-int max(int a, int b){
+double max(double a, double b){
     return ((a >= b) ? a:b);
 }
 
@@ -26,7 +26,7 @@ int max(int a, int b){
  * Calculates value of MST solution.
  * Returns the sum of all edge costs.
  */
-float mst_value(int *mst, int size, float **g){
+double mst_value(int *mst, int size, double **g){
 	int i;
 	float sum=0;
 	

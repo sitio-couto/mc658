@@ -1,8 +1,8 @@
 #include "dcmstp-solver.h"
 
-#define INIT_STEP 2
-#define MIN_STEP 0.005
-#define MAX_ITER_STEP 30
+#define INIT_PI 2
+#define MIN_PI 0.005
+#define MAX_ITER_PI 30
 
 /**
  * Lagrangian heuristic implementation for DCMSTP.
@@ -12,11 +12,13 @@
  * @return out Best solution and dual bound found within time "max_time"
  */
 struct out *lagrangian_heuristic(mat_graph *g, int max_time){
-    double step = INIT_STEP;
+    double pi = INIT_PI, step;
     int i, j, iter = 0;
-    float *mult;			// Lagrange Multipliers.
-    float **lg;				// Lagrangian Graph
+    double *mult;			// Lagrange Multipliers.
+    double **lg;			// Lagrangian Graph
     int *mst = NULL;		// Minimum spanning tree: mst[i] is the parent of vertex i.
+    double dual, primal;	// Current dual or primal.
+    double *subgrad, subgrad_sum=0;		
     struct out *ans;
 	
     // Initializing
@@ -33,7 +35,13 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     for(i=0; i<g->n; i++)
 		mult[i]=1;
     
-    while (step > MIN_STEP && curr_time(start_time) < max_time){
+    subgrad = malloc(sizeof(double)*g->n);
+    
+    ans->dual = 0;
+    ans->primal = INT_MAX;
+    
+    // End conditions: pi too small, too much time elapsed and optimum found.
+    while (pi > MIN_PI && curr_time(start_time) < max_time && ans->dual != ans->primal){
 		
 		//Generating lagrangian costs
 		for (i=0; i<g->n; i++){
@@ -46,7 +54,29 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		// 1- Solving MST for the lagrangian graph.
 		// 2- Calculating dual solution value (MST + mult*deg)
 		mst = mst_prim(lg, g->n);
-		ans->dual = mst_value(mst, g->n, lg) + mult_deg(mult, g->deg, g->n);
+		dual = mst_value(mst, g->n, lg) + mult_deg(mult, g->deg, g->n);
+		
+		iter++;
+		if (dual > ans->dual){
+			ans->dual = dual;
+			iter = 0;
+		}
+		
+		// If the dual hasn't increased in a few iterations, take half pi.
+		else if (iter == MAX_ITER_PI)
+			pi/=2;
+		
+		// Subgradients for lagrange multipliers step.
+		for(i=0; i<g->n; i++){
+			subgrad[i] = subgradient(i, g->deg[i], g->n, mst);
+			subgrad_sum+= subgrad[i]*subgrad[i];
+		}
+			
+		step = pi*(1.05*ans->primal - ans->dual)/subgrad_sum;
+		
+		// Updating lagrange multipliers
+		for (i=0; i< g->n; i++)
+			mult[i] = max(0, mult[i]+step*subgrad[i]);
     }
     
     // Freeing lagrangian graph and multiplier array.
@@ -54,6 +84,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		free(lg[i]);
 	free(lg);
 	free(mult);
+	free(subgrad);
 	
 	//print_mst(mst, g->n, g->mat);
 	ans->mst = mst;
@@ -67,7 +98,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
  * @param g Graph to generate tree from.
  * @return Minimum spanning tree for graph g.
  */
-int* mst_prim(float **g, int size){
+int* mst_prim(double **g, int size){
 	
 	// Parents[i] has the index of the parent of vertex i in the MST.
 	int *parents = malloc(sizeof(int)*size);
@@ -131,7 +162,7 @@ int min_value(int *values, char *mst_flag, int size){
  * Calculates independent term in the primal lagrangian problem.
  * Multiplies the lagrangian terms by the degree constraints for each vertex.
  */
-float mult_deg(float *mult, int *deg, int size){
+double mult_deg(double *mult, int *deg, int size){
 	float res=0;
 	int i;
 	
@@ -140,4 +171,23 @@ float mult_deg(float *mult, int *deg, int size){
 	}
 	
 	return res;
+}
+
+/**
+ * Calculates subgradients for the relaxed constraint.
+ * Given by the difference between the max degree of the vertex and the amount of neighbors in the MST.
+ */
+double subgradient(int v, int deg, int size, int *mst){
+	int count=0, i;
+	
+	// Checking if it has parent.
+	if (mst[v] > -1)
+		count++;
+	
+	// Checking children.
+	for (i=1; i<size; i++)
+		if (mst[i] == v)
+			count++;
+			
+	return deg - count;
 }
