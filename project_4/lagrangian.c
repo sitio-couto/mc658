@@ -33,7 +33,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     
     // Initializing lagrange multipliers.
     for(i=0; i<g->n; i++)
-		mult[i]=1;
+		mult[i]=0.5;
     
     subgrad = malloc(sizeof(double)*g->n);
     
@@ -45,21 +45,24 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		
 		//Generating lagrangian costs
 		for (i=0; i<g->n; i++){
-			for(j=0; j<g->n; j++){	
-				lg[i][j] = g->mat[i][j] + mult[i] + mult[j];
+			for(j=0; j<g->n; j++){
+				if (g->mat[i][j] >= 0)
+					lg[i][j] = g->mat[i][j] + mult[i] + mult[j];
 			}
 		}
 		
 		// Solving Lagrangian Primal Problem
 		// 1- Solving MST for the lagrangian graph.
-		// 2- Calculating dual solution value (MST + mult*deg)
+		// 2- Calculating dual solution value (MST - mult*deg)
+		free(mst);
 		mst = mst_prim(lg, g->n);
-		dual = mst_value(mst, g->n, lg) + mult_deg(mult, g->deg, g->n);
+		dual = mst_value(mst, g->n, lg) - mult_deg(mult, g->deg, g->n);
 		
 		iter++;
 		if (dual > ans->dual){
 			ans->dual = dual;
 			iter = 0;
+			printf("%lf\n", ans->dual);
 		}
 		
 		// If the dual hasn't increased in a few iterations, take half pi.
@@ -67,9 +70,18 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 			pi/=2;
 		
 		// Subgradients for lagrange multipliers step.
+		subgrad_sum = 0;
 		for(i=0; i<g->n; i++){
 			subgrad[i] = subgradient(i, g->deg[i], g->n, mst);
-			subgrad_sum+= subgrad[i]*subgrad[i];
+			if (subgrad[i] > 0 || mult[i] > 0)
+				subgrad_sum+= subgrad[i]*subgrad[i];
+		}
+		
+		// Finished execution if Gi=0 for every i.
+		// If solution is viable, it's the optimum.
+		if (subgrad_sum == 0){
+			// Check if viable
+			break;
 		}
 			
 		step = pi*(1.05*ans->primal - ans->dual)/subgrad_sum;
@@ -77,6 +89,11 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		// Updating lagrange multipliers
 		for (i=0; i< g->n; i++)
 			mult[i] = max(0, mult[i]+step*subgrad[i]);
+		
+		//for(i=0; i< g->n; i++)
+		//	printf("%lf ", mult[i]);
+		//printf("\n");
+		//getchar();
     }
     
     // Freeing lagrangian graph and multiplier array.
@@ -86,7 +103,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 	free(mult);
 	free(subgrad);
 	
-	//print_mst(mst, g->n, g->mat);
+	print_mst(mst, g->n, g->mat);
 	ans->mst = mst;
     
     return ans;
@@ -102,7 +119,7 @@ int* mst_prim(double **g, int size){
 	
 	// Parents[i] has the index of the parent of vertex i in the MST.
 	int *parents = malloc(sizeof(int)*size);
-	int *values = malloc(sizeof(int)*size);
+	double *values = malloc(sizeof(double)*size);
 	char *is_in_mst = calloc(size,sizeof(char));
     int edges, i;
     int vertex;
@@ -126,16 +143,14 @@ int* mst_prim(double **g, int size){
 		for(i=0; i<size; i++){
 			
 			// Updates if edge exists (cost>0), isn't in the MST and choice value is higher than the edge cost.
-			if(g[vertex][i] && !is_in_mst[i] && g[vertex][i] < values[i]){
+			if(g[vertex][i] >= 0 && !is_in_mst[i] && g[vertex][i] < values[i]){
 				parents[i] = vertex;
 				values[i] = g[vertex][i];
 			}
 		}
 	}
     
-	int sum = 0;
-	for (i=0; i<size; ++i) sum += values[i];
-	printf("PRIM=(%d)\n", sum);
+	//printf("PRIM=(%lf)\n", mst_value(parents, size, g));
 
     free(values);
     free(is_in_mst);
@@ -149,7 +164,7 @@ int* mst_prim(double **g, int size){
  * @param mst_flag Flags that indicate if each vertex is in the MST.
  * @return index of the minimum valid value.
  */
-int min_value(int *values, char *mst_flag, int size){
+int min_value(double *values, char *mst_flag, int size){
 	int minn, idx=0, i;
 	
 	minn = INT_MAX;
@@ -167,7 +182,7 @@ int min_value(int *values, char *mst_flag, int size){
  * Multiplies the lagrangian terms by the degree constraints for each vertex.
  */
 double mult_deg(double *mult, int *deg, int size){
-	float res=0;
+	double res=0;
 	int i;
 	
 	for (i=0; i<size; i++){

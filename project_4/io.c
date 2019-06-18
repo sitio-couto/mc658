@@ -73,6 +73,10 @@ mat_graph *read_input_matrix(char *filename){
         g->mat[end-1][start-1] = cost;
     }
     
+    // Initializes (i,i) with -1.
+    for (i=0; i<(g->n); i++)
+		g->mat[i][i] = -1;
+    
     // Reads degree constraints
     for (i=0; i<(g->n); i++){
         fscanf(in, "%d %d \n", &start, &deg);
