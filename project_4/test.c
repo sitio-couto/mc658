@@ -23,7 +23,11 @@ void dfs(int **mx, int *flag, int deg[], int n, int v) {
     }
 
     for (j=0; j < n; ++j) {
-        if(mx[v][j] && !flag[j]){
+        if (flag[j]) {
+            printf("FLAWED!!\n");
+            exit(0);
+        }
+        if(mx[v][j]){
             dfs(mx, flag, deg, n, j);
         }
     }
@@ -94,7 +98,6 @@ int first_primal(mat_graph *g) {
     int comp[g->n]; // Indicates the component of the vertex
     edge2vert *e = malloc(g->m*sizeof(edge2vert));
 
-    printf("OK\n");
     k = 0;
     for(i=0; i < g->n; ++i) {
         deg[i] = g->deg[i];
