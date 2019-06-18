@@ -36,3 +36,77 @@ double mst_value(int *mst, int size, double **g){
 	
 	return sum;
 }
+
+/**
+ * Compares values returning their difference.
+ * For sorting edges lists with qsort.
+ */
+int compare(const void * a, const void * b) { 
+    return (((edge2vert*)a)->cost - ((edge2vert*)b)->cost); 
+}
+
+/**
+ * DFS for testing if a graph is a tree.
+ * Used for checking result correctness.
+ */
+void test_mst(int **mx, int deg[], int n){
+	int i, j;
+	int *flag = calloc(n, sizeof(char));
+
+	// for (i=0; i<n; ++i) {
+	// 	for (j=0; j<n; ++j) {
+	// 		if (mx[i][j] < 0)
+	// 			printf(" *|");
+	// 		else
+	// 			printf(" %d|", mx[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
+
+	// Initilize search
+	dfs(mx, flag, deg, n, 0, 0);
+	
+	// Checks if all vertex are reached
+	for (i=0; i<n; ++i) {
+		if (!flag[i]) {
+			printf("FLAWED!! (Not a connected graph)\n");
+			exit(0);
+		}
+	}
+
+	free(flag);
+	return;
+}
+
+/**
+ * DFS for testing if a graph is a tree.
+ * Used for checking result correctness.
+ */
+void dfs(int **mx, int *flag, int deg[], int n, int v, int p) {
+    int j, count = 0;
+    flag[v] = 1;
+	// printf("V->(%d)\n",v);
+
+	// Check if the vertex respects the degree contraint
+    for (j=0; j < n; ++j) if (mx[v][j] >= 0) ++count;
+    if (count > deg[v]) {
+        printf("FLAWED!! (degree constraint violated)\n");
+        exit(0);
+    }
+
+	// Check for loops
+    for (j=0; j < n; ++j) {
+		// if next vertex is visited and not the parent, theres a cycle.
+        if (j!=p && mx[v][j] >= 0 && flag[j]) {
+            printf("FLAWED!! (cycle detected)\n");
+            exit(0);
+        }
+
+		// Recursive search on next available edge
+        if(j!=p && mx[v][j] >= 0){
+            dfs(mx, flag, deg, n, j, v);
+        }
+    }
+
+    return;
+}

@@ -38,6 +38,14 @@ struct out{
 	int *mst;
 };
 
+// Heuristic adjacency matrix tree
+typedef struct {
+    int primal;
+    int n;
+    int *deg;
+    int **mst;
+} heu_graph;
+
 // Adjacency Matrix
 typedef struct{
     int n,m;
@@ -68,7 +76,7 @@ double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
 
 /* HEURISTIC */
-int first_primal(mat_graph *g);
+heu_graph* first_primal(mat_graph *g);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
@@ -80,5 +88,8 @@ int min(int a, int b);
 double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
 int compare(const void * a, const void * b);
+void test_mst(int **mx, int deg[], int n);
+void dfs(int **mx, int *flag, int deg[], int n, int v, int p);
+
 
 #endif
