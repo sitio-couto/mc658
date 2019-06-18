@@ -28,11 +28,11 @@ double max(double a, double b){
  */
 double mst_value(int *mst, int size, double **g){
 	int i;
-	float sum=0;
+	double sum=0;
 	
-	for(i=0; i<size; i++){
-		sum+= g[i][mst[i]];
-	}
+	for(i=0; i<size; i++)
+		if (mst[i] >= 0)
+			sum+= g[i][mst[i]];
 	
 	return sum;
 }

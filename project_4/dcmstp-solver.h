@@ -63,7 +63,7 @@ void print_mst(int *mst, int size, int **g);
 /* LAGRANGIAN HEURISTIC */
 struct out *lagrangian_heuristic(mat_graph *g, int max_time);
 int* mst_prim(double **g, int size);
-int min_value(int *values, char *mst_flag, int size);
+int min_value(double *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
 

@@ -26,8 +26,6 @@ int main(int argc, char *argv[]){
     //g = read_input_list(argv[1]);
     g = read_input_matrix(argv[1]);
     
-    first_primal(g);
-
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
         printf("Lagrangian\n");
