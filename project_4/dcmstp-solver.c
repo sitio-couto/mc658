@@ -54,16 +54,16 @@ int main(int argc, char *argv[]){
 }
 
 int first_primal(mat_graph *g) {
-    int i, j, k;
+    int i, j, k, main, merge;
     int c1, c2, primal = 0;
-    int v[g->n];
-    int deg[g->n];
+    int deg[g->n];  // Indicates the remaining edges alowed per vertex
+    int comp[g->n]; // Indicates the component of the vertex
     edge2vert e[g->m];
 
     k = 0;
     for(i=0; i < g->n; ++i) {
-        v[i] = 0;
         deg[i] = g->deg[i];
+        comp[i] = i;
         for(j=i+1; j < g->n; ++j) {
             if (g->mat[i][j] <= 0) continue;
             e[k].a = i;
@@ -78,18 +78,22 @@ int first_primal(mat_graph *g) {
     k = 0;
     for (i=0; i < g->m; ++i) {
         // printf("(%d,%d)->%d\n",e[i].a,e[i].b,e[i].cost);
-        c1 = (!v[e[i].a] || !v[e[i].b]);
+        c1 = (comp[e[i].a] != comp[e[i].b]);
         c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0);
 
         if (c1 && c2) {
-            if (!v[e[i].a]) {
-                v[e[i].a] = 1;
-                ++k;
+            if (comp[e[i].a] < comp[e[i].b]) {
+                main  = comp[e[i].a];
+                merge = comp[e[i].b];
+            } else {
+                main  = comp[e[i].b]; 
+                merge = comp[e[i].a];
             }
-            if (!v[e[i].b]){
-                v[e[i].b] = 1;
-                ++k;
+
+            for (j=0; j<g->n; ++j){
+                if (comp[j] == merge) comp[j] = main;
             }
+
             --deg[e[i].a]; 
             --deg[e[i].b];
 
@@ -101,7 +105,7 @@ int first_primal(mat_graph *g) {
 
     printf("HMST=(%d)\n", primal);
     for (i=0; i < g->n; ++i){
-        if(v[i] == 0 || deg[i] < 0) printf("FLAWED!!\n");
+        if(comp[i] != 0 || deg[i] < 0) printf("FLAWED!!\n");
     }
     
     return primal;

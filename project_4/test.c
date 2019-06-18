@@ -26,6 +26,15 @@ int main(int argc, char *argv[]){
     //g = read_input_list(argv[1]);
     g = read_input_matrix(argv[1]);
     
+    int sum_max = 0;
+    for(i=0; i<g->n; ++i){
+        for(j=i+1; j<g->n; ++j){
+            sum_max += g->mat[i][j];
+        }
+    }
+    printf("MAX=(%d)\n",sum_max);
+
+
     first_primal(g);
 
     double **lg = malloc(sizeof(double*)*g->n);
