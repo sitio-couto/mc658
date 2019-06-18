@@ -27,9 +27,9 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     
     // Allocating lagrangian graph and multiplier array.
     mult = malloc(sizeof(double)*g->n);
-    lg = malloc(sizeof(int*)*g->n);
+    lg = malloc(sizeof(double*)*g->n);
     for(i=0; i<g->n; i++)
-        lg[i] = malloc(sizeof(int)*g->n);
+        lg[i] = malloc(sizeof(double)*g->n);
     
     // Initializing lagrange multipliers.
     for(i=0; i<g->n; i++)
