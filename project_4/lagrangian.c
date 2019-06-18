@@ -45,14 +45,15 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		
 		//Generating lagrangian costs
 		for (i=0; i<g->n; i++){
-			for(j=0; j<g->n; j++){	
-				lg[i][j] = g->mat[i][j] + mult[i] + mult[j];
+			for(j=0; j<g->n; j++){
+				if (g->mat[i][j] >= 0)
+					lg[i][j] = g->mat[i][j] + mult[i] + mult[j];
 			}
 		}
 		
 		// Solving Lagrangian Primal Problem
 		// 1- Solving MST for the lagrangian graph.
-		// 2- Calculating dual solution value (MST + mult*deg)
+		// 2- Calculating dual solution value (MST - mult*deg)
 		free(mst);
 		mst = mst_prim(lg, g->n);
 		dual = mst_value(mst, g->n, lg) - mult_deg(mult, g->deg, g->n);
@@ -72,7 +73,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		subgrad_sum = 0;
 		for(i=0; i<g->n; i++){
 			subgrad[i] = subgradient(i, g->deg[i], g->n, mst);
-			if (subgrad[i] > 0 && mult[i] > 0)
+			if (subgrad[i] > 0 || mult[i] > 0)
 				subgrad_sum+= subgrad[i]*subgrad[i];
 		}
 		
