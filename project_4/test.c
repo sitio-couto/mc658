@@ -12,6 +12,25 @@
 
 #include "dcmstp-solver.h"
 
+void dfs(int **mx, int *flag, int deg[], int n, int v) {
+    int j, count = 0;
+    flag[v] = 1;
+
+    for (j=0; j < n; ++j) if (mx[v][j] >= 0) ++count;
+    if (count > deg[v]) {
+        printf("FLAWED!!\n");
+        exit(0);
+    }
+
+    for (j=0; j < n; ++j) {
+        if(mx[v][j] && !flag[j]){
+            dfs(mx, flag, deg, n, j);
+        }
+    }
+
+    return;
+}
+
 int main(int argc, char *argv[]){
     int i,j;
     mat_graph *g;
@@ -23,9 +42,9 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    //g = read_input_list(argv[1]);
+    printf("Reding input...\n");
     g = read_input_matrix(argv[1]);
-    
+
     int sum_max = 0;
     for(i=0; i<g->n; ++i){
         for(j=i+1; j<g->n; ++j){
@@ -34,7 +53,7 @@ int main(int argc, char *argv[]){
     }
     printf("MAX=(%d)\n",sum_max);
 
-
+    printf("Calculating primal...\n");
     first_primal(g);
 
     double **lg = malloc(sizeof(double*)*g->n);
@@ -46,6 +65,7 @@ int main(int argc, char *argv[]){
         }
     }
 
+    printf("Calculating dual...\n");
     mst_prim(lg, g->n);
 
     // // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
@@ -55,22 +75,31 @@ int main(int argc, char *argv[]){
     //     //printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
     // }
     
+    for(i=0; i<g->n; i++) {
+        free(lg[i]);
+        free(g->mat[i]);
+    }
+    free(lg);
+    free(g->mat);
+    free(g->deg);
+    free(g);
+
     return 0;
 }
 
 int first_primal(mat_graph *g) {
     int i, j, k, main, merge;
     int c1, c2, primal = 0;
-    int deg[g->n];
-    int comp[g->n];
-    edge2vert e[g->m];
+    int deg[g->n];  // Indicates the remaining edges alowed per vertex
+    int comp[g->n]; // Indicates the component of the vertex
+    edge2vert *e = malloc(g->m*sizeof(edge2vert));
 
+    printf("OK\n");
     k = 0;
     for(i=0; i < g->n; ++i) {
         deg[i] = g->deg[i];
         comp[i] = i;
         for(j=i+1; j < g->n; ++j) {
-            if (g->mat[i][j] <= 0) continue;
             e[k].a = i;
             e[k].b = j; 
             e[k].cost = g->mat[i][j];
@@ -82,7 +111,6 @@ int first_primal(mat_graph *g) {
 
     k = 0;
     for (i=0; i < g->m; ++i) {
-        // printf("(%d,%d)->%d\n",e[i].a,e[i].b,e[i].cost);
         c1 = (comp[e[i].a] != comp[e[i].b]);
         c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0);
 
@@ -103,6 +131,7 @@ int first_primal(mat_graph *g) {
             --deg[e[i].b];
 
             primal += e[i].cost;
+            ++k;
         }
         
         if (k == g->n) break;
@@ -113,6 +142,7 @@ int first_primal(mat_graph *g) {
         if(comp[i] != 0 || deg[i] < 0) printf("FLAWED!!\n");
     }
     
+    free(e);
     return primal;
 }
 

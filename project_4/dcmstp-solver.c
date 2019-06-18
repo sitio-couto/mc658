@@ -58,14 +58,13 @@ int first_primal(mat_graph *g) {
     int c1, c2, primal = 0;
     int deg[g->n];  // Indicates the remaining edges alowed per vertex
     int comp[g->n]; // Indicates the component of the vertex
-    edge2vert e[g->m];
+    edge2vert *e = malloc(g->m*sizeof(edge2vert));
 
     k = 0;
     for(i=0; i < g->n; ++i) {
         deg[i] = g->deg[i];
         comp[i] = i;
         for(j=i+1; j < g->n; ++j) {
-            if (g->mat[i][j] <= 0) continue;
             e[k].a = i;
             e[k].b = j; 
             e[k].cost = g->mat[i][j];
@@ -98,6 +97,7 @@ int first_primal(mat_graph *g) {
             --deg[e[i].b];
 
             primal += e[i].cost;
+            ++k;
         }
         
         if (k == g->n) break;
@@ -108,6 +108,7 @@ int first_primal(mat_graph *g) {
         if(comp[i] != 0 || deg[i] < 0) printf("FLAWED!!\n");
     }
     
+    free(e);
     return primal;
 }
 
