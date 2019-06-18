@@ -54,18 +54,18 @@ int main(int argc, char *argv[]){
 }
 
 int first_primal(mat_graph *g) {
-    int c1, c2;
-    int i, j, k, primal = 0;
-    int qnt_e = (g->n*g->n - g->n)/2;
+    int i, j, k;
+    int c1, c2, primal = 0;
     int v[g->n];
     int deg[g->n];
-    edge2vert e[qnt_e];
+    edge2vert e[g->m];
 
     k = 0;
     for(i=0; i < g->n; ++i) {
         v[i] = 0;
         deg[i] = g->deg[i];
         for(j=i+1; j < g->n; ++j) {
+            if (g->mat[i][j] <= 0) continue;
             e[k].a = i;
             e[k].b = j; 
             e[k].cost = g->mat[i][j];
@@ -73,13 +73,13 @@ int first_primal(mat_graph *g) {
         }
     }
 
-    qsort(e, qnt_e, sizeof(edge2vert), compare);
+    qsort(e, g->m, sizeof(edge2vert), compare);
 
     k = 0;
-    for (i=0; i < qnt_e; ++i) {
+    for (i=0; i < g->m; ++i) {
         // printf("(%d,%d)->%d\n",e[i].a,e[i].b,e[i].cost);
         c1 = (!v[e[i].a] || !v[e[i].b]);
-        c2 = ((deg[e[i].a] > 0 && deg[e[i].b] > 0));
+        c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0);
 
         if (c1 && c2) {
             if (!v[e[i].a]) {
@@ -99,7 +99,7 @@ int first_primal(mat_graph *g) {
         if (k == g->n) break;
     }
 
-    printf("(%d)\n", primal);
+    printf("HMST=(%d)\n", primal);
     for (i=0; i < g->n; ++i){
         if(v[i] == 0 || deg[i] < 0) printf("FLAWED!!\n");
     }

@@ -133,6 +133,10 @@ int* mst_prim(double **g, int size){
 		}
 	}
     
+	int sum = 0;
+	for (i=0; i<size; ++i) sum += values[i];
+	printf("PRIM=(%d)\n", sum);
+
     free(values);
     free(is_in_mst);
     return parents;
