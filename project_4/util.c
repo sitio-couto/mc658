@@ -49,32 +49,22 @@ int compare(const void * a, const void * b) {
  * DFS for testing if a graph is a tree.
  * Used for checking result correctness.
  */
-void test_mst(int **mx, int deg[], int n){
+void test_mst(int **mx, int deg[], int n, int comp[]){
 	int i, j;
-	int *flag = calloc(n, sizeof(char));
-
-	// for (i=0; i<n; ++i) {
-	// 	for (j=0; j<n; ++j) {
-	// 		if (mx[i][j] < 0)
-	// 			printf(" *|");
-	// 		else
-	// 			printf(" %d|", mx[i][j]);
-	// 	}
-	// 	printf("\n");
-	// }
+	int *visited = calloc(n, sizeof(int));
 
 	// Initilize search
-	dfs(mx, flag, deg, n, 0, 0);
+	dfs(mx, visited, deg, n, 0, 0);
 	
 	// Checks if all vertex are reached
 	for (i=0; i<n; ++i) {
-		if (!flag[i]) {
+		if (!visited[i]) {
 			printf("FLAWED!! (Not a connected graph)\n");
 			exit(0);
 		}
 	}
 
-	free(flag);
+	free(visited);
 	return;
 }
 
@@ -82,9 +72,9 @@ void test_mst(int **mx, int deg[], int n){
  * DFS for testing if a graph is a tree.
  * Used for checking result correctness.
  */
-void dfs(int **mx, int *flag, int deg[], int n, int v, int p) {
-    int j, count = 0;
-    flag[v] = 1;
+void dfs(int **mx, int *visited, int deg[], int n, int v, int p) {
+    int i, j, count = 0;
+    visited[v] = 1;
 	// printf("V->(%d)\n",v);
 
 	// Check if the vertex respects the degree contraint
@@ -97,14 +87,16 @@ void dfs(int **mx, int *flag, int deg[], int n, int v, int p) {
 	// Check for loops
     for (j=0; j < n; ++j) {
 		// if next vertex is visited and not the parent, theres a cycle.
-        if (j!=p && mx[v][j] >= 0 && flag[j]) {
+        if (j!=p && mx[v][j] >= 0 && visited[j]) {
+			// for (i=0; i<n; ++i) printf("-(%d)",visited[i]);
+			// printf("\n");
+			printf("p=(%d)|v->j=(%d,%d)|e=(%d)\n",p,v,j,mx[v][j]);
             printf("FLAWED!! (cycle detected)\n");
             exit(0);
         }
-
 		// Recursive search on next available edge
-        if(j!=p && mx[v][j] >= 0){
-            dfs(mx, flag, deg, n, j, v);
+        else if (j!=p && mx[v][j] >= 0) {
+            dfs(mx, visited, deg, n, j, v);
         }
     }
 

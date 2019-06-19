@@ -88,7 +88,7 @@ int min(int a, int b);
 double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
 int compare(const void * a, const void * b);
-void test_mst(int **mx, int deg[], int n);
+void test_mst(int **mx, int deg[], int n, int comp[]);
 void dfs(int **mx, int *flag, int deg[], int n, int v, int p);
 
 
