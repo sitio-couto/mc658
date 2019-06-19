@@ -33,7 +33,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     
     // Initializing lagrange multipliers.
     for(i=0; i<g->n; i++)
-		mult[i]=0.5;
+		mult[i]=1;
     
     subgrad = malloc(sizeof(double)*g->n);
     
@@ -103,7 +103,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 	free(mult);
 	free(subgrad);
 	
-	print_mst(mst, g->n, g->mat);
+	//print_mst(mst, g->n, g->mat);
 	ans->mst = mst;
     
     return ans;
@@ -208,5 +208,5 @@ double subgradient(int v, int deg, int size, int *mst){
 		if (mst[i] == v)
 			count++;
 			
-	return deg - count;
+	return count - deg;
 }
