@@ -15,6 +15,7 @@
 int main(int argc, char *argv[]){
     //graph *g;
     mat_graph *g;
+    heu_graph *hg;
     struct out *o;
     
     // Verifying arguments
@@ -23,9 +24,12 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    //g = read_input_list(argv[1]);
     g = read_input_matrix(argv[1]);
     
+    hg = first_primal(g);
+    printf("HMST=(%d)\n", hg->primal);
+    exit(0);
+
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
         printf("Lagrangian\n");
@@ -51,17 +55,30 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-int first_primal(mat_graph *g) {
-    int i, j, k, main, merge;
-    int c1, c2, primal = 0;
+heu_graph* first_primal(mat_graph *g) {
+    int i, j, k, component, merge;
+    int c1, c2;
     int deg[g->n];  // Indicates the remaining edges alowed per vertex
     int comp[g->n]; // Indicates the component of the vertex
-    edge2vert *e = malloc(g->m*sizeof(edge2vert));
+    edge2vert *e = malloc(g->m*sizeof(edge2vert)); // List of edges for greedy algrithims
 
+    // Alocate resulting struct with primal and mst
+    heu_graph *result = malloc(sizeof(heu_graph));
+    result->primal = 0;
+    result->n = g->n;
+    result->deg = malloc(g->n*sizeof(int));
+    result->mst = malloc(g->n*sizeof(int*));
+    for (i=0; i<g->n; ++i) {
+        result->deg[i] = g->deg[i];
+        result->mst[i] = malloc(g->n*sizeof(int*));
+        for (j=0; j<g->n; ++j) result->mst[i][j] = -1;
+    }
+
+    // Initilize lists for greedy heuristic
     k = 0;
     for(i=0; i < g->n; ++i) {
-        deg[i] = g->deg[i];
-        comp[i] = i;
+        deg[i] = g->deg[i]; // Max vertices degrees
+        comp[i] = i;        // Vertex component ID
         for(j=i+1; j < g->n; ++j) {
             e[k].a = i;
             e[k].b = j; 
@@ -70,46 +87,40 @@ int first_primal(mat_graph *g) {
         }
     }
 
+    // Sort edges in ascending weight order
     qsort(e, g->m, sizeof(edge2vert), compare);
 
-    k = 0;
+    // Insert edges in ascending order avoiding cycles and respecting degrees
     for (i=0; i < g->m; ++i) {
-        // printf("(%d,%d)->%d\n",e[i].a,e[i].b,e[i].cost);
-        c1 = (comp[e[i].a] != comp[e[i].b]);
-        c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0);
+        c1 = (comp[e[i].a] != comp[e[i].b]); // Vertices must be in different components
+        c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0); // Degrees constraint must be respected
 
         if (c1 && c2) {
-            if (comp[e[i].a] < comp[e[i].b]) {
-                main  = comp[e[i].a];
-                merge = comp[e[i].b];
-            } else {
-                main  = comp[e[i].b]; 
-                merge = comp[e[i].a];
+            component  = min(comp[e[i].a],comp[e[i].b]);
+            merge = max(comp[e[i].a],comp[e[i].b]);
+            
+            // Merge components
+            for (j=0; j<g->n; ++j) {
+                if (comp[j] == merge) comp[j] = component;
             }
 
-            for (j=0; j<g->n; ++j){
-                if (comp[j] == merge) comp[j] = main;
-            }
-
+            // Decrement vertices avalable connections
             --deg[e[i].a]; 
             --deg[e[i].b];
 
-            primal += e[i].cost;
-            ++k;
+            // Add edge to result struct
+            result->mst[e[i].a][e[i].b] = e[i].cost;
+            result->mst[e[i].b][e[i].a] = e[i].cost;
+            result->primal += e[i].cost;
         }
-        
-        if (k == g->n) break;
     }
 
-    printf("HMST=(%d)\n", primal);
-    for (i=0; i < g->n; ++i){
-        if(comp[i] != 0 || deg[i] < 0) printf("FLAWED!!\n");
-    }
-    
+    test_mst(result->mst, result->deg, result->n);
+
     free(e);
-    return primal;
+    return result;
 }
 
-int compare(const void * a, const void * b) { 
-    return (((edge2vert*)a)->cost - ((edge2vert*)b)->cost); 
-}
+// void local_search() {
+    
+// }

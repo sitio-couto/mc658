@@ -38,7 +38,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     subgrad = malloc(sizeof(double)*g->n);
     
     ans->dual = 0;
-    ans->primal = first_primal(g);
+    ans->primal = first_primal(g)->primal;
     
     // End conditions: pi too small, too much time elapsed and optimum found.
     while (pi > MIN_PI && curr_time(start_time) < max_time && ans->dual != ans->primal){

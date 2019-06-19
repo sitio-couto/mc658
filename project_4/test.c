@@ -12,29 +12,6 @@
 
 #include "dcmstp-solver.h"
 
-void dfs(int **mx, int *flag, int deg[], int n, int v) {
-    int j, count = 0;
-    flag[v] = 1;
-
-    for (j=0; j < n; ++j) if (mx[v][j] >= 0) ++count;
-    if (count > deg[v]) {
-        printf("FLAWED!!\n");
-        exit(0);
-    }
-
-    for (j=0; j < n; ++j) {
-        if (flag[j]) {
-            printf("FLAWED!!\n");
-            exit(0);
-        }
-        if(mx[v][j]){
-            dfs(mx, flag, deg, n, j);
-        }
-    }
-
-    return;
-}
-
 int main(int argc, char *argv[]){
     int i,j;
     mat_graph *g;
@@ -92,7 +69,7 @@ int main(int argc, char *argv[]){
 }
 
 int first_primal(mat_graph *g) {
-    int i, j, k, main, merge;
+    int i, j, k, main, merge, min_edge;
     int c1, c2, primal = 0;
     int deg[g->n];  // Indicates the remaining edges alowed per vertex
     int comp[g->n]; // Indicates the component of the vertex
@@ -110,6 +87,37 @@ int first_primal(mat_graph *g) {
         }
     }
 
+    min_edge = INT_MAX;
+    k = -1;
+    for (i=0; i<g->n; ++i) {
+        if (deg[i] == 1){
+            for (j=0; j<g->n; ++j) {
+                if (deg[j] > 1 && g->mat[i][j] < min_edge) {
+                    k = j;
+                }
+            }
+
+            if (k > -1) {
+                for (j=0; j<g->m; ++j) {
+                    if (e[j].a == i && e[j].b == k) break;
+                }
+                
+                --deg[e[j].a]; 
+                --deg[e[j].b];
+
+                main  = min(comp[e[i].a],comp[e[i].b]);
+                merge = max(comp[e[i].a],comp[e[i].b]);
+
+                for (j=0; j<g->n; ++j){
+                    if (comp[j] == merge) comp[j] = main;
+                }
+
+                primal += e[i].cost;
+            }
+        }
+    }
+
+
     qsort(e, g->m, sizeof(edge2vert), compare);
 
     k = 0;
@@ -118,13 +126,8 @@ int first_primal(mat_graph *g) {
         c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0);
 
         if (c1 && c2) {
-            if (comp[e[i].a] < comp[e[i].b]) {
-                main  = comp[e[i].a];
-                merge = comp[e[i].b];
-            } else {
-                main  = comp[e[i].b]; 
-                merge = comp[e[i].a];
-            }
+            main  = min(comp[e[i].a],comp[e[i].b]);
+            merge = max(comp[e[i].a],comp[e[i].b]);
 
             for (j=0; j<g->n; ++j){
                 if (comp[j] == merge) comp[j] = main;
@@ -142,7 +145,9 @@ int first_primal(mat_graph *g) {
 
     printf("HMST=(%d)\n", primal);
     for (i=0; i < g->n; ++i){
-        if(comp[i] != 0 || deg[i] < 0) printf("FLAWED!!\n");
+        if(comp[i] != 0 || deg[i] < 0) {
+            printf("FLAWED(0)=>(%d|%d)!!\n",comp[i], deg[i]);
+        }
     }
     
     free(e);
