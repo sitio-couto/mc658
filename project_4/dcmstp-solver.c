@@ -25,10 +25,6 @@ int main(int argc, char *argv[]){
     }
     
     g = read_input_matrix(argv[1]);
-    
-    hg = first_primal(g);
-    printf("HMST=(%d)\n", hg->primal);
-    exit(0);
 
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
@@ -118,7 +114,6 @@ heu_graph* first_primal(mat_graph *g) {
     }
 
     if (!is_disjoint(comp, g->n)) {
-        test_mst(result->mst, result->deg, result->n, comp);
         free(e);
         return result;
     }
@@ -188,8 +183,6 @@ heu_graph* first_primal(mat_graph *g) {
             --degGap[e[i].b];
         }
     }
-
-    test_mst(result->mst, result->deg, result->n, comp);
 
     free(e);
     return result;
