@@ -117,9 +117,25 @@ heu_graph* first_primal(mat_graph *g) {
         }
     }
 
-    // Merging remaining components
+    if (!is_disjoint(comp, g->n)) {
+        test_mst(result->mst, result->deg, result->n, comp);
+        free(e);
+        return result;
+    }
 
-    // Get the only relaxed component after greey steps
+    // MERGING GRAPH COMPONENTS //
+    /** In case the generated graph consists of multiple distinct
+     *  connected components, the following code will merge such 
+     *  components based on tree propositions:
+     *  1 - The input graph is complete.
+     *  2 - The disjoint components have no cycles.
+     *  3 - Only one component has relaxed vertices.
+     *  NOTE: the latter two are ensured by the greedy heuristic
+     *        used to generate the current disjoint graph.
+    */
+
+    // Get the only relaxed component after greedy steps
+    master = -1;
     for (i=0; i<g->n; ++i){
         if (degGap[i]) {
             master = comp[i];
@@ -177,6 +193,10 @@ heu_graph* first_primal(mat_graph *g) {
 
     free(e);
     return result;
+}
+
+void fix_disjuction(heu_graph *result, int degGap[]) {
+
 }
 
 // void local_search() {

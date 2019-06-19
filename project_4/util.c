@@ -46,6 +46,16 @@ int compare(const void * a, const void * b) {
 }
 
 /**
+ * Check if theres more than one ID in the
+ * components array.
+ */
+int is_disjoint(int comp[], int n) { 
+	int i, aux = comp[0];
+	for (i=0; i<n; ++i) if (comp[i] != aux) return 1;
+	return 0;
+}
+
+/**
  * DFS for testing if a graph is a tree.
  * Used for checking result correctness.
  */
@@ -76,7 +86,10 @@ void test_mst(int **mx, int deg[], int n, int comp[]){
 
 	// for (i=0; i<n; ++i) {
 	// 	for (j=0; j<n; ++j) {
-	// 		printf("%d|", mx[i][j]);
+	// 		if (mx[i][j] > -1)
+	// 			printf("%d|", mx[i][j]);
+	// 		else 
+	// 			printf("*|", mx[i][j]);
 	// 	}
 	// 	printf("\n");
 	// }
