@@ -56,13 +56,14 @@ int main(int argc, char *argv[]){
 }
 
 heu_graph* first_primal(mat_graph *g) {
-    int i, j, k, component, merge;
-    int c1, c2;
-    int deg[g->n];  // Indicates the remaining edges alowed per vertex
-    int comp[g->n]; // Indicates the component of the vertex
+    int i, j, k, master, merge;
+    int c1, c2, c3;
+    int relaxed[g->n]; // Indicates which components where relaxed
+    int degGap[g->n];  // Indicates the remaining edges alowed per vertex
+    int comp[g->n];    // Indicates the component of the vertex
     edge2vert *e = malloc(g->m*sizeof(edge2vert)); // List of edges for greedy algrithims
 
-    // Alocate resulting struct with primal and mst
+    // Alocate resulting struct to keep results
     heu_graph *result = malloc(sizeof(heu_graph));
     result->primal = 0;
     result->n = g->n;
@@ -77,8 +78,9 @@ heu_graph* first_primal(mat_graph *g) {
     // Initilize lists for greedy heuristic
     k = 0;
     for(i=0; i < g->n; ++i) {
-        deg[i] = g->deg[i]; // Max vertices degrees
+        degGap[i] = g->deg[i]; // Max vertices degrees
         comp[i] = i;        // Vertex component ID
+        relaxed[i] = 0;     // Relaxation hash table
         for(j=i+1; j < g->n; ++j) {
             e[k].a = i;
             e[k].b = j; 
@@ -93,25 +95,83 @@ heu_graph* first_primal(mat_graph *g) {
     // Insert edges in ascending order avoiding cycles and respecting degrees
     for (i=0; i < g->m; ++i) {
         c1 = (comp[e[i].a] != comp[e[i].b]); // Vertices must be in different components
-        c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0); // Degrees constraint must be respected
+        c2 = (degGap[e[i].a] > 0 && degGap[e[i].b] > 0); // Degrees constraint must be respected
 
         if (c1 && c2) {
-            component  = min(comp[e[i].a],comp[e[i].b]);
+            master  = min(comp[e[i].a],comp[e[i].b]);
             merge = max(comp[e[i].a],comp[e[i].b]);
             
             // Merge components
             for (j=0; j<g->n; ++j) {
-                if (comp[j] == merge) comp[j] = component;
+                if (comp[j] == merge) comp[j] = master;
             }
 
             // Decrement vertices avalable connections
-            --deg[e[i].a]; 
-            --deg[e[i].b];
+            --degGap[e[i].a]; 
+            --degGap[e[i].b];
 
             // Add edge to result struct
             result->mst[e[i].a][e[i].b] = e[i].cost;
             result->mst[e[i].b][e[i].a] = e[i].cost;
             result->primal += e[i].cost;
+        }
+    }
+
+    // Merging remaining components
+
+    // Get the only relaxed component after greey steps
+    for (i=0; i<g->n; ++i){
+        if (degGap[i]) {
+            master = comp[i];
+            relaxed[master] = 1;
+            break;
+        }
+    } 
+    // printf("master = %d\n", master);
+
+	// Removes heaviest edge from constrained components
+    for (i=(g->m-1); i>=0; --i) {
+        // Is the edge present in the current graph?.
+        c1 = result->mst[e[i].a][e[i].b] > -1;
+        // Is a constrained component?
+        c2 = !relaxed[comp[e[i].a]];
+        
+        // Relax vertices and tag vertices/components
+        if (c1 && c2) {
+            // printf("Relax->(%d,%d)\n", e[i].a, e[i].b);
+            // Remove edge from secondary component
+            result->mst[e[i].a][e[i].b] = -1;
+            result->mst[e[i].b][e[i].a] = -1;
+            result->primal -= e[i].cost;
+
+            // Relax degree constraint on vertices
+            ++degGap[e[i].a]; 
+            ++degGap[e[i].b];
+
+            // Tag component as relaxed
+            relaxed[comp[i]] = 1;
+        }
+    }
+    
+    // Connect relaxed vertices to master component by the lightest edge
+    for (i=0; i<g->m; ++i) {
+        // One of the vertices MUST belong to the master component.
+        c1 = (comp[e[i].a] == master || comp[e[i].b] == master);
+        // One of the vertices must NOT belong to the master component.
+        c2 = (comp[e[i].a] != master || comp[e[i].b] != master);
+        // Both vertices must have enough room for new connections  
+        c3 = (degGap[e[i].a] > 0 && degGap[e[i].b] > 0);
+        
+        if (c1 && c2 && c3) {
+            // printf("Conne->(%d,%d)\n", e[i].a, e[i].b);
+            // Insert edge from in solution
+            result->mst[e[i].a][e[i].b] = e[i].cost;
+            result->mst[e[i].b][e[i].a] = e[i].cost;
+            result->primal += e[i].cost;
+
+            // Constrain degree
+            --degGap[e[i].a]; 
+            --degGap[e[i].b];
         }
     }
 

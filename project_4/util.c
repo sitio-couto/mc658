@@ -50,8 +50,36 @@ int compare(const void * a, const void * b) {
  * Used for checking result correctness.
  */
 void test_mst(int **mx, int deg[], int n, int comp[]){
-	int i, j;
+	int i, j, k, count_deg, gap;
+	int hash[n];
 	int *visited = calloc(n, sizeof(int));
+
+	// for (i=0; i<n; ++i) hash[i] = 0;
+	// for (i=0; i<n; ++i) ++hash[comp[i]];
+	// for (i=0; i<n; ++i) {
+	// 	if (hash[i]) {
+	// 		for (j=0; j<n; ++j) {
+	// 			if (comp[j] == i) {
+	// 				count_deg = 0;
+	// 				for (k=0; k<n; ++k) {
+	// 					if (mx[j][k] >= 0) ++count_deg;
+	// 				}
+	// 				if (count_deg - deg[j] < 0) {
+	// 					printf("GAP=>%d\n", i);
+	// 					break;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// printf("\n");
+
+	// for (i=0; i<n; ++i) {
+	// 	for (j=0; j<n; ++j) {
+	// 		printf("%d|", mx[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
 
 	// Initilize search
 	dfs(mx, visited, deg, n, 0, 0);
@@ -73,7 +101,7 @@ void test_mst(int **mx, int deg[], int n, int comp[]){
  * Used for checking result correctness.
  */
 void dfs(int **mx, int *visited, int deg[], int n, int v, int p) {
-    int i, j, count = 0;
+    int j, count = 0;
     visited[v] = 1;
 	// printf("V->(%d)\n",v);
 
