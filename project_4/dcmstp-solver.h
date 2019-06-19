@@ -74,6 +74,7 @@ int* mst_prim(double **g, int size);
 int min_value(double *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
+int check_viability(int size, int *r_deg, int *mst);
 
 /* HEURISTIC */
 heu_graph* first_primal(mat_graph *g);
