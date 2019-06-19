@@ -46,6 +46,17 @@ int compare(const void * a, const void * b) {
 }
 
 /**
+ * Checks if a value e is in an array
+ * of length n.
+ */
+int contains(edge2vert arr[], int len, edge2vert e) {
+	int i;
+	for (i=0; i<len; ++i)
+		if (arr[i].a == e.a && arr[i].b == e.b) return 1;
+	return 0;
+}
+
+/**
  * Check if theres more than one ID in the
  * components array.
  */
@@ -54,6 +65,27 @@ int is_disjoint(int comp[], int n) {
 	for (i=0; i<n; ++i) if (comp[i] != aux) return 1;
 	return 0;
 }
+
+/**
+ * DFS for tagging a new graph component.
+ * Used for local search heuristic.
+ */
+void tag_component (int **mx, int *visited, int *comp, int tag, int n, int v) {
+    int i;
+
+    visited[v] = 1;
+	comp[v] = tag;
+
+    for (i=0; i < n; ++i) {
+		if (mx[v][i] >= 0 && !visited[i]) 
+			tag_component(mx, visited, comp, tag, n, i);
+    }
+
+    return;
+}
+
+
+// FOR TESTING //////////////////////////////////////////
 
 /**
  * DFS for testing if a graph is a tree.

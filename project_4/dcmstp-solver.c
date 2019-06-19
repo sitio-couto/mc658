@@ -63,10 +63,10 @@ heu_graph* first_primal(mat_graph *g) {
     heu_graph *result = malloc(sizeof(heu_graph));
     result->primal = 0;
     result->n = g->n;
+    result->m = g->m;
     result->deg = malloc(g->n*sizeof(int));
     result->mst = malloc(g->n*sizeof(int*));
     for (i=0; i<g->n; ++i) {
-        result->deg[i] = g->deg[i];
         result->mst[i] = malloc(g->n*sizeof(int));
         for (j=0; j<g->n; ++j) result->mst[i][j] = -1;
     }
@@ -114,6 +114,7 @@ heu_graph* first_primal(mat_graph *g) {
     }
 
     if (!is_disjoint(comp, g->n)) {
+        for (i=0; i<g->n; ++i) result->deg[i] = degGap[i];
         free(e);
         return result;
     }
@@ -183,6 +184,8 @@ heu_graph* first_primal(mat_graph *g) {
             --degGap[e[i].b];
         }
     }
+
+    for (i=0; i<g->n; ++i) result->deg[i] = degGap[i];
 
     free(e);
     return result;

@@ -41,7 +41,7 @@ struct out{
 // Heuristic adjacency matrix tree
 typedef struct {
     int primal;
-    int n;
+    int n, m;
     int *deg;
     int **mst;
 } heu_graph;
@@ -81,7 +81,7 @@ heu_graph* first_primal(mat_graph *g);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
-
+void tag_component (int **mx, int *visited, int *comp, int tag, int n, int v);
 
 /* MISC */
 double curr_time(time_t start_time);
@@ -91,6 +91,7 @@ double mst_value(int *mst, int size, double **g);
 int compare(const void * a, const void * b);
 void test_mst(int **mx, int deg[], int n, int comp[]);
 void dfs(int **mx, int *flag, int deg[], int n, int v, int p);
+int contains(edge2vert array[], int len, edge2vert e);
 
 
 #endif
