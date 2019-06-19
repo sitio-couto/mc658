@@ -41,7 +41,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     ans->primal = first_primal(g)->primal;
     
     // End conditions: pi too small, too much time elapsed and optimum found.
-    while (pi > MIN_PI && curr_time(start_time) < max_time && ans->dual != ans->primal){
+    while (pi > MIN_PI && curr_time(start_time) < max_time && (ans->primal - ans->dual) >= 1){
 		
 		//Generating lagrangian costs
 		for (i=0; i<g->n; i++){
@@ -80,7 +80,8 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		// Finished execution if Gi=0 for every i.
 		// If solution is viable, it's the optimum.
 		if (subgrad_sum == 0){
-			// Check if viable
+			if (check_viability(g->n, g->deg, mst))
+				ans->primal = ans->dual;
 			break;
 		}
 			
@@ -209,4 +210,35 @@ double subgradient(int v, int deg, int size, int *mst){
 			count++;
 			
 	return count - deg;
+}
+
+/**
+ * Checks if the MST found is viable for DCMSTP.
+ * @param g Original graph
+ * @param mst Tree to be checked.
+ * @return 1 if viable, 0 otherwise
+ */
+int check_viability(int size, int *r_deg, int *mst){
+	int i;
+	int *degs = calloc((short)size, sizeof(int));
+	int res = 1;
+	
+	// Calculating degrees.
+	for(i=0; i<size; i++){
+		if (mst[i] >= 0){
+			degs[mst[i]]++;
+			degs[i]++;
+		}
+	}
+	
+	// Checking restrictions.
+	for(i=0; i<size; i++){
+		if (degs[i] > r_deg[i]){
+			res = 0;
+			break;
+		}
+	}
+	
+	free(degs);
+	return res;
 }
