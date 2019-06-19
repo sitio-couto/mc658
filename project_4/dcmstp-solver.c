@@ -126,8 +126,7 @@ heu_graph* first_primal(mat_graph *g) {
             relaxed[master] = 1;
             break;
         }
-    } 
-    // printf("master = %d\n", master);
+    }
 
 	// Removes heaviest edge from constrained components
     for (i=(g->m-1); i>=0; --i) {
@@ -135,10 +134,9 @@ heu_graph* first_primal(mat_graph *g) {
         c1 = result->mst[e[i].a][e[i].b] > -1;
         // Is a constrained component?
         c2 = !relaxed[comp[e[i].a]];
-        
+    
         // Relax vertices and tag vertices/components
         if (c1 && c2) {
-            // printf("Relax->(%d,%d)\n", e[i].a, e[i].b);
             // Remove edge from secondary component
             result->mst[e[i].a][e[i].b] = -1;
             result->mst[e[i].b][e[i].a] = -1;
@@ -149,7 +147,7 @@ heu_graph* first_primal(mat_graph *g) {
             ++degGap[e[i].b];
 
             // Tag component as relaxed
-            relaxed[comp[i]] = 1;
+            relaxed[comp[e[i].a]] = 1;
         }
     }
     
