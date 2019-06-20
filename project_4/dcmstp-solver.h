@@ -76,14 +76,13 @@ int min_value(double *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
 int check_viability(int size, int *r_deg, int *mst);
+int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi);
 
-/* HEURISTIC */
+/* HEURISTIC / METAHEURISTIC */
 heu_graph* first_primal(mat_graph *g);
 void tag_component (int **mx, int n, int v, int *comp, int tag);
 void tag_component_dfs (int **mx, int n, int *visited, int v, int *comp, int tag);
 void heuristic(heu_graph *r, edge_list *e);
-
-/* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
 
 /* MISC */
