@@ -70,14 +70,15 @@ void generate_out_file(char *filename, struct out *ans);
 void print_mst(int *mst, int size, int **g);
 
 /* LAGRANGIAN HEURISTIC */
-struct out *lagrangian_heuristic(mat_graph *g, int max_time);
+struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time);
 int* mst_prim(double **g, int size);
 int min_value(double *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
 int check_viability(int size, int *r_deg, int *mst);
+int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi);
 
-/* HEURISTIC */
+/* HEURISTIC / METAHEURISTIC */
 heu_graph* first_primal(mat_graph *g);
 void tag_component (int **mx, int n, int v, int *comp, int tag);
 void tag_component_dfs (int **mx, int n, int *visited, int v, int *comp, int tag);
@@ -86,7 +87,7 @@ int* get_comp_gap (int n, int comp[], int deg[], int n_comp);
 void update_comp_gap (int n, int comp[], int deg[], int n_curr, int *curr);
 
 /* METAHEURISTIC */
-struct out *metaheuristic(mat_graph *g, int max_time);
+struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time);
 
 /* MISC */
 double curr_time(time_t start_time);

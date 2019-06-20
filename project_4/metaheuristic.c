@@ -10,9 +10,7 @@
  * @return out Best solution found within time "max_time"
  */
 
-// CAREFULL: some variables are removed by the -o3 flag!!!
-struct out *metaheuristic(mat_graph *g, int max_time){
-    time_t start_time = clock();
+struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     int i, j, k, updates = 0;
     int comp[g->n], deg[g->n];
     heu_graph *state = first_primal(g);

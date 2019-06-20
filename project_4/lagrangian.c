@@ -13,22 +13,19 @@
  * @param max_time Execution time limit.
  * @return out Best solution and dual bound found within time "max_time"
  */
-struct out *lagrangian_heuristic(mat_graph *g, int max_time){
-    double pi = INIT_PI, step;
+struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
+    double pi = INIT_PI;
     int i, j, iter = 0;
     int viable=0;
     double *mult;			// Lagrange Multipliers.
     double **lg;			// Lagrangian Graph
     int *mst = NULL;		// Minimum spanning tree: mst[i] is the parent of vertex i.
     double dual, primal;	// Current dual or primal.
-    double *subgrad, subgrad_sum=0;		
+    double *subgrad;		
     struct out *ans;
-	
-    // Initializing
-    time_t start_time = clock();
-    ans = malloc(sizeof(struct out));
-    
+
     // Allocating lagrangian graph and multiplier array.
+    ans = malloc(sizeof(struct out));    
     mult = malloc(sizeof(double)*g->n);
     lg = malloc(sizeof(double*)*g->n);
     for(i=0; i<g->n; i++)
@@ -74,32 +71,10 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		// If the dual hasn't increased in a few iterations, take half pi.
 		else if (iter == MAX_ITER_PI)
 			pi/=2;
-		
-		// Subgradients for lagrange multipliers step.
-		subgrad_sum = 0;
-		for(i=0; i<g->n; i++){
-			subgrad[i] = subgradient(i, g->deg[i], g->n, mst);
-			if (subgrad[i] > 0 || mult[i] > 0)
-				subgrad_sum+= subgrad[i]*subgrad[i];
-		}
-		
-		// Finished execution if Gi=0 for every i.
-		// If solution is viable, it's the optimum.
-		if (subgrad_sum == 0){
-			if (viable)
-				ans->primal = ans->dual;
-			break;
-		}
-		
-		// If the solution is viable, try to update primal.
-		if (viable)
-			min(ans->primal, mst_value(mst, g->n, (double**)g->mat));
 			
-		step = pi*((1+EPS)*ans->primal - ans->dual)/subgrad_sum;
-		
-		// Updating lagrange multipliers
-		for (i=0; i< g->n; i++)
-			mult[i] = max(0, mult[i]+step*subgrad[i]);
+		// Updates lagrange multipliers and checks if execution needs to continue.
+		if (!update_multipliers_and_check(g, mult, mst, subgrad, ans, viable, pi))
+			break;
     }
     
     // Freeing lagrangian graph and multiplier array.
@@ -246,4 +221,50 @@ int check_viability(int size, int *r_deg, int *mst){
 	
 	free(degs);
 	return res;
+}
+
+/**
+ * Function to update lagrange multipliers.
+ * Calculates subgradients for each vertex,
+ * Checks if it's ready to end (subgrad[i] = 0 for every i),
+ * With the subgradients, calculates step for multipliers and updates them.
+ * Tries to update primal bound.
+ * @param g: graph
+ * @param mult: previous lagrange multipliers
+ * @param mst: dual mst for the previous graph
+ * @param subgrad: subgradient array for storage.
+ * @param ans: best dual and primal solutions
+ * @param viable: if the MST is viable for DCMSTP.
+ * @return 0 if the execution is to be stopped. 1 otherwise.
+ */
+int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi){		
+	double step, subgrad_sum=0;	
+	int i;
+	
+	// Subgradients for lagrange multipliers step.
+	for(i=0; i<g->n; i++){
+		subgrad[i] = subgradient(i, g->deg[i], g->n, mst);
+		if (subgrad[i] > 0 || mult[i] > 0)
+			subgrad_sum+= subgrad[i]*subgrad[i];
+	}
+	
+	// Finished execution if Gi=0 for every i.
+	// If solution is viable, it's the optimum.
+	if (subgrad_sum == 0){
+		if (viable)
+			ans->primal = ans->dual;
+		return 0;
+	}
+	
+	// If the solution is viable, try to update primal.
+	if (viable)
+		min(ans->primal, mst_value(mst, g->n, (double**)g->mat));
+		
+	step = pi*((1+EPS)*ans->primal - ans->dual)/subgrad_sum;
+	
+	// Updating lagrange multipliers
+	for (i=0; i< g->n; i++)
+		mult[i] = max(0, mult[i]+step*subgrad[i]);
+	
+	return 1;
 }
