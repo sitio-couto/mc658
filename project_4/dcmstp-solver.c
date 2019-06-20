@@ -13,7 +13,7 @@
 #include "dcmstp-solver.h"
 
 int main(int argc, char *argv[]){
-    //graph *g;
+    time_t start_time = clock();
     mat_graph *g;
     heu_graph *hg;
     struct out *o;
@@ -31,12 +31,12 @@ int main(int argc, char *argv[]){
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
         printf("Lagrangian\n");
-        o = lagrangian_heuristic(g, atoi(argv[2]));
+        o = lagrangian_heuristic(g, atoi(argv[2]), start_time);
         printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
     }
     else if (argv[3][0] == 'm'){
         printf("Metaheuristics\n");
-        o = metaheuristic(g, atoi(argv[2]));
+        o = metaheuristic(g, atoi(argv[2]), start_time);
         //printf("%s,%lf\n", argv[1], o->primal);
     }
     else{

@@ -13,7 +13,7 @@
  * @param max_time Execution time limit.
  * @return out Best solution and dual bound found within time "max_time"
  */
-struct out *lagrangian_heuristic(mat_graph *g, int max_time){
+struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
     double pi = INIT_PI;
     int i, j, iter = 0;
     int viable=0;
@@ -23,12 +23,9 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     double dual, primal;	// Current dual or primal.
     double *subgrad;		
     struct out *ans;
-	
-    // Initializing
-    time_t start_time = clock();
-    ans = malloc(sizeof(struct out));
-    
+
     // Allocating lagrangian graph and multiplier array.
+    ans = malloc(sizeof(struct out));    
     mult = malloc(sizeof(double)*g->n);
     lg = malloc(sizeof(double*)*g->n);
     for(i=0; i<g->n; i++)

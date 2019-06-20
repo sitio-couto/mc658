@@ -10,8 +10,7 @@
 
 #define _PERM_ 3
 
-struct out *metaheuristic(mat_graph *g, int max_time){
-    time_t start_time = clock();
+struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     int i, j, k, updates = 0;
     heu_graph *state = first_primal(g);
     edge_list *e = edge_list_alloc(g->mat, g->n, g->m);

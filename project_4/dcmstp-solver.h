@@ -70,7 +70,7 @@ void generate_out_file(char *filename, struct out *ans);
 void print_mst(int *mst, int size, int **g);
 
 /* LAGRANGIAN HEURISTIC */
-struct out *lagrangian_heuristic(mat_graph *g, int max_time);
+struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time);
 int* mst_prim(double **g, int size);
 int min_value(double *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
@@ -83,7 +83,7 @@ heu_graph* first_primal(mat_graph *g);
 void tag_component (int **mx, int n, int v, int *comp, int tag);
 void tag_component_dfs (int **mx, int n, int *visited, int v, int *comp, int tag);
 void heuristic(heu_graph *r, edge_list *e);
-struct out *metaheuristic(mat_graph *g, int max_time);
+struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time);
 
 /* MISC */
 double curr_time(time_t start_time);
