@@ -25,12 +25,18 @@ int main(int argc, char *argv[]){
     }
     
     g = read_input_matrix(argv[1]);
+<<<<<<< HEAD
+=======
+    
+    hg = first_primal(g);
+    printf("HMST=(%d)\n", hg->primal);
+>>>>>>> 35ec7d02bae2a3e0cbfe111ea159dd24100d7aa4
 
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
         printf("Lagrangian\n");
         o = lagrangian_heuristic(g, atoi(argv[2]));
-        //printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
+        printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
     }
     else if (argv[3][0] == 'm'){
         printf("Metaheuristics\n");
