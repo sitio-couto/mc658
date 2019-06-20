@@ -28,13 +28,12 @@ int main(int argc, char *argv[]){
     
     hg = first_primal(g);
     printf("HMST=(%d)\n", hg->primal);
-    exit(0);
 
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
         printf("Lagrangian\n");
         o = lagrangian_heuristic(g, atoi(argv[2]));
-        //printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
+        printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
     }
     else if (argv[3][0] == 'm'){
         printf("Metaheuristics\n");

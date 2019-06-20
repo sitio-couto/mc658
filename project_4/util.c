@@ -60,8 +60,8 @@ int is_disjoint(int comp[], int n) {
  * Used for checking result correctness.
  */
 void test_mst(int **mx, int deg[], int n, int comp[]){
-	int i, j, k, count_deg, gap;
-	int hash[n];
+	int i;//, j, k, count_deg, gap;
+	//int hash[n];
 	int *visited = calloc(n, sizeof(int));
 
 	// for (i=0; i<n; ++i) hash[i] = 0;

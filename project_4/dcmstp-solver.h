@@ -91,6 +91,6 @@ double mst_value(int *mst, int size, double **g);
 int compare(const void * a, const void * b);
 void test_mst(int **mx, int deg[], int n, int comp[]);
 void dfs(int **mx, int *flag, int deg[], int n, int v, int p);
-
+int is_disjoint(int comp[], int n);
 
 #endif

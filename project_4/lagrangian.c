@@ -1,8 +1,10 @@
 #include "dcmstp-solver.h"
 
 #define INIT_PI 2
+#define INIT_MULT 1
 #define MIN_PI 0.005
 #define MAX_ITER_PI 30
+#define EPS 0.0
 
 /**
  * Lagrangian heuristic implementation for DCMSTP.
@@ -33,7 +35,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     
     // Initializing lagrange multipliers.
     for(i=0; i<g->n; i++)
-		mult[i]=1;
+		mult[i]=INIT_MULT;
     
     subgrad = malloc(sizeof(double)*g->n);
     
@@ -85,16 +87,11 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 			break;
 		}
 			
-		step = pi*(1.05*ans->primal - ans->dual)/subgrad_sum;
+		step = pi*((1+EPS)*ans->primal - ans->dual)/subgrad_sum;
 		
 		// Updating lagrange multipliers
 		for (i=0; i< g->n; i++)
 			mult[i] = max(0, mult[i]+step*subgrad[i]);
-		
-		//for(i=0; i< g->n; i++)
-		//	printf("%lf ", mult[i]);
-		//printf("\n");
-		//getchar();
     }
     
     // Freeing lagrangian graph and multiplier array.
@@ -106,7 +103,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 	
 	//print_mst(mst, g->n, g->mat);
 	ans->mst = mst;
-    
+	
     return ans;
 }
 
