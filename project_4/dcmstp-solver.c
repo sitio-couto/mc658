@@ -24,13 +24,9 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    g = read_input_matrix(argv[1]);
-<<<<<<< HEAD
-=======
-    
+    g = read_input_matrix(argv[1]);    
     hg = first_primal(g);
     printf("HMST=(%d)\n", hg->primal);
->>>>>>> 35ec7d02bae2a3e0cbfe111ea159dd24100d7aa4
 
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
@@ -201,7 +197,3 @@ heu_graph* first_primal(mat_graph *g) {
 void fix_disjuction(heu_graph *result, int degGap[]) {
 
 }
-
-// void local_search() {
-    
-// }

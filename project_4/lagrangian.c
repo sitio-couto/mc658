@@ -16,6 +16,7 @@
 struct out *lagrangian_heuristic(mat_graph *g, int max_time){
     double pi = INIT_PI, step;
     int i, j, iter = 0;
+    int viable=0;
     double *mult;			// Lagrange Multipliers.
     double **lg;			// Lagrangian Graph
     int *mst = NULL;		// Minimum spanning tree: mst[i] is the parent of vertex i.
@@ -60,6 +61,9 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		mst = mst_prim(lg, g->n);
 		dual = mst_value(mst, g->n, lg) - mult_deg(mult, g->deg, g->n);
 		
+		// Checks if MST is viable for DCMSTP.
+		viable = check_viability(g->n, g->deg, mst);
+		
 		iter++;
 		if (dual > ans->dual){
 			ans->dual = dual;
@@ -82,10 +86,14 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time){
 		// Finished execution if Gi=0 for every i.
 		// If solution is viable, it's the optimum.
 		if (subgrad_sum == 0){
-			if (check_viability(g->n, g->deg, mst))
+			if (viable)
 				ans->primal = ans->dual;
 			break;
 		}
+		
+		// If the solution is viable, try to update primal.
+		if (viable)
+			min(ans->primal, mst_value(mst, g->n, (double**)g->mat));
 			
 		step = pi*((1+EPS)*ans->primal - ans->dual)/subgrad_sum;
 		

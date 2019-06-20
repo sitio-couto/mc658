@@ -92,19 +92,16 @@ int min(int a, int b);
 double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
 int compare(const void * a, const void * b);
-void test_mst(int **mx, int deg[], int n, int comp[]);
-<<<<<<< HEAD
-void dfs_test(int **mx, int *flag, int deg[], int n, int v, int p);
 int contains(edge_list array[], int len, edge_list e);
 int* to_array (int **mx, int n, int *arr);
 void to_array_dfs (int **mx, int n, int *visited, int v, int *arr);
 struct out* out_alloc(int primal, int dual, int n);
 void heu_graph_free (heu_graph *hg);
 edge_list* edge_list_alloc (int **mx, int n, int m);
-
-=======
-void dfs(int **mx, int *flag, int deg[], int n, int v, int p);
 int is_disjoint(int comp[], int n);
->>>>>>> 35ec7d02bae2a3e0cbfe111ea159dd24100d7aa4
+
+/* TEST */
+void test_mst(int **mx, int deg[], int n, int comp[]);
+void dfs_test(int **mx, int *flag, int deg[], int n, int v, int p);
 
 #endif
