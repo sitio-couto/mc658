@@ -5,12 +5,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <limits.h>
+#include <float.h>
 
 // Graph edge with vertex index
-typedef struct edge2vert{
+typedef struct edge_list{
     int a, b;
     int cost;
-} edge2vert;
+} edge_list;
 
 // Graph edge
 typedef struct edge{
@@ -78,10 +79,12 @@ int check_viability(int size, int *r_deg, int *mst);
 
 /* HEURISTIC */
 heu_graph* first_primal(mat_graph *g);
+void tag_component (int **mx, int n, int v, int *comp, int tag);
+void tag_component_dfs (int **mx, int n, int *visited, int v, int *comp, int tag);
+void heuristic(heu_graph *r, edge_list *e);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);
-void tag_component (int **mx, int *visited, int *comp, int tag, int n, int v);
 
 /* MISC */
 double curr_time(time_t start_time);
@@ -90,8 +93,13 @@ double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
 int compare(const void * a, const void * b);
 void test_mst(int **mx, int deg[], int n, int comp[]);
-void dfs(int **mx, int *flag, int deg[], int n, int v, int p);
-int contains(edge2vert array[], int len, edge2vert e);
+void dfs_test(int **mx, int *flag, int deg[], int n, int v, int p);
+int contains(edge_list array[], int len, edge_list e);
+int* to_array (int **mx, int n, int *arr);
+void to_array_dfs (int **mx, int n, int *visited, int v, int *arr);
+struct out* out_alloc(int primal, int dual, int n);
+void heu_graph_free (heu_graph *hg);
+edge_list* edge_list_alloc (int **mx, int n, int m);
 
 
 #endif

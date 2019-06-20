@@ -57,7 +57,7 @@ heu_graph* first_primal(mat_graph *g) {
     int relaxed[g->n]; // Indicates which components where relaxed
     int degGap[g->n];  // Indicates the remaining edges alowed per vertex
     int comp[g->n];    // Indicates the component of the vertex
-    edge2vert *e = malloc(g->m*sizeof(edge2vert)); // List of edges for greedy algrithims
+    edge_list *e = malloc(g->m*sizeof(edge_list)); // List of edges for greedy algrithims
 
     // Alocate resulting struct to keep results
     heu_graph *result = malloc(sizeof(heu_graph));
@@ -86,7 +86,7 @@ heu_graph* first_primal(mat_graph *g) {
     }
 
     // Sort edges in ascending weight order
-    qsort(e, g->m, sizeof(edge2vert), compare);
+    qsort(e, g->m, sizeof(edge_list), compare);
 
     // Insert edges in ascending order avoiding cycles and respecting degrees
     for (i=0; i < g->m; ++i) {
@@ -185,6 +185,7 @@ heu_graph* first_primal(mat_graph *g) {
         }
     }
 
+    // Save current degree gap of each node
     for (i=0; i<g->n; ++i) result->deg[i] = degGap[i];
 
     free(e);

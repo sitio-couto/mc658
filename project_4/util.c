@@ -42,14 +42,14 @@ double mst_value(int *mst, int size, double **g){
  * For sorting edges lists with qsort.
  */
 int compare(const void * a, const void * b) { 
-    return (((edge2vert*)a)->cost - ((edge2vert*)b)->cost); 
+    return (((edge_list*)a)->cost - ((edge_list*)b)->cost); 
 }
 
 /**
  * Checks if a value e is in an array
  * of length n.
  */
-int contains(edge2vert arr[], int len, edge2vert e) {
+int contains(edge_list arr[], int len, edge_list e) {
 	int i;
 	for (i=0; i<len; ++i)
 		if (arr[i].a == e.a && arr[i].b == e.b) return 1;
@@ -67,23 +67,104 @@ int is_disjoint(int comp[], int n) {
 }
 
 /**
- * DFS for tagging a new graph component.
- * Used for local search heuristic.
+ * Wrapper for the to_array_dfs function..
  */
-void tag_component (int **mx, int *visited, int *comp, int tag, int n, int v) {
+int* to_array (int **mx, int n, int *arr) {
+	int i;
+	int visited[n];
+
+	for (i=0; i<n; ++i) arr[i] = -1;
+
+	to_array_dfs(mx, n, visited, 0, arr);
+
+	return arr;
+}
+
+/**
+ * DFS for converting a adjacency matrix
+ * into a node-parent array.
+ */
+void to_array_dfs (int **mx, int n, int *visited, int v, int *arr) {
     int i;
 
-    visited[v] = 1;
-	comp[v] = tag;
-
+	visited[v] = 1;
     for (i=0; i < n; ++i) {
-		if (mx[v][i] >= 0 && !visited[i]) 
-			tag_component(mx, visited, comp, tag, n, i);
+		if (mx[v][i] >= 0 && !visited[i]) {
+			arr[i] = v; 
+			to_array_dfs(mx, n, visited, i, arr);
+		}
     }
 
     return;
 }
 
+/**
+ * DFS for tagging a new graph component.
+ * Used for local search heuristic.
+ */
+void tag_component (int **mx, int n, int v, int *comp, int tag) {
+	int visited[n];
+
+	tag_component_dfs(mx, n, visited, v, comp, tag);
+
+	return;
+}
+
+void tag_component_dfs (int **mx, int n, int *visited, int v, int *comp, int tag) {
+    int i;
+
+	comp[v] = tag;
+
+	visited[v] = 1;
+    for (i=0; i < n; ++i) {
+		if (mx[v][i] >= 0 && !visited[i]) 
+			tag_component_dfs(mx, n, visited, i, comp, tag);
+    }
+
+    return;
+}
+
+// MEMORY HANDLING FUNCTIONS ////////////////////////////
+struct out* out_alloc(int primal, int dual, int n) {
+	int i;
+	struct out* o = malloc(sizeof(struct out));
+
+	o->primal = primal;
+	o->dual = dual;
+	o->mst = malloc(n*sizeof(int));
+	
+	return o;
+}
+
+void heu_graph_free (heu_graph *hg) {
+	int i;
+
+	free(hg->deg);
+	for (i=0; i<hg->n; ++i) free(hg->mst[i]);
+	free(hg->mst);
+	free(hg);
+
+	return;
+}
+
+edge_list* edge_list_alloc (int **mx, int n, int m) {
+	int i, j, k = 0;
+	edge_list *e = malloc(m*sizeof(edge_list));
+
+	// Initialize list of edges (permutations options)
+    k = 0;
+    for (i=0; i<n; ++i) {
+        for(j=i+1; j < n; ++j) {
+            e[k].a = i;
+            e[k].b = j; 
+            e[k].cost = mx[i][j];
+            ++k;
+        }
+    }
+    qsort(e, m, sizeof(edge_list), compare);
+
+	return e;
+} 
 
 // FOR TESTING //////////////////////////////////////////
 
@@ -127,7 +208,7 @@ void test_mst(int **mx, int deg[], int n, int comp[]){
 	// }
 
 	// Initilize search
-	dfs(mx, visited, deg, n, 0, 0);
+	dfs_test(mx, visited, deg, n, 0, 0);
 	
 	// Checks if all vertex are reached
 	for (i=0; i<n; ++i) {
@@ -145,7 +226,7 @@ void test_mst(int **mx, int deg[], int n, int comp[]){
  * DFS for testing if a graph is a tree.
  * Used for checking result correctness.
  */
-void dfs(int **mx, int *visited, int deg[], int n, int v, int p) {
+void dfs_test(int **mx, int *visited, int deg[], int n, int v, int p) {
     int j, count = 0;
     visited[v] = 1;
 	// printf("V->(%d)\n",v);
@@ -169,7 +250,7 @@ void dfs(int **mx, int *visited, int deg[], int n, int v, int p) {
         }
 		// Recursive search on next available edge
         else if (j!=p && mx[v][j] >= 0) {
-            dfs(mx, visited, deg, n, j, v);
+            dfs_test(mx, visited, deg, n, j, v);
         }
     }
 
