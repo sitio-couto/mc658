@@ -15,7 +15,6 @@
 int main(int argc, char *argv[]){
     //graph *g;
     mat_graph *g;
-    heu_graph *hg;
     struct out *o;
     
     // Verifying arguments
@@ -25,8 +24,6 @@ int main(int argc, char *argv[]){
     }
     
     g = read_input_matrix(argv[1]);    
-    hg = first_primal(g);
-    printf("HMST=(%d)\n", hg->primal);
 
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){

@@ -82,6 +82,8 @@ heu_graph* first_primal(mat_graph *g);
 void tag_component (int **mx, int n, int v, int *comp, int tag);
 void tag_component_dfs (int **mx, int n, int *visited, int v, int *comp, int tag);
 void heuristic(heu_graph *r, edge_list *e);
+int* get_comp_gap (int n, int comp[], int deg[], int n_comp);
+void update_comp_gap (int n, int comp[], int deg[], int n_curr, int *curr);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time);

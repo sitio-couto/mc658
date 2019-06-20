@@ -103,7 +103,9 @@ void to_array_dfs (int **mx, int n, int *visited, int v, int *arr) {
  * Used for local search heuristic.
  */
 void tag_component (int **mx, int n, int v, int *comp, int tag) {
-	int visited[n];
+	int i, visited[n];
+
+	for (i=0; i<n; ++i) visited[i] = 0;
 
 	tag_component_dfs(mx, n, visited, v, comp, tag);
 
@@ -122,6 +124,32 @@ void tag_component_dfs (int **mx, int n, int *visited, int v, int *comp, int tag
     }
 
     return;
+}
+
+/**
+ * Calculates the amount of vacant degrees for each component.
+ * Used for checking if a component is saturated or not.
+ */
+int* get_comp_gap (int n, int comp[], int deg[], int n_comp) {
+	int i;
+
+	n_comp++;
+	int *comp_deg = malloc(n_comp*sizeof(int));
+
+	for (i=0; i<n_comp; ++i) comp_deg[i] = 0;
+	for (i=0; i<n; ++i) comp_deg[comp[i]] += deg[i];
+	
+	return comp_deg;
+}
+
+void update_comp_gap (int n, int comp[], int deg[], int n_curr, int *curr) {
+	int i;
+	n_curr++;
+
+	for (i=0; i<n_curr; ++i) curr[i] = 0;
+	for (i=0; i<n; ++i) curr[comp[i]] += deg[i];
+	
+	return;
 }
 
 // MEMORY HANDLING FUNCTIONS ////////////////////////////
@@ -233,7 +261,8 @@ void dfs_test(int **mx, int *visited, int deg[], int n, int v, int p) {
 
 	// Check if the vertex respects the degree contraint
     for (j=0; j < n; ++j) if (mx[v][j] >= 0) ++count;
-    if (count > deg[v]) {
+    if (deg != NULL && count > deg[v]) {
+		printf("%d->(%d <= %d)\n", v, count, deg[v]);
         printf("FLAWED!! (degree constraint violated)\n");
         exit(0);
     }
