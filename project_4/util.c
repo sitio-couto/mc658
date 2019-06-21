@@ -202,6 +202,66 @@ edge_list* edge_list_alloc (int **mx, int n, int m) {
  * DFS for testing if a graph is a tree.
  * Used for checking result correctness.
  */
+int is_new_result (int *(***list), int *qnt, heu_graph *r) {
+	int k;
+
+	for (k=0; k<(*qnt); ++k) {
+		if (is_equal((*list)[k], r->mst, r->n)) 
+			return 0;
+	}
+
+	(*list) = append_result((*list), ++(*qnt), r->mst, r->n);
+
+	return 1;
+}
+
+int*** append_result (int ***list, int qnt, int **new, int n) {
+	int i, j;
+	int ***new_list = malloc(qnt*sizeof(int**));
+
+	memcpy(new_list, list, (qnt-1)*sizeof(int**));
+	new_list[qnt-1] = malloc(n*sizeof(int*));
+	for (i=0; i<n; ++i) {
+		new_list[qnt-1][i] = malloc(n*sizeof(int)); 
+		for (j=0; j<n; ++j) {
+			new_list[qnt-1][i][j] = new[i][j];
+		}
+	}
+
+	free(list);
+	return new_list;
+}
+
+int is_equal (int *old[], int *new[], int n) {
+	int i, j;
+
+	for (i=0; i<n; ++i) {
+		for (j=0; j<n; ++j) {
+			if (old[i][j] != new[i][j])
+				return 0; 
+		}
+	}
+
+	return 1;
+}
+
+void free_results (int ***list, int qnt, int n) {
+	int i, k;
+
+	for (k=0; k<qnt; ++k) {
+		for (i=0; i<n; ++i) {
+			free(list[k][i]);
+		}
+		free(list[k]);
+	}
+
+	free(list);
+}
+
+/**
+ * DFS for testing if a graph is a tree.
+ * Used for checking result correctness.
+ */
 void test_mst(int **mx, int deg[], int n, int comp[]){
 	int i;//, j, k, count_deg, gap;
 	//int hash[n];

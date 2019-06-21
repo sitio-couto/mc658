@@ -1,6 +1,6 @@
 #include "dcmstp-solver.h"
 
-#define _PERM_ 10
+#define _PERM_ 100
 
 /**
  * Metaheuristic implementation for DCMSTP.
@@ -18,6 +18,8 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     struct out *best = out_alloc(state->primal, 0, g->n);
     
     // TESTING //
+    int*** results = NULL;
+    int qnt = 0;
     int hash[(int)best->primal*2];
     for (i=0; i<best->primal*2; ++i) hash[i] = 0;
     ////////////
@@ -27,26 +29,32 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
         deg[i] = g->deg[i];
     } 
     
+    // TESTING //
+    is_new_result(&results, &qnt, state);
     printf("FIRST=>(%d)\n", (int)best->primal);
+    ////////////
 
     // Iterate trough the solutions graph
     while (curr_time(start_time) < max_time) { 
-        heuristic(state, e); // Get new solution
+        // TESTING //
         test_mst(state->mst, deg, state->n, comp);
-        if (hash[state->primal]) {
-            // printf("Old value ==>(%d)\n", state->primal);
-        } else {
+        if (is_new_result(&results, &qnt, state)) {
             hash[state->primal] = 1;
-            printf("NEW VALUE!!==>(%d)\n", state->primal);
+            printf("New value ==> (%d)\n", state->primal);
         }
-
+        /////////////
+        heuristic(state, e); // Get new solution
         if (state->primal < (int)best->primal) {
             best->primal = state->primal;
             to_array(state->mst, state->n, best->mst);
-            printf("IHMST=>(%d)\n", (int)best->primal);
+            printf("|| UPDATE || => (%d)\n", (int)best->primal);
             updates++;
         };
     }
+
+    // TESTING //
+    free_results(results, qnt, state->n);
+    /////////////
 
     free(e);
     heu_graph_free(state);

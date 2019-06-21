@@ -6,6 +6,7 @@
 #include <time.h>
 #include <limits.h>
 #include <float.h>
+#include <string.h>
 
 // Graph edge with vertex index
 typedef struct edge_list{
@@ -108,5 +109,9 @@ int is_disjoint(int comp[], int n);
 /* TEST */
 void test_mst(int **mx, int deg[], int n, int comp[]);
 void dfs_test(int **mx, int *flag, int deg[], int n, int v, int p);
+int is_new_result (int *(***list), int *qnt, heu_graph *r);
+int is_equal (int *old[], int *new[], int n);
+int*** append_result (int ***list, int qnt, int **new, int n);
+void free_results (int ***list, int qnt, int n);
 
 #endif
