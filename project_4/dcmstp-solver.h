@@ -7,6 +7,7 @@
 #include <limits.h>
 #include <float.h>
 #include <string.h>
+#include <math.h>
 
 // Graph edge with vertex index
 typedef struct edge_list{

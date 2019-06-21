@@ -16,12 +16,12 @@ graph *read_input_list(char *filename){
     
     // Reads dimensions and creates list.
     g = malloc(sizeof(graph));
-    fscanf(in, "%d %d \n", &g->n, &g->m);
+    if (!fscanf(in, "%d %d \n", &g->n, &g->m)) exit(0);
     g->list = calloc(g->n, sizeof(node));
     
     // Reads edges and inserts them in the graph.
     for (i=0; i<(g->m); i++){
-        fscanf(in, "%d %d %d \n", &start, &end, &cost);
+        if (!fscanf(in, "%d %d %d \n", &start, &end, &cost)) exit(0);
         new = malloc(sizeof(edge));
         new->idx = end-1;
         new->cost = cost;
@@ -37,7 +37,7 @@ graph *read_input_list(char *filename){
     
     // Reads degree constraints
     for (i=0; i<(g->n); i++){
-        fscanf(in, "%d %d \n", &start, &deg);
+        if (!fscanf(in, "%d %d \n", &start, &deg)) exit(0);
         g->list[start-1].deg = deg;
     }
     
@@ -60,7 +60,7 @@ mat_graph *read_input_matrix(char *filename){
     
     // Reads dimensions and creates matrix.
     g = malloc(sizeof(mat_graph));
-    fscanf(in, "%d %d \n", &g->n, &g->m);
+    if (!fscanf(in, "%d %d \n", &g->n, &g->m)) exit(0);
     g->deg = calloc(g->n, sizeof(int));
     g->mat = calloc(g->n, sizeof(int*));
     for (i=0; i<(g->n); i++)
@@ -68,7 +68,7 @@ mat_graph *read_input_matrix(char *filename){
     
     // Reads edges and inserts them in the graph.
     for (i=0; i<(g->m); i++){
-        fscanf(in, "%d %d %d \n", &start, &end, &cost);
+        if (!fscanf(in, "%d %d %d \n", &start, &end, &cost)) exit(0);
         g->mat[start-1][end-1] = cost;
         g->mat[end-1][start-1] = cost;
     }
@@ -79,7 +79,7 @@ mat_graph *read_input_matrix(char *filename){
     
     // Reads degree constraints
     for (i=0; i<(g->n); i++){
-        fscanf(in, "%d %d \n", &start, &deg);
+        if (!fscanf(in, "%d %d \n", &start, &deg)) exit(0);
         g->deg[start-1] = deg;
     }
     

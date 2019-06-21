@@ -1,7 +1,7 @@
 #include "dcmstp-solver.h"
 
-#define _PERM_ 100
-#define _TIME_ 10
+int perm;
+int tabu_time;
 
 /**
  * Metaheuristic implementation for DCMSTP.
@@ -19,10 +19,15 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     heu_graph *state = first_primal(g);
     edge_list *e = edge_list_alloc(g->mat, g->n, g->m);
     struct out *best = out_alloc(state->primal, 0, g->n);
-    
+
     // TESTING //
     int*** results = NULL;
     int qnt = 0, nodes = 0;
+    /////////////
+
+    // PARAMS //
+    perm = floor(g->m*0.1);
+    tabu_time = floor(g->m*0.1);
     ////////////
 
     // Initializations
@@ -66,23 +71,24 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
     int i, k;
     int c1, c2, c3, c4, c5;
     int comp[r->n], *vacant;
-    edge_list *changed[_PERM_];
+    edge_list* changed[perm];
 
     // Initialization
-    for (i=0; i<_PERM_; ++i) changed[i] = NULL;
+    for (i=0; i<perm; ++i) changed[i] = NULL;
     for (i=0; i<r->n; ++i) comp[i] = 0;
 
-    // Remove _PERM_ edges from current solution
+    // Remove perm edges from current solution
     k = 0; 
     for (i=(r->m-1); i>=0; --i) {
         // Checks if amount of desired edges have been removed
-        if (k == _PERM_) break;
+        if (k == perm) break;
 
         // checks if edge is in the current solution
         c1 = (r->mst[e[i].a][e[i].b] > -1);
 
         // Remove edges spliting graph in +1 components
         if (c1) {
+            changed[k] = &e[i];
             // Add to tabu list
             add_tabu(tabus, timer, e[i]);
             remove_edge(r, vacant, comp, e[i], (++k));
@@ -90,9 +96,9 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
     }
 
     // Get the exact amount of vacant degrees per component
-    vacant = get_comp_gap(r->n, comp, r->deg, _PERM_);
+    vacant = get_comp_gap(r->n, comp, r->deg, perm);
 
-    // Insert _PERM_ edges creating new solution 
+    // Insert perm edges creating new solution 
     for (i=0; i<r->m; ++i) {
         // Checks if amount of desired edges have been inserted
         if (k == 0) break;
@@ -111,7 +117,7 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
 
         // Insert edges forming new solution
         if (c1 && c2 && c3 && c4 && c5) {
-            add_tabu(tabus, timer, e[i]);
+            // add_tabu(tabus, timer, e[i]);
             insert_edge(r, vacant, comp, e[i]);
             --k;
         }
@@ -120,20 +126,27 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
     // Violate tabu by returning edges in case the only viable edge was 
     // the one removed in this iteration (ensures solution viability).
     if (is_disjoint(comp, r->n)) {
-        for (i=0; i<_PERM_; ++i) {
-            // In case there are not enough edges to permutated, gets NULL and breaks.
-            if (changed[i] == NULL) break; 
-
+        // Insert perm edges creating new solution 
+        for (i=0; i<r->m; ++i) {
+            // Checks if amount of desired edges have been inserted
+            if (k == 0) break;
+            
+            // checks if edge is NOT in the current solution
+            c1 = !(r->mst[e[i].a][e[i].b] > -1);
             // Checks if degree cosntraint are obeyed
-            c2 = (r->deg[changed[i]->a] > 0 && r->deg[changed[i]->b] > 0);
+            c2 = (r->deg[e[i].a] > 0 && r->deg[e[i].b] > 0);
             // Checks if the edge connects different components
-            c3 = (comp[changed[i]->a] != comp[changed[i]->b]);
+            c3 = (comp[e[i].a] != comp[e[i].b]);
+            // If not last edge, must not constraint both components.
+            // This prevents the insertion to saturate components and result in a disjoint graph.
+            c4 = (k == 1 || vacant[comp[e[i].a]] > 1 || vacant[comp[e[i].b]] > 1);
 
             // Insert edges forming new solution
-            if (c2 && c3) {
-                insert_edge(r, vacant, comp, *changed[i]);
+            if (c1 && c2 && c3 && c4) {
+                add_tabu(tabus, timer, e[i]);
+                insert_edge(r, vacant, comp, e[i]);
                 --k;
-            }  
+            }
         }
     }
 
@@ -164,7 +177,7 @@ void remove_edge(heu_graph *r, int vacant[], int comp[], edge_list e, int k) {
 void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e) {
     int start_v, new_id, old_id;
     
-    // if (contains(changed, _PERM_, e)) printf("Re-insertion!!\n");
+    // if (contains(changed, perm, e)) printf("Re-insertion!!\n");
 
     // Insert edge
     r->mst[e.a][e.b] = e.cost;
@@ -207,8 +220,8 @@ void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e) {
 void add_tabu (char **tabus, char **timer, edge_list e) {
     tabus[e.a][e.b] = 1;
     tabus[e.b][e.a] = 1;
-    timer[e.a][e.b] = _TIME_;
-    timer[e.b][e.a] = _TIME_;
+    timer[e.a][e.b] = tabu_time;
+    timer[e.b][e.a] = tabu_time;
     return;
 }
 
