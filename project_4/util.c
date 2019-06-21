@@ -199,8 +199,8 @@ edge_list* edge_list_alloc (int **mx, int n, int m) {
 // FOR TESTING //////////////////////////////////////////
 
 /**
- * DFS for testing if a graph is a tree.
- * Used for checking result correctness.
+ * Save obtained MSTs to ensures new nodes of the solutions
+ * graph are being visited.
  */
 int is_new_result (int *(***list), int *qnt, heu_graph *r) {
 	int k;
@@ -256,6 +256,19 @@ void free_results (int ***list, int qnt, int n) {
 	}
 
 	free(list);
+}
+
+/**
+ * Print report for the metahuristic local search.
+ */
+void print_report(int primal, int iters, int nodes, int updates) {
+	printf("   _______________________________________\n");
+    printf("  |            Optimal => (%6d)        |\n", primal);
+    printf("  |---------------------------------------|\n");
+    printf("  | iterations | nodes explored | updates |\n");
+    printf("  | %10d | %14d | %7d |  \n", iters, nodes, updates);
+    printf("   --------------------------------------- \n");
+	return;
 }
 
 /**

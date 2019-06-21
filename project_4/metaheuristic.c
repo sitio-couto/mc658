@@ -11,7 +11,8 @@
  */
 
 struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
-    int i, j, k, updates = 0;
+    int i, j, k;
+    int iterations = 0, updates = 0;
     int comp[g->n], deg[g->n]; // Components ID and initial degree constrains
     heu_graph *state = first_primal(g);
     edge_list *e = edge_list_alloc(g->mat, g->n, g->m);
@@ -19,40 +20,31 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     
     // TESTING //
     int*** results = NULL;
-    int qnt = 0;
-    int hash[(int)best->primal*2];
-    for (i=0; i<best->primal*2; ++i) hash[i] = 0;
+    int qnt = 0, nodes = 0;
     ////////////
 
     for (i=0; i<g->n; ++i){
         comp[i] = 0;
         deg[i] = g->deg[i];
     } 
-    
-    // TESTING //
-    is_new_result(&results, &qnt, state);
-    printf("FIRST=>(%d)\n", (int)best->primal);
-    ////////////
 
     // Iterate trough the solutions graph
     while (curr_time(start_time) < max_time) { 
         // TESTING //
         test_mst(state->mst, deg, state->n, comp);
-        if (is_new_result(&results, &qnt, state)) {
-            hash[state->primal] = 1;
-            printf("New value ==> (%d)\n", state->primal);
-        }
+        if (is_new_result(&results, &qnt, state)) ++nodes;
         /////////////
         heuristic(state, e); // Get new solution
         if (state->primal < (int)best->primal) {
             best->primal = state->primal;
             to_array(state->mst, state->n, best->mst);
-            printf("|| UPDATE || => (%d)\n", (int)best->primal);
-            updates++;
-        };
+            ++updates;
+        }
+        ++iterations;
     }
 
     // TESTING //
+    print_report((int)best->primal, iterations, nodes, updates);
     free_results(results, qnt, state->n);
     /////////////
 

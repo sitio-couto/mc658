@@ -113,5 +113,6 @@ int is_new_result (int *(***list), int *qnt, heu_graph *r);
 int is_equal (int *old[], int *new[], int n);
 int*** append_result (int ***list, int qnt, int **new, int n);
 void free_results (int ***list, int qnt, int n);
+void print_report(int, int, int, int);
 
 #endif
