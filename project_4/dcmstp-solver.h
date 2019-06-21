@@ -97,7 +97,7 @@ int min(int a, int b);
 double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
 int compare(const void * a, const void * b);
-int contains(edge_list array[], int len, edge_list e);
+int contains(edge_list *arr[], int len, edge_list e);
 int* to_array (int **mx, int n, int *arr);
 void to_array_dfs (int **mx, int n, int *visited, int v, int *arr);
 struct out* out_alloc(int primal, int dual, int n);

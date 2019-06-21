@@ -1,6 +1,6 @@
 #include "dcmstp-solver.h"
 
-#define _PERM_ 3
+#define _PERM_ 10
 
 /**
  * Metaheuristic implementation for DCMSTP.
@@ -58,9 +58,10 @@ void heuristic(heu_graph *r, edge_list *e) {
     int c1, c2, c3, c4, c5;
     int start_v, new_id, old_id;
     int comp[r->n], *vacant;
-    edge_list changed[_PERM_];
+    edge_list *changed[_PERM_];
 
     // Initialization
+    for (i=0; i<_PERM_; ++i) changed[i] = NULL;
     for (i=0; i<r->n; ++i) comp[i] = 0;
 
     // Remove _PERM_ edges from current solution
@@ -76,7 +77,7 @@ void heuristic(heu_graph *r, edge_list *e) {
         if (c1) {
             // printf("%d->(%d,%d)\n", k, e[i].a, e[i].b);
             // Tag edge as changed 
-            changed[k] = e[i];
+            changed[k] = &e[i];
             remove_edge(r, vacant, comp, e[i], (++k));
         }
     }
@@ -124,11 +125,11 @@ void heuristic(heu_graph *r, edge_list *e) {
     // Returns edges in case the only viable edge was the one removed
     if (is_disjoint(comp, r->n)) {
         for (i=0; i<_PERM_; ++i) {
-            
+            if (changed[i] == NULL) break;
             // Checks if degree cosntraint are obeyed
-            c2 = (r->deg[changed[i].a] > 0 && r->deg[changed[i].b] > 0);
+            c2 = (r->deg[changed[i]->a] > 0 && r->deg[changed[i]->b] > 0);
             // Checks if the edge connects components
-            c3 = (comp[changed[i].a] != comp[changed[i].b]);
+            c3 = (comp[changed[i]->a] != comp[changed[i]->b]);
             // CAN A REINSERTION RESULT IN DISJUNCTION DUE TO SATURATION??
             // // If not last edge, must not constraint both components.
             // // This prevents the insertion to saturate components and result in a disjoint graph.
@@ -136,7 +137,7 @@ void heuristic(heu_graph *r, edge_list *e) {
 
             // Insert edges forming new solution
             if (c2 && c3) {
-                insert_edge(r, vacant, comp, changed[i]);
+                insert_edge(r, vacant, comp, *changed[i]);
                 --k;
             }  
         }

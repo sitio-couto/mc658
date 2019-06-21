@@ -49,10 +49,12 @@ int compare(const void * a, const void * b) {
  * Checks if a value e is in an array
  * of length n.
  */
-int contains(edge_list arr[], int len, edge_list e) {
+int contains(edge_list *arr[], int len, edge_list e) {
 	int i;
-	for (i=0; i<len; ++i)
-		if (arr[i].a == e.a && arr[i].b == e.b) return 1;
+	for (i=0; i<len; ++i){
+		if (arr[i] && arr[i]->a == e.a && arr[i]->b == e.b) 
+			return 1;
+	}
 	return 0;
 }
 
