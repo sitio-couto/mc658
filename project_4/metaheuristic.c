@@ -34,7 +34,7 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
         heuristic(state, e); // Get new solution
         test_mst(state->mst, deg, state->n, comp);
         if (hash[state->primal]) {
-            printf("Old value ==>(%d)\n", state->primal);
+            // printf("Old value ==>(%d)\n", state->primal);
         } else {
             hash[state->primal] = 1;
             printf("NEW VALUE!!==>(%d)\n", state->primal);
@@ -61,9 +61,7 @@ void heuristic(heu_graph *r, edge_list *e) {
     edge_list changed[_PERM_];
 
     // Initialization
-    for (i=0; i<r->n; ++i) {
-        comp[i] = 0;
-    }
+    for (i=0; i<r->n; ++i) comp[i] = 0;
 
     // Remove _PERM_ edges from current solution
     k = 0; 
@@ -77,23 +75,9 @@ void heuristic(heu_graph *r, edge_list *e) {
         // Remove edges spliting graph in +1 components
         if (c1) {
             // printf("%d->(%d,%d)\n", k, e[i].a, e[i].b);
-
-            // Remove edge from solution
-            r->mst[e[i].a][e[i].b] = -1;
-            r->mst[e[i].b][e[i].a] = -1;
-            r->primal -= e[i].cost;
-
-            // Relax degree constraint
-            ++r->deg[e[i].a]; 
-            ++r->deg[e[i].b];
-
             // Tag edge as changed 
             changed[k] = e[i];
-
-            // Tag new component with new ID 
-            start_v = e[i].a;
-            new_id = ++k;
-            tag_component(r->mst, r->n, start_v, comp, new_id);
+            remove_edge(r, vacant, comp, e[i], (++k));
         }
     }
 
@@ -132,39 +116,30 @@ void heuristic(heu_graph *r, edge_list *e) {
         //     printf("(%d,%d)->(%d|%d|%d|%d)\n", e[i].a+1, e[i].b+1, c1, c2, c3, c4);
         // Insert edges forming new solution
         if (c1 && c2 && c3 && c4 && c5) {
-            // if (contains(changed, _PERM_, e[i])) printf("Re-insertion!!\n");
-
-            // Insert edge
-            r->mst[e[i].a][e[i].b] = e[i].cost;
-            r->mst[e[i].b][e[i].a] = e[i].cost;
-            r->primal += e[i].cost;
-
-            // Update degree constraint on vertices
-            --r->deg[e[i].a]; 
-            --r->deg[e[i].b];
-
-            // Update vacant degrees per component
-            --vacant[comp[e[i].a]]; 
-            --vacant[comp[e[i].b]];
-
-            // merge component higher ID to lowest ID
-            new_id = min(comp[e[i].a], comp[e[i].b]);
-            old_id = max(comp[e[i].a], comp[e[i].b]);
-            if (comp[e[i].b] < comp[e[i].a]) start_v = e[i].a;
-            else start_v = e[i].a;
-
-            // Update components vacants degrees
-            vacant[new_id] += vacant[old_id];
-            vacant[old_id] = 0;
-
-            // DFS merge components
-            tag_component(r->mst, r->n, start_v, comp, new_id);
+            insert_edge(r, vacant, comp, e[i]);
             --k;
         }
     }
 
+    // Returns edges in case the only viable edge was the one removed
     if (is_disjoint(comp, r->n)) {
-        printf("DISJOINT!!");
+        for (i=0; i<_PERM_; ++i) {
+            
+            // Checks if degree cosntraint are obeyed
+            c2 = (r->deg[changed[i].a] > 0 && r->deg[changed[i].b] > 0);
+            // Checks if the edge connects components
+            c3 = (comp[changed[i].a] != comp[changed[i].b]);
+            // CAN A REINSERTION RESULT IN DISJUNCTION DUE TO SATURATION??
+            // // If not last edge, must not constraint both components.
+            // // This prevents the insertion to saturate components and result in a disjoint graph.
+            // c4 = (k == 1 || vacant[comp[changed[i].a]] > 1 || vacant[comp[changed[i].b]] > 1);
+
+            // Insert edges forming new solution
+            if (c2 && c3) {
+                insert_edge(r, vacant, comp, changed[i]);
+                --k;
+            }  
+        }
     }
 
     // int count, j;
@@ -180,5 +155,57 @@ void heuristic(heu_graph *r, edge_list *e) {
     // free(hash);
 
     free(vacant);
+    return;
+}
+
+void remove_edge(heu_graph *r, int vacant[], int comp[], edge_list e, int k) {
+    int start_v, new_id;
+    
+    // Remove edge from solution
+            r->mst[e.a][e.b] = -1;
+            r->mst[e.b][e.a] = -1;
+            r->primal -= e.cost;
+
+            // Relax degree constraint
+            ++r->deg[e.a]; 
+            ++r->deg[e.b];
+
+            // Tag new component with new ID 
+            start_v = e.a;
+            new_id = k;
+            tag_component(r->mst, r->n, start_v, comp, new_id);
+}
+
+void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e) {
+    int start_v, new_id, old_id;
+    
+    // if (contains(changed, _PERM_, e)) printf("Re-insertion!!\n");
+
+    // Insert edge
+    r->mst[e.a][e.b] = e.cost;
+    r->mst[e.b][e.a] = e.cost;
+    r->primal += e.cost;
+
+    // Update degree constraint on vertices
+    --r->deg[e.a]; 
+    --r->deg[e.b];
+
+    // Update vacant degrees per component
+    --vacant[comp[e.a]]; 
+    --vacant[comp[e.b]];
+
+    // merge component higher ID to lowest ID
+    new_id = min(comp[e.a], comp[e.b]);
+    old_id = max(comp[e.a], comp[e.b]);
+    if (comp[e.b] < comp[e.a]) start_v = e.a;
+    else start_v = e.a;
+
+    // Update components vacants degrees
+    vacant[new_id] += vacant[old_id];
+    vacant[old_id] = 0;
+
+    // DFS merge components
+    tag_component(r->mst, r->n, start_v, comp, new_id);
+
     return;
 }
