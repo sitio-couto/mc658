@@ -155,8 +155,29 @@ void update_comp_gap (int n, int comp[], int deg[], int n_curr, int *curr) {
 }
 
 // MEMORY HANDLING FUNCTIONS ////////////////////////////
-struct out* out_alloc(int primal, int dual, int n) {
+void alloc_tabus (char*** tabus, char*** timer, int n) {
 	int i;
+
+	(*tabus) = malloc(n*sizeof(char*));
+	(*timer) = malloc(n*sizeof(char*));
+	for (i=0; i<n; ++i) {
+		(*tabus)[i] = malloc(n*sizeof(char*));
+		(*timer)[i] = malloc(n*sizeof(char*));
+	}
+}
+
+void free_tabus (char*** tabus, char*** timer, int n) {
+	int i;
+
+	for (i=0; i<n; ++i) {
+		free((*tabus)[i]);
+		free((*timer)[i]);
+	}
+	free(*tabus);
+	free(*timer);
+}
+
+struct out* out_alloc(int primal, int dual, int n) {
 	struct out* o = malloc(sizeof(struct out));
 
 	o->primal = primal;
