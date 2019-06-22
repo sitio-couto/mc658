@@ -10,7 +10,8 @@
  * Lagrangian heuristic implementation for DCMSTP.
  * Solutions and dual bounds acquired through Lagrangian Relaxation.
  * @param g Instance graph
- * @param max_time Execution time limit.
+ * @param max_time Execution time limit
+ * @param start_time 
  * @return out Best solution and dual bound found within time "max_time"
  */
 struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){

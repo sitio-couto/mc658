@@ -9,30 +9,12 @@
 #include <string.h>
 #include <math.h>
 
-// Graph edge with vertex index
-typedef struct edge_list{
-    int a, b;
-    int cost;
-} edge_list;
-
-// Graph edge
-typedef struct edge{
-    int idx;
-    int cost;
-    struct edge *next;
-} edge;
-
-// Graph vertex
-typedef struct node{
-    int deg;
-    struct edge *edges;
-} node;
-
-// Graph
+// Adjacency Matrix
 typedef struct{
     int n,m;
-    node *list;
-} graph;
+    int *deg;
+    int **mat;
+}mat_graph;
 
 // Output (primal, lagrangian dual, tree)
 struct out{
@@ -49,25 +31,16 @@ typedef struct {
     int **mst;
 } heu_graph;
 
-// Adjacency Matrix
-typedef struct{
-    int n,m;
-    int *deg;
-    int **mat;
-}mat_graph;
+// Graph edge with vertex index
+typedef struct edge_list{
+    int a, b;
+    int cost;
+} edge_list;
 
 /* IO FUNCTIONS */
-// List
-graph *read_input_list(char *filename);
-void print_graph_list(graph *g);
-void free_graph_list(graph *g);
-
-// Matrix
-mat_graph *read_input_matrix(char *filename);
-void free_graph_matrix(mat_graph *g);
-void print_graph_matrix(mat_graph *g);
-
-// Out
+mat_graph *read_input(char *filename);
+void free_graph(mat_graph *g);
+void print_graph(mat_graph *g);
 void generate_out_file(char *filename, struct out *ans, int size);
 void print_mst(int *mst, int size, int **g);
 
