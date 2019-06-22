@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
     else if (argv[3][0] == 'm'){
         printf("Metaheuristics\n");
         o = metaheuristic(g, atoi(argv[2]), start_time);
-        //printf("%s,%lf\n", argv[1], o->primal);
+        printf("%s,%d\n", argv[1], (int)o->primal);
     }
     else{
         printf("Invalid method.\nMethods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic\n");

@@ -89,13 +89,14 @@ int* get_comp_gap (int n, int comp[], int deg[], int n_comp);
 void update_comp_gap (int n, int comp[], int deg[], int n_curr, int *curr);
 void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e);
 void remove_edge(heu_graph *r, int vacant[], int comp[], edge_list e, int k);
+int viable_insertion(heu_graph* r, int* vacant, int* comp, char** tabus, edge_list e, int count);
 
 /* METAHEURISTIC */
 struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time);
 void add_tabu (char **tabus, char **timer, edge_list e);
 int is_tabu (char **tabus, edge_list e);
 void update_tabus (char** tabus, char** timer, int n);
-int tabu_time(int tt, edge_list e);
+int tabu_time(edge_list e);
 
 /* MISC */
 double curr_time(time_t start_time);
@@ -111,7 +112,7 @@ void heu_graph_free (heu_graph *hg);
 edge_list* edge_list_alloc (int **mx, int n, int m);
 int is_disjoint(int comp[], int n);
 void alloc_tabus (char*** tabus, char*** timer, int n);
-void free_tabus (char*** tabus, char*** timer, int n);
+void tabus_free (char*** tabus, char*** timer, int n);
 heu_graph* heu_graph_alloc (mat_graph *g);
 
 

@@ -161,12 +161,12 @@ void alloc_tabus (char*** tabus, char*** timer, int n) {
 	(*tabus) = malloc(n*sizeof(char*));
 	(*timer) = malloc(n*sizeof(char*));
 	for (i=0; i<n; ++i) {
-		(*tabus)[i] = malloc(n*sizeof(char*));
-		(*timer)[i] = malloc(n*sizeof(char*));
+		(*tabus)[i] = calloc(n, sizeof(char));
+		(*timer)[i] = calloc(n, sizeof(char));
 	}
 }
 
-void free_tabus (char*** tabus, char*** timer, int n) {
+void tabus_free (char*** tabus, char*** timer, int n) {
 	int i;
 
 	for (i=0; i<n; ++i) {
@@ -318,7 +318,7 @@ void print_report(int best, int high, int first, int* hash, int n, int iters, in
 	
 	printf("   _______________________________________\n");
     printf("  |  Best   |  First  |   Avg   |  High   |\n");
-	printf("  |%9d|%9d|%9d|%9d|\n", best, first, avg, high);
+	printf("  |%7d  |%7d  |%7d  |%7d  |\n", best, first, avg, high);
     printf("  |---------------------------------------|\n");
     printf("  | iterations | nodes explored | updates |\n");
     printf("  | %10d | %14d | %7d |  \n", iters, nodes, updates);
