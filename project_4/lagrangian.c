@@ -5,6 +5,7 @@
 #define MIN_PI 0.005
 #define MAX_ITER_PI 30
 #define EPS 0.0005
+#define LARGE_INSTANCE 900
 
 /**
  * Lagrangian heuristic implementation for DCMSTP.
@@ -76,14 +77,19 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 			ans->dual = dual;
 			iter = 0;
 			printf("%lf\n", ans->dual);
+			
+			// Updates primal if it's a big instance and possible.
+			if (g->n >= LARGE_INSTANCE)
+				update_primal(ans, g, mst, viable);
 		}
 		
 		// If the dual hasn't increased in a few iterations, take half pi.
 		else if (iter == MAX_ITER_PI)
 			pi/=2;
 		
-		// If the solution is viable, try to update primal.
-		update_primal(ans, g, mst, viable);
+		// Updates primal, if it's a small or medium instance and possible.
+		if (g->n < LARGE_INSTANCE)
+			update_primal(ans, g, mst, viable);
 			
 		// Updates lagrange multipliers and checks if execution needs to continue.
 		if (!update_multipliers_and_check(g, mult, mst, subgrad, ans, viable, pi))
@@ -263,14 +269,12 @@ void update_primal(struct out *ans, mat_graph *g, int *mst, int viable){
 /**
  * Function to viabilize dual MST.
  * Given an MST, tries to change edges so that it is viable for DCMSTP
- * Returns the DCMST.
+ * Returns the DCMST if possible (checks viability before returning).
  */
 int *viabilize_mst(int *mst, mat_graph *g){
-	int i,j,minn;
+	int i,j;
 	int *deg_mst = malloc(sizeof(int)*g->n);
 	int *dcmst = malloc(sizeof(int)*g->n);
-	int *row;
-	int viable;
 	
 	for(i=0; i<g->n; i++)
 		deg_mst[i] = g->deg[i];
@@ -292,34 +296,7 @@ int *viabilize_mst(int *mst, mat_graph *g){
 		
 		// Replaces the amount of edges it needs to viablilize.
 		while(deg_mst[i] < 0){
-			
-			// Finds children (first fit. Best fit worth it?)
-			while(j<g->n){
-				if (dcmst[j] == i){
-					viable = 1;
-					
-					// Finds edge to replace.
-					row = splice_row(j, i, deg_mst, g);
-					
-					// Tries replacing with the least cost edge.
-					// If fails, tries with the second least cost edge and so on.
-					do{
-						minn = min_array_idx(row, g->n);
-						dcmst[j] = minn;
-						if(!(viable = check_cycle_connection(dcmst, g->n)))
-							deg_mst[minn]--;
-						else
-							row[minn] = INT_MAX;
-							
-					} while(viable);
-					
-					free(row);
-
-					// If edge has been replaced, exit the loop.
-					if (minn != i) break;
-				}
-				j++;
-			}
+			change_edge(g, i, deg_mst, dcmst, j);
 			deg_mst[i]++;
 		}
 	}
@@ -334,6 +311,48 @@ int *viabilize_mst(int *mst, mat_graph *g){
 	
 	//print_mst(dcmst, g->n, g->mat);
 	return dcmst;
+}
+
+/**
+ * Function to replace an edge in an MST so to comply by the degree restrictions.
+ * Finds the first child to remove edge (first-fit) and replaces with the best possible.
+ * If not possible, because of cycles or connection issues, goes to the second child and so on.
+ * @param deg_mst: degree scores of each vertex (restriction - actual deg)
+ * @param curr_pos: if more than 1 edge for one vertex have to be removed, there's no 
+ * use in going back, so the current position is a parameter.
+ */
+void change_edge(mat_graph *g, int parent, int *deg_mst, int *dcmst, int curr_pos){
+	int minn = INT_MAX;
+	int viable;
+	int *row;
+	
+	// Finds children (first fit. Best fit worth it?)
+	while(curr_pos < g->n){
+		if (dcmst[curr_pos] == parent){
+			viable = 1;
+			
+			// Finds edge to replace.
+			row = splice_row(curr_pos, parent, deg_mst, g);
+			
+			// Tries replacing with the least cost edge.
+			// If fails, tries with the second least cost edge and so on.
+			do{
+				minn = min_array_idx(row, g->n);
+				dcmst[curr_pos] = minn;
+				if(!(viable = check_cycle_connection(dcmst, g->n)))
+					deg_mst[minn]--;
+				else
+					row[minn] = INT_MAX;
+					
+			} while(viable);
+			
+			free(row);
+
+			// If edge has been replaced, exit the loop.
+			if (minn != parent) break;
+		}
+		curr_pos++;
+	}
 }
 
 /**

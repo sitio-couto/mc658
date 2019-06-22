@@ -60,12 +60,6 @@ void generate_out_file(char *filename, struct out *ans, int size){
 	// Test
 	if(edges != size-1)
 		printf("THIS SHOULDN'T HAPPEN! Out tree has %d edges, should have %d\n", edges, size-1);
-	
-    
-    if (ans)
-		free(ans->mst);
-		
-    free(ans);
 }
 
 /**

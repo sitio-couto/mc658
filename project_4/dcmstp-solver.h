@@ -53,6 +53,7 @@ double subgradient(int v, int deg, int size, int *mst);
 int check_viability(int size, int *r_deg, int *mst);
 void update_primal(struct out *ans, mat_graph *g, int *mst, int viable);
 int *viabilize_mst(int *mst, mat_graph *g);
+void change_edge(mat_graph *g, int parent, int *deg_mst, int *dcmst, int curr_pos);
 int *splice_row(int v, int parent, int *deg, mat_graph *g);
 int check_cycle_connection(int *tree, int size);
 int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi);

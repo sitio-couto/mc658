@@ -27,22 +27,22 @@ int main(int argc, char *argv[]){
 
     // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
     if (argv[3][0] == 'l'){
-        printf("Lagrangian\n");
         o = lagrangian_heuristic(g, atoi(argv[2]), start_time);
-        printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
+        printf("%s,%.4lf,%.4lf\n", argv[1], o->dual, o->primal);
     }
     else if (argv[3][0] == 'm'){
-        printf("Metaheuristics\n");
         o = metaheuristic(g, atoi(argv[2]), start_time);
-        printf("%s,%d\n", argv[1], (int)o->primal);
+        printf("%s,%.4lf\n", argv[1], o->primal);
     }
     else{
         printf("Invalid method.\nMethods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic\n");
         return 1;
     }
     
-    generate_out_file(argv[1], o, g->n);
+    //generate_out_file(argv[1], o, g->n);
     free_graph(g);
+    free(o->mst);
+    free(o);
     
     return 0;
 }
