@@ -44,7 +44,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
     ans->primal = greed->primal;
     ans->mst = malloc(sizeof(int)*g->n);
     ans->mst = to_array(greed->mst, g->n, ans->mst);
-    free(greed);
+    heu_graph_free(greed);
     
     ans->dual = 0;
     
