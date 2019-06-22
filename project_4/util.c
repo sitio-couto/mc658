@@ -187,6 +187,24 @@ struct out* out_alloc(int primal, int dual, int n) {
 	return o;
 }
 
+heu_graph* heu_graph_alloc (mat_graph *g) {
+	int i, j;
+
+	heu_graph *r = malloc(sizeof(heu_graph));
+    r->primal = 0;
+    r->n = g->n;
+    r->m = g->m;
+    r->deg = malloc(g->n*sizeof(int));
+    r->mst = malloc(g->n*sizeof(int*));
+    for (i=0; i<g->n; ++i) {
+        r->deg[i] = g->deg[i];
+        r->mst[i] = malloc(g->n*sizeof(int));
+        for (j=0; j<g->n; ++j) r->mst[i][j] = -1;
+    }
+
+	return r;
+}
+
 void heu_graph_free (heu_graph *hg) {
 	int i;
 
@@ -297,8 +315,8 @@ void print_report(int primal, int iters, int nodes, int updates) {
  * Used for checking result correctness.
  */
 void test_mst(int **mx, int deg[], int n, int comp[]){
-	int i;//, j, k, count_deg, gap;
-	//int hash[n];
+	int i, j, k, count_deg, gap;
+	int hash[n];
 	int *visited = calloc(n, sizeof(int));
 
 	// for (i=0; i<n; ++i) hash[i] = 0;

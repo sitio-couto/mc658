@@ -1,7 +1,8 @@
 #include "dcmstp-solver.h"
 
 int perm;
-int tabu_time;
+int start;
+int max_cost;
 
 /**
  * Metaheuristic implementation for DCMSTP.
@@ -12,7 +13,7 @@ int tabu_time;
  */
 
 struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
-    int i, j, k;
+    int i, j;
     int iterations = 0, updates = 0;
     int comp[g->n], deg[g->n]; // Components ID and initial degree constrains
     char **tabus, **timer;
@@ -26,8 +27,9 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     /////////////
 
     // PARAMS //
-    perm = floor(g->m*0.1);
-    tabu_time = floor(g->m*0.1);
+    perm = (int)floor(g->m*0.1);
+    start = (int)floor(g->m*0.1);
+    max_cost = e[g->m-1].cost;
     ////////////
 
     // Initializations
@@ -176,13 +178,17 @@ void remove_edge(heu_graph *r, int vacant[], int comp[], edge_list e, int k) {
 
 void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e) {
     int start_v, new_id, old_id;
-    
-    // if (contains(changed, perm, e)) printf("Re-insertion!!\n");
 
-    // Insert edge
-    r->mst[e.a][e.b] = e.cost;
-    r->mst[e.b][e.a] = e.cost;
-    r->primal += e.cost;
+    // Merge component higher ID to lowest ID
+    new_id = min(comp[e.a], comp[e.b]);
+    old_id = max(comp[e.a], comp[e.b]);
+
+    // Get vertex from component that will be merged
+    if (comp[e.b] < comp[e.a]) start_v = e.a;
+    else start_v = e.b;
+
+    // Merge: Change vertices from old_id component to new_id component.
+    tag_component(r->mst, r->n, start_v, comp, new_id); 
 
     // Update degree constraint on vertices
     --r->deg[e.a]; 
@@ -192,18 +198,14 @@ void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e) {
     --vacant[comp[e.a]]; 
     --vacant[comp[e.b]];
 
-    // merge component higher ID to lowest ID
-    new_id = min(comp[e.a], comp[e.b]);
-    old_id = max(comp[e.a], comp[e.b]);
-    if (comp[e.b] < comp[e.a]) start_v = e.a;
-    else start_v = e.a;
-
     // Update components vacants degrees
     vacant[new_id] += vacant[old_id];
     vacant[old_id] = 0;
 
-    // DFS merge components
-    tag_component(r->mst, r->n, start_v, comp, new_id);
+    // Insert edge
+    r->mst[e.a][e.b] = e.cost;
+    r->mst[e.b][e.a] = e.cost;
+    r->primal += e.cost;
 
     return;
 }
@@ -218,10 +220,11 @@ void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e) {
  * Returns: void.
  */
 void add_tabu (char **tabus, char **timer, edge_list e) {
+    int start_time = tabu_time(start, e); 
     tabus[e.a][e.b] = 1;
     tabus[e.b][e.a] = 1;
-    timer[e.a][e.b] = tabu_time;
-    timer[e.b][e.a] = tabu_time;
+    timer[e.a][e.b] = start_time;
+    timer[e.b][e.a] = start_time;
     return;
 }
 
@@ -255,4 +258,20 @@ void update_tabus (char** tabus, char** timer, int n) {
     }
 
     return;
+}
+
+int tabu_time(int tt, edge_list e) {
+    int cost = e.cost+1;
+
+    // float damper = ((float)e.cost/(float)max_cost);
+    // double divider = ((float)tt)*damper;
+    // int time1 = rand()%(int)floor(divider); 
+
+    // int time2 = rand()/tt;
+
+    int time3 = rand()%(e.cost+1);
+
+    // int time4 = (int)floor(expf((cost/max_cost)));
+
+    return tt;
 }

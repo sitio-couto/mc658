@@ -95,6 +95,7 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time);
 void add_tabu (char **tabus, char **timer, edge_list e);
 int is_tabu (char **tabus, edge_list e);
 void update_tabus (char** tabus, char** timer, int n);
+int tabu_time(int tt, edge_list e);
 
 /* MISC */
 double curr_time(time_t start_time);
@@ -111,6 +112,8 @@ edge_list* edge_list_alloc (int **mx, int n, int m);
 int is_disjoint(int comp[], int n);
 void alloc_tabus (char*** tabus, char*** timer, int n);
 void free_tabus (char*** tabus, char*** timer, int n);
+heu_graph* heu_graph_alloc (mat_graph *g);
+
 
 /* TEST */
 void test_mst(int **mx, int deg[], int n, int comp[]);
