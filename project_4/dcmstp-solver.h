@@ -68,7 +68,7 @@ void free_graph_matrix(mat_graph *g);
 void print_graph_matrix(mat_graph *g);
 
 // Out
-void generate_out_file(char *filename, struct out *ans);
+void generate_out_file(char *filename, struct out *ans, int size);
 void print_mst(int *mst, int size, int **g);
 
 /* LAGRANGIAN HEURISTIC */

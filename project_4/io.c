@@ -90,8 +90,22 @@ mat_graph *read_input_matrix(char *filename){
 /**
  * Function that generates .out file with the edges of the best tree found.
  */
-void generate_out_file(char *filename, struct out *ans){
-    printf("Answer here\n");
+void generate_out_file(char *filename, struct out *ans, int size){
+    int i,j;
+    int edges=0;
+    
+    //Finds children for each vertex.
+    for(i=0; i<size-1; i++)
+		for(j=i; j<size; j++)
+			if (ans->mst[j] == i || ans->mst[i] == j){
+				printf("%d %d\n", i+1, j+1);
+				edges++;
+			}
+			
+	// Test
+	if(edges != size-1)
+		printf("THIS SHOULDN'T HAPPEN! Out tree has %d edges, should have %d\n", edges, size-1);
+	
     
     if (ans)
 		free(ans->mst);

@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    generate_out_file(argv[1], o);
+    generate_out_file(argv[1], o, g->n);
     //print_graph_list(g);
     //print_graph_matrix(g);
     //free_graph_list(g);

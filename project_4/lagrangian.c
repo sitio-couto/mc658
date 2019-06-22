@@ -4,7 +4,7 @@
 #define INIT_MULT 1
 #define MIN_PI 0.005
 #define MAX_ITER_PI 30
-#define EPS 0.0
+#define EPS 0.0005
 
 /**
  * Lagrangian heuristic implementation for DCMSTP.
@@ -97,7 +97,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 	free(subgrad);
 	free(mst);
 	
-	print_mst(ans->mst, g->n, g->mat);
+	//print_mst(ans->mst, g->n, g->mat);
 	
     return ans;
 }
@@ -135,7 +135,7 @@ int* mst_prim(double **g, int size){
 		// Updates neighbors which are not in the MST yet.
 		for(i=0; i<size; i++){
 			
-			// Updates if edge exists (cost>0), isn't in the MST and choice value is higher than the edge cost.
+			// Updates if edge exists (cost>=0), isn't in the MST and choice value is higher than the edge cost.
 			if(g[vertex][i] >= 0 && !is_in_mst[i] && g[vertex][i] < values[i]){
 				parents[i] = vertex;
 				values[i] = g[vertex][i];
@@ -247,8 +247,7 @@ void update_primal(struct out *ans, mat_graph *g, int *mst, int viable){
 	// Else, viabilize and update if possible.
 	if (viable)
 		min(ans->primal, mst_value_int(mst, g->n, g->mat));
-	else{
-		primal_mst = viabilize_mst(mst, g);
+	else if((primal_mst = viabilize_mst(mst, g))){
 		primal = mst_value_int(primal_mst, g->n, g->mat);
 		if (primal < ans->primal){
 			free(ans->mst);
@@ -325,7 +324,13 @@ int *viabilize_mst(int *mst, mat_graph *g){
 	}
 	
 	free(deg_mst);
-	//if(!check_viability(g->n, g->deg, dcmst)) exit(0);
+	
+	// If the final result isn't viable, return null.
+	if(!check_viability(g->n, g->deg, dcmst)){
+		free(dcmst);
+		return NULL;
+	}
+	
 	//print_mst(dcmst, g->n, g->mat);
 	return dcmst;
 }
