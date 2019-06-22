@@ -12,7 +12,7 @@ int max_cost;
  */
 
 struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
-    int i, j;
+    int i;
     char **tabus, **timer;
     int threshold = 100, stagnated = 0;
     heu_graph *state = first_primal(g);
