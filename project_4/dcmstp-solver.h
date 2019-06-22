@@ -78,6 +78,10 @@ int min_value(double *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
 int check_viability(int size, int *r_deg, int *mst);
+void update_primal(struct out *ans, mat_graph *g, int *mst, int viable);
+int *viabilize_mst(int *mst, mat_graph *g);
+int *splice_row(int v, int parent, int *deg, mat_graph *g);
+int check_cycle_connection(int *tree, int size);
 int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi);
 
 /* HEURISTIC / METAHEURISTIC */
@@ -101,10 +105,14 @@ int tabu_time(edge_list e);
 /* MISC */
 double curr_time(time_t start_time);
 int min(int a, int b);
+int min_array_idx(int *arr, int n);
 double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
+int mst_value_int(int *mst, int size, int **g);
 int compare(const void * a, const void * b);
 int contains(edge_list *arr[], int len, edge_list e);
+int is_connected(int **g, int *visited, int size);
+void connected_dfs(int **g, int *visited, int n, int v);
 int* to_array (int **mx, int n, int *arr);
 void to_array_dfs (int **mx, int n, int *visited, int v, int *arr);
 struct out* out_alloc(int primal, int dual, int n);

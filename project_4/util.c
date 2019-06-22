@@ -15,6 +15,17 @@ int min(int a, int b){
     return ((a < b) ? a:b);
 }
 
+int min_array_idx(int *arr, int n){
+	int i, minn = INT_MAX, idx=0;
+	for(i=0; i<n; i++){
+		if (arr[i] < minn){
+			minn = arr[i];
+			idx = i;
+		}
+	}
+	return idx;
+}
+
 /**
  * Returns maximum value between a and b.
  */
@@ -29,6 +40,21 @@ double max(double a, double b){
 double mst_value(int *mst, int size, double **g){
 	int i;
 	double sum=0;
+	
+	for(i=0; i<size; i++)
+		if (mst[i] >= 0)
+			sum+= g[i][mst[i]];
+	
+	return sum;
+}
+
+/**
+ * Calculates value of MST solution.
+ * Returns the sum of all edge costs.
+ */
+int mst_value_int(int *mst, int size, int **g){
+	int i;
+	int sum=0;
 	
 	for(i=0; i<size; i++)
 		if (mst[i] >= 0)
@@ -69,16 +95,43 @@ int is_disjoint(int comp[], int n) {
 }
 
 /**
+ * Checks if graph is connected
+ * Uses DFS.
+ */
+int is_connected(int **g, int *visited, int size){
+	int i;
+	
+	for (i=0; i<size; i++){
+		visited[i] = 0;
+	}
+	
+	connected_dfs(g, visited, size, 0);
+	
+	return visited[min_array_idx(visited, size)];
+}
+
+void connected_dfs(int **g, int *visited, int n, int v){
+	int j;
+	
+	visited[v]=1;
+	for(j=0; j<n; j++){
+		if(!visited[j] && g[v][j])
+			connected_dfs(g, visited, n, j);
+	}
+}
+
+/**
  * Wrapper for the to_array_dfs function..
  */
 int* to_array (int **mx, int n, int *arr) {
 	int i;
-	int visited[n];
+	int *visited = calloc(n, sizeof(int));
 
 	for (i=0; i<n; ++i) arr[i] = -1;
 
 	to_array_dfs(mx, n, visited, 0, arr);
 
+	free(visited);
 	return arr;
 }
 
