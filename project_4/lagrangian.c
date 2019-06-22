@@ -79,6 +79,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 			printf("%lf\n", ans->dual);
 			
 			// Updates primal if it's a big instance and possible.
+			// TODO: CHECK TIME, IT'S GOING OVER MAX TIME ON 2000 VERTICES INSTANCES.
 			if (g->n >= LARGE_INSTANCE)
 				update_primal(ans, g, mst, viable);
 		}
