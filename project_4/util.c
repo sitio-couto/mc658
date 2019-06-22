@@ -384,8 +384,7 @@ void print_report(int best, int high, int first, int* hash, int n, int iters, in
  * Used for checking result correctness.
  */
 void test_mst(int **mx, int deg[], int n, int comp[]){
-	int i, j, k, count_deg, gap;
-	int hash[n];
+	int i;
 	int *visited = calloc(n, sizeof(int));
 
 	// for (i=0; i<n; ++i) hash[i] = 0;
