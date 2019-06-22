@@ -300,9 +300,25 @@ void free_results (int ***list, int qnt, int n) {
 /**
  * Print report for the metahuristic local search.
  */
-void print_report(int primal, int iters, int nodes, int updates) {
+void print_report(int best, int high, int first, int* hash, int n, int iters, int nodes, int updates) {
+	int i, sum, avg, reps;
+	long long int count;
+
+	reps = 0;
+	count = 0;
+	sum = 0;
+	for (i=0; i<n; ++i) {
+		if (hash[i] > 0) reps++;
+		count += hash[i];
+		sum += i*hash[i];
+	}
+	avg = (int)floor(sum/count);
+	reps = (int)floor(reps/count);
+	
+	
 	printf("   _______________________________________\n");
-    printf("  |            Optimal => (%6d)        |\n", primal);
+    printf("  |  Best   |  First  |   Avg   |  High   |\n");
+	printf("  |%9d|%9d|%9d|%9d|\n", best, first, avg, high);
     printf("  |---------------------------------------|\n");
     printf("  | iterations | nodes explored | updates |\n");
     printf("  | %10d | %14d | %7d |  \n", iters, nodes, updates);

@@ -14,7 +14,7 @@ int max_cost;
 
 struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     int i, j;
-    int iterations = 0, updates = 0;
+    int iterations = 1, updates = 0;
     int comp[g->n], deg[g->n]; // Components ID and initial degree constrains
     char **tabus, **timer;
     heu_graph *state = first_primal(g);
@@ -22,14 +22,21 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     struct out *best = out_alloc(state->primal, 0, g->n);
 
     // TESTING //
+    int n_hash = 0;
+    for (i=g->m-1; i>=(g->m-g->n); --i) n_hash += e[i].cost; 
     int*** results = NULL;
     int qnt = 0, nodes = 0;
+    int max_primal = state->primal;
+    int first_primal = state->primal;
+    int *hash = calloc(n_hash, sizeof(int));
+    hash[first_primal] = 1;
     /////////////
 
     // PARAMS //
-    perm = (int)floor(g->m*0.1);
+    perm = 3;//max(3, (int)floor(g->n*0.3));
     start = (int)floor(g->m*0.1);
     max_cost = e[g->m-1].cost;
+    printf("MAX=%d|MIN=%d\n",e[g->m-1].cost,  e[0].cost);
     ////////////
 
     // Initializations
@@ -48,6 +55,11 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
         // TESTING //
         test_mst(state->mst, deg, state->n, comp);
         if (is_new_result(&results, &qnt, state)) ++nodes;
+        if (!hash[state->primal]) {
+            if (state->primal > max_primal)
+                max_primal = state->primal;
+        }
+        hash[state->primal]++;
         /////////////
         heuristic(state, e, tabus, timer); // Get new solution
         if (state->primal < (int)best->primal) {
@@ -60,8 +72,9 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     }
 
     // TESTING //
-    print_report((int)best->primal, iterations, nodes, updates);
+    print_report((int)best->primal, max_primal, first_primal, hash, n_hash, iterations, nodes, updates);
     free_results(results, qnt, state->n);
+    free(hash);
     /////////////
 
     free(e);
@@ -78,21 +91,18 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
     // Initialization
     for (i=0; i<perm; ++i) changed[i] = NULL;
     for (i=0; i<r->n; ++i) comp[i] = 0;
+    
 
     // Remove perm edges from current solution
     k = 0; 
-    for (i=(r->m-1); i>=0; --i) {
-        // Checks if amount of desired edges have been removed
-        if (k == perm) break;
-
+    for (i=(r->m-1); (i>=0 && k<perm) ; --i) {
         // checks if edge is in the current solution
         c1 = (r->mst[e[i].a][e[i].b] > -1);
 
         // Remove edges spliting graph in +1 components
         if (c1) {
-            changed[k] = &e[i];
             // Add to tabu list
-            add_tabu(tabus, timer, e[i]);
+            // add_tabu(tabus, timer, e[i]);
             remove_edge(r, vacant, comp, e[i], (++k));
         }
     }
@@ -101,10 +111,7 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
     vacant = get_comp_gap(r->n, comp, r->deg, perm);
 
     // Insert perm edges creating new solution 
-    for (i=0; i<r->m; ++i) {
-        // Checks if amount of desired edges have been inserted
-        if (k == 0) break;
-        
+    for (i=0; (i<r->m && k>0); ++i) {
         // checks if edge is NOT in the current solution
         c1 = !(r->mst[e[i].a][e[i].b] > -1);
         // Checks if degree cosntraint are obeyed
@@ -119,7 +126,7 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
 
         // Insert edges forming new solution
         if (c1 && c2 && c3 && c4 && c5) {
-            // add_tabu(tabus, timer, e[i]);
+            add_tabu(tabus, timer, e[i]);
             insert_edge(r, vacant, comp, e[i]);
             --k;
         }
@@ -129,10 +136,7 @@ void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
     // the one removed in this iteration (ensures solution viability).
     if (is_disjoint(comp, r->n)) {
         // Insert perm edges creating new solution 
-        for (i=0; i<r->m; ++i) {
-            // Checks if amount of desired edges have been inserted
-            if (k == 0) break;
-            
+        for (i=0; (i<r->m && k>0); ++i) {
             // checks if edge is NOT in the current solution
             c1 = !(r->mst[e[i].a][e[i].b] > -1);
             // Checks if degree cosntraint are obeyed
@@ -269,9 +273,9 @@ int tabu_time(int tt, edge_list e) {
 
     // int time2 = rand()/tt;
 
-    int time3 = rand()%(e.cost+1);
+    int time3 = min((int)floor(max_cost/e.cost+1), tt);
 
-    // int time4 = (int)floor(expf((cost/max_cost)));
+    int time4 = (int)floor(expf(max_cost/e.cost+1));
 
-    return tt;
+    return time3;
 }
