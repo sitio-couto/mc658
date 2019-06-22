@@ -15,6 +15,17 @@ int min(int a, int b){
     return ((a < b) ? a:b);
 }
 
+int min_array_idx(int *arr, int n){
+	int i, minn = INT_MAX, idx=0;
+	for(i=0; i<n; i++){
+		if (arr[i] < minn){
+			minn = arr[i];
+			idx = i;
+		}
+	}
+	return idx;
+}
+
 /**
  * Returns maximum value between a and b.
  */
@@ -81,6 +92,32 @@ int is_disjoint(int comp[], int n) {
 	int i, aux = comp[0];
 	for (i=0; i<n; ++i) if (comp[i] != aux) return 1;
 	return 0;
+}
+
+/**
+ * Checks if graph is connected
+ * Uses DFS.
+ */
+int is_connected(int **g, int *visited, int size){
+	int i;
+	
+	for (i=0; i<size; i++){
+		visited[i] = 0;
+	}
+	
+	connected_dfs(g, visited, size, 0);
+	
+	return visited[min_array_idx(visited, size)];
+}
+
+void connected_dfs(int **g, int *visited, int n, int v){
+	int j;
+	
+	visited[v]=1;
+	for(j=0; j<n; j++){
+		if(!visited[j] && g[v][j])
+			connected_dfs(g, visited, n, j);
+	}
 }
 
 /**

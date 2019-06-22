@@ -18,11 +18,10 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
     double pi = INIT_PI;
     int i, j, iter = 0;
     int viable=0;
-    double *mult;					// Lagrange Multipliers.
-    double **lg;					// Lagrangian Graph
-    int *mst = NULL, *primal_mst;	// Minimum spanning tree: mst[i] is the parent of vertex i.
-    double dual;					// Current dual or primal.
-    int primal;
+    double *mult;		// Lagrange Multipliers.
+    double **lg;		// Lagrangian Graph
+    int *mst = NULL;	// Minimum spanning tree: mst[i] is the parent of vertex i.
+    double dual;		// Current dual bound.
     double *subgrad;
     struct out *ans;
 
@@ -83,19 +82,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 			pi/=2;
 		
 		// If the solution is viable, try to update primal.
-		if (viable)
-			min(ans->primal, mst_value_int(mst, g->n, g->mat));
-		else{
-			primal_mst = viabilize_mst(mst, g);
-			primal = mst_value_int(primal_mst, g->n, g->mat);
-			if (primal < ans->primal){
-				free(ans->mst);
-				ans->primal = primal;
-				ans->mst = primal_mst;
-			}
-			else
-				free(primal_mst);
-		}
+		update_primal(ans, g, mst, viable);
 			
 		// Updates lagrange multipliers and checks if execution needs to continue.
 		if (!update_multipliers_and_check(g, mult, mst, subgrad, ans, viable, pi))
@@ -249,15 +236,41 @@ int check_viability(int size, int *r_deg, int *mst){
 }
 
 /**
+ * Function to update primal bound.
+ * Utilizes heuristic to viabilize the dual MST.
+ */ 
+void update_primal(struct out *ans, mat_graph *g, int *mst, int viable){
+	int *primal_mst;
+	int primal;
+	
+	// If the dual MST is viable, update if possible.
+	// Else, viabilize and update if possible.
+	if (viable)
+		min(ans->primal, mst_value_int(mst, g->n, g->mat));
+	else{
+		primal_mst = viabilize_mst(mst, g);
+		primal = mst_value_int(primal_mst, g->n, g->mat);
+		if (primal < ans->primal){
+			free(ans->mst);
+			ans->primal = primal;
+			ans->mst = primal_mst;
+		}
+		else
+			free(primal_mst);
+	}
+ }
+ 
+/**
  * Function to viabilize dual MST.
  * Given an MST, tries to change edges so that it is viable for DCMSTP
  * Returns the DCMST.
  */
 int *viabilize_mst(int *mst, mat_graph *g){
-	int i,j,k;
+	int i,j,minn;
 	int *deg_mst = malloc(sizeof(int)*g->n);
 	int *dcmst = malloc(sizeof(int)*g->n);
-	int cycle;
+	int *row;
+	int viable;
 	
 	for(i=0; i<g->n; i++)
 		deg_mst[i] = g->deg[i];
@@ -279,23 +292,31 @@ int *viabilize_mst(int *mst, mat_graph *g){
 		
 		// Replaces the amount of edges it needs to viablilize.
 		while(deg_mst[i] < 0){
-			cycle = 1;
 			
 			// Finds children (first fit. Best fit worth it?)
 			while(j<g->n){
 				if (dcmst[j] == i){
+					viable = 1;
 					
 					// Finds edge to replace.
-					for(k=0; k<g->n;k++){
-						if (k != j && k != i && deg_mst[k] > 0){
-							dcmst[j] = k;
-							if (!(cycle = check_cycle(dcmst, g->n))){
-								deg_mst[k]++;
-								break;
-							}
-						}
-					}
-					if (!cycle) break;
+					row = splice_row(j, i, deg_mst, g);
+					
+					// Tries replacing with the least cost edge.
+					// If fails, tries with the second least cost edge and so on.
+					do{
+						minn = min_array_idx(row, g->n);
+						dcmst[j] = minn;
+						if(!(viable = check_cycle_connection(dcmst, g->n)))
+							deg_mst[minn]--;
+						else
+							row[minn] = INT_MAX;
+							
+					} while(viable);
+					
+					free(row);
+
+					// If edge has been replaced, exit the loop.
+					if (minn != i) break;
 				}
 				j++;
 			}
@@ -304,20 +325,41 @@ int *viabilize_mst(int *mst, mat_graph *g){
 	}
 	
 	free(deg_mst);
+	//if(!check_viability(g->n, g->deg, dcmst)) exit(0);
 	//print_mst(dcmst, g->n, g->mat);
 	return dcmst;
 }
 
 /**
+ * Takes a row from the adjacency cost matrix.
+ * Takes the costs, aside from the saturated vertices, itself and parents.
+ */
+int *splice_row(int v, int parent, int *deg, mat_graph *g){
+	int *row = malloc(sizeof(int)*g->n);
+	int i;
+	
+	for (i=0; i<g->n; i++){
+		if (i == v || deg[i] <= 0)
+			row[i] = INT_MAX;
+		else if (i == parent)
+			row[i] = INT_MAX - 1;
+		else
+			row[i] = g->mat[v][i];
+	}
+	return row;
+}
+
+/**
  * Checks if there's a cycle in an MST.
  */
-int check_cycle(int *tree, int size){
+int check_cycle_connection(int *tree, int size){
 	int i,j;
-	char **mat_tree = malloc(size*sizeof(char*));
-	char *visited = calloc(size, sizeof(char));
+	int **mat_tree = malloc(size*sizeof(int*));
+	int *visited = calloc(size, sizeof(int));
+	int connected=0;
 	
 	for(i=0;i<size;i++)
-		mat_tree[i] = calloc(size, sizeof(char));
+		mat_tree[i] = calloc(size, sizeof(int));
 	
 	// Initializing matrix
 	for(i=0; i<size; i++){
@@ -331,7 +373,7 @@ int check_cycle(int *tree, int size){
 	// If a vertex is visited again, without being the parent, there's a cycle.
 	for(i=0; i<size; i++){
 		for(j=0; j<size; j++){
-			if (mat_tree[i][j] > 0){
+			if (mat_tree[i][j]){
 				if (!visited[j] && j != tree[i])
 					visited[j]=1;
 				else if (j != tree[i]){
@@ -346,13 +388,15 @@ int check_cycle(int *tree, int size){
 		}
 	}
 	
+	connected = !is_connected(mat_tree, visited, size);
 	
 	for(i=0; i<size;i++)
 		free(mat_tree[i]);
 	free(mat_tree);
 	free(visited);
-	return 0;
+	return connected;
 }
+
 
 /**
  * Function to update lagrange multipliers.
