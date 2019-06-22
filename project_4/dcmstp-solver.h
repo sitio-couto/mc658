@@ -79,6 +79,8 @@ double mult_deg(double *mult, int *deg, int size);
 double subgradient(int v, int deg, int size, int *mst);
 int check_viability(int size, int *r_deg, int *mst);
 int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi);
+int *viabilize_mst(int *mst, mat_graph *g);
+int check_cycle(int *tree, int size);
 
 /* HEURISTIC / METAHEURISTIC */
 heu_graph* first_primal(mat_graph *g);
@@ -102,6 +104,7 @@ double curr_time(time_t start_time);
 int min(int a, int b);
 double max(double a, double b);
 double mst_value(int *mst, int size, double **g);
+int mst_value_int(int *mst, int size, int **g);
 int compare(const void * a, const void * b);
 int contains(edge_list *arr[], int len, edge_list e);
 int* to_array (int **mx, int n, int *arr);

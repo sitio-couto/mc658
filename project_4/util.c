@@ -38,6 +38,21 @@ double mst_value(int *mst, int size, double **g){
 }
 
 /**
+ * Calculates value of MST solution.
+ * Returns the sum of all edge costs.
+ */
+int mst_value_int(int *mst, int size, int **g){
+	int i;
+	int sum=0;
+	
+	for(i=0; i<size; i++)
+		if (mst[i] >= 0)
+			sum+= g[i][mst[i]];
+	
+	return sum;
+}
+
+/**
  * Compares values returning their difference.
  * For sorting edges lists with qsort.
  */
@@ -73,12 +88,13 @@ int is_disjoint(int comp[], int n) {
  */
 int* to_array (int **mx, int n, int *arr) {
 	int i;
-	int visited[n];
+	int *visited = calloc(n, sizeof(int));
 
 	for (i=0; i<n; ++i) arr[i] = -1;
 
 	to_array_dfs(mx, n, visited, 0, arr);
 
+	free(visited);
 	return arr;
 }
 
