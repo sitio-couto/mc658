@@ -80,9 +80,8 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 			printf("%lf\n", ans->dual);
 			
 			// Updates primal if it's a big instance and possible.
-			// TODO: CHECK TIME, IT'S GOING OVER MAX TIME ON 2000 VERTICES INSTANCES.
 			if (g->n >= LARGE_INSTANCE)
-				update_primal(ans, g, mst, viable);
+				update_primal(ans, g, mst, viable, start_time, max_time);
 		}
 		
 		// If the dual hasn't increased in a few iterations, take half pi.
@@ -93,7 +92,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 		
 		// Updates primal, if it's a small or medium instance and possible.
 		if (g->n < LARGE_INSTANCE)
-			update_primal(ans, g, mst, viable);
+			update_primal(ans, g, mst, viable, start_time, max_time);
 			
 		// Updates lagrange multipliers and checks if execution needs to continue.
 		if (!update_multipliers_and_check(g, mult, mst, subgrad, ans, viable, pi))
@@ -200,25 +199,6 @@ double mult_deg(double *mult, int *deg, int size){
 }
 
 /**
- * Calculates subgradients for the relaxed constraint.
- * Given by the difference between the max degree of the vertex and the amount of neighbors in the MST.
- */
-double subgradient(int v, int deg, int size, int *mst){
-	int count=0, i;
-	
-	// Checking if it has parent.
-	if (mst[v] > -1)
-		count++;
-	
-	// Checking children.
-	for (i=1; i<size; i++)
-		if (mst[i] == v)
-			count++;
-			
-	return count - deg;
-}
-
-/**
  * Checks if the MST found is viable for DCMSTP.
  * @param g Original graph
  * @param mst Tree to be checked.
@@ -253,7 +233,7 @@ int check_viability(int size, int *r_deg, int *mst){
  * Function to update primal bound.
  * Utilizes heuristic to viabilize the dual MST.
  */ 
-void update_primal(struct out *ans, mat_graph *g, int *mst, int viable){
+void update_primal(struct out *ans, mat_graph *g, int *mst, int viable, time_t start_time, int max_time){
 	int *primal_mst;
 	int primal;
 	
@@ -261,7 +241,7 @@ void update_primal(struct out *ans, mat_graph *g, int *mst, int viable){
 	// Else, viabilize and update if possible.
 	if (viable)
 		min(ans->primal, mst_value_int(mst, g->n, g->mat));
-	else if((primal_mst = viabilize_mst(mst, g))){
+	else if((primal_mst = viabilize_mst(mst, g, start_time, max_time))){
 		primal = mst_value_int(primal_mst, g->n, g->mat);
 		if (primal < ans->primal){
 			free(ans->mst);
@@ -278,10 +258,11 @@ void update_primal(struct out *ans, mat_graph *g, int *mst, int viable){
  * Given an MST, tries to change edges so that it is viable for DCMSTP
  * Returns the DCMST if possible (checks viability before returning).
  */
-int *viabilize_mst(int *mst, mat_graph *g){
+int *viabilize_mst(int *mst, mat_graph *g, time_t start_time, int max_time){
 	int i,j;
 	int *deg_mst = malloc(sizeof(int)*g->n);
 	int *dcmst = malloc(sizeof(int)*g->n);
+	time_t time=0;
 	
 	for(i=0; i<g->n; i++)
 		deg_mst[i] = g->deg[i];
@@ -302,16 +283,19 @@ int *viabilize_mst(int *mst, mat_graph *g){
 		j=0;
 		
 		// Replaces the amount of edges it needs to viablilize.
-		while(deg_mst[i] < 0){
-			change_edge(g, i, deg_mst, dcmst, j);
+		while(deg_mst[i] < 0 && j <= g->n && ((time = curr_time(start_time)) < max_time)){
+			j = change_edge(g, i, deg_mst, dcmst, j);
 			deg_mst[i]++;
 		}
+		
+		if (time >= max_time)
+			break;
 	}
 	
 	free(deg_mst);
 	
 	// If the final result isn't viable, return null.
-	if(!check_viability(g->n, g->deg, dcmst)){
+	if(time >= max_time || !check_viability(g->n, g->deg, dcmst)){
 		free(dcmst);
 		return NULL;
 	}
@@ -328,7 +312,7 @@ int *viabilize_mst(int *mst, mat_graph *g){
  * @param curr_pos: if more than 1 edge for one vertex have to be removed, there's no 
  * use in going back, so the current position is a parameter.
  */
-void change_edge(mat_graph *g, int parent, int *deg_mst, int *dcmst, int curr_pos){
+int change_edge(mat_graph *g, int parent, int *deg_mst, int *dcmst, int curr_pos){
 	int minn = INT_MAX;
 	int viable;
 	int *row;
@@ -360,6 +344,7 @@ void change_edge(mat_graph *g, int parent, int *deg_mst, int *dcmst, int curr_po
 		}
 		curr_pos++;
 	}
+	return curr_pos;
 }
 
 /**
@@ -429,7 +414,6 @@ int check_cycle_connection(int *tree, int size){
 	return connected;
 }
 
-
 /**
  * Function to update lagrange multipliers.
  * Calculates subgradients for each vertex,
@@ -470,4 +454,23 @@ int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *s
 		mult[i] = max(0, mult[i]+step*subgrad[i]);
 	
 	return 1;
+}
+
+/**
+ * Calculates subgradients for the relaxed constraint.
+ * Given by the difference between the max degree of the vertex and the amount of neighbors in the MST.
+ */
+double subgradient(int v, int deg, int size, int *mst){
+	int count=0, i;
+	
+	// Checking if it has parent.
+	if (mst[v] > -1)
+		count++;
+	
+	// Checking children.
+	for (i=1; i<size; i++)
+		if (mst[i] == v)
+			count++;
+			
+	return count - deg;
 }
