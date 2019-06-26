@@ -25,7 +25,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
     double **lg;		// Lagrangian Graph
     int *mst = NULL;	// Minimum spanning tree: mst[i] is the parent of vertex i.
     double dual;		// Current dual bound.
-    double *subgrad;
+    int *subgrad;
     struct out *ans;
 
     // Allocating lagrangian graph and multiplier array.
@@ -39,7 +39,7 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
     for(i=0; i<g->n; i++)
 		mult[i]=INIT_MULT;
     
-    subgrad = malloc(sizeof(double)*g->n);
+    subgrad = malloc(sizeof(int)*g->n);
     
     // Greedy heuristic: converting output to wanted format.
     greed = first_primal(g);
@@ -191,9 +191,8 @@ double mult_deg(double *mult, int *deg, int size){
 	double res=0;
 	int i;
 	
-	for (i=0; i<size; i++){
+	for (i=0; i<size; i++)
 		res+=mult[i]*deg[i];
-	}
 	
 	return res;
 }
@@ -428,15 +427,16 @@ int check_cycle_connection(int *tree, int size){
  * @param pi: value to multiply step.
  * @return 0 if the execution is to be stopped. 1 otherwise.
  */
-int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi){		
+int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, int *subgrad, struct out *ans, int viable, double pi){		
 	double step, subgrad_sum=0;	
 	int i;
 	
 	// Subgradients for lagrange multipliers step.
 	for(i=0; i<g->n; i++){
 		subgrad[i] = subgradient(i, g->deg[i], g->n, mst);
-		if (subgrad[i] > 0 || mult[i] > 0)
-			subgrad_sum+= subgrad[i]*subgrad[i];
+		if (subgrad[i] < 0 && mult[i] == 0)
+			subgrad[i] = 0;
+		subgrad_sum+= subgrad[i]*subgrad[i];
 	}
 	
 	// Finished execution if Gi=0 for every i.
@@ -460,7 +460,7 @@ int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *s
  * Calculates subgradients for the relaxed constraint.
  * Given by the difference between the max degree of the vertex and the amount of neighbors in the MST.
  */
-double subgradient(int v, int deg, int size, int *mst){
+int subgradient(int v, int deg, int size, int *mst){
 	int count=0, i;
 	
 	// Checking if it has parent.
