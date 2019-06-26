@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-    //generate_out_file(argv[1], o, g->n);
+    generate_out_file(argv[1], o, g->n);
     free_graph(g);
     free(o->mst);
     free(o);

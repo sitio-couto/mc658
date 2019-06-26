@@ -121,7 +121,9 @@ void connected_dfs(int **g, int *visited, int n, int v){
 }
 
 /**
- * Wrapper for the to_array_dfs function..
+ * Wrapper for the to_array_dfs function.
+ * DFS for converting a adjacency matrix
+ * into a node-parent array.
  */
 int* to_array (int **mx, int n, int *arr) {
 	int i;
@@ -135,10 +137,6 @@ int* to_array (int **mx, int n, int *arr) {
 	return arr;
 }
 
-/**
- * DFS for converting a adjacency matrix
- * into a node-parent array.
- */
 void to_array_dfs (int **mx, int n, int *visited, int v, int *arr) {
     int i;
 

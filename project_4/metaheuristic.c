@@ -19,6 +19,7 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     heu_graph *state = first_primal(g); // Get initial solution
     edge_list *e = edge_list_alloc(g->mat, g->n, g->m); // Get sorted edges
     struct out *best = out_alloc(state->primal, 0, g->n); // Restulting struct
+    to_array(state->mst, state->n, best->mst);
 
     // PARAMS //
     max_cost = e[g->m-1].cost;
@@ -29,7 +30,7 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
 
     // Iterate trough the solutions graph
     while (curr_time(start_time) < max_time) {
-         // Get new solution 
+        // Get new solution 
         heuristic(state, e, tabus, timer);
 
         // Update primal if found new best
@@ -37,7 +38,6 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
             best->primal = state->primal;
             to_array(state->mst, state->n, best->mst);
         } 
-
         // If cycling solutions, increase amount o edges permutated
         else if (++stagnated > threshold) {
             stagnated = 0;
