@@ -5,6 +5,7 @@
 #define MIN_PI 0.005
 #define MAX_ITER_PI 30
 #define EPS 0.0005
+#define ZERO 0.000001
 #define LARGE_INSTANCE 900
 
 /**
@@ -85,8 +86,10 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 		}
 		
 		// If the dual hasn't increased in a few iterations, take half pi.
-		else if (iter == MAX_ITER_PI)
+		else if (iter == MAX_ITER_PI){
+			iter = 0;
 			pi/=2;
+		}	
 		
 		// Updates primal, if it's a small or medium instance and possible.
 		if (g->n < LARGE_INSTANCE)
@@ -97,6 +100,9 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 			break;
     }
     
+    if (ans->dual > ans->primal)
+		ans->dual = floor(ans->dual);
+		    
     // Freeing lagrangian graph and multiplier array.
     for(i=0; i<g->n; i++)
 		free(lg[i]);
@@ -451,7 +457,7 @@ int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *s
 	
 	// Finished execution if Gi=0 for every i.
 	// If solution is viable, it's the optimum.
-	if (subgrad_sum == 0){
+	if (subgrad_sum < ZERO){
 		if (viable)
 			ans->primal = ans->dual;
 		return 0;
