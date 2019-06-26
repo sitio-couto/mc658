@@ -1,159 +1,190 @@
-/* MC658 (Algorithms III) - P4 - Heuristic Algoritms for DCMSTP.
- * DCMSTP: Degree Constrained Minimum Spanning Tree.
- * Problem details: https://en.wikipedia.org/wiki/Degree-constrained_spanning_tree
- * 
- * Receives the instance to be solved, maximum execution time and solving method.
- * 
- * Authors:
- * Victor Ferreira Ferrari  - RA 187890
- * Vinícius Couto Espindola - RA 188815
- * University of Campinas - 26/06/2019
-*/
-
+// FOR TESTING //////////////////////////////////////////
 #include "dcmstp-solver.h"
 
-int main(int argc, char *argv[]){
-    int i,j;
-    mat_graph *g;
-    struct out *o;
-    
-    // Verifying arguments
-    if (argc < 4){
-        printf("Usage: dcmstp-solver <instance> <max_time> <method>\n");
-        return 1;
-    }
-    
-    printf("Reding input...\n");
-    g = read_input_matrix(argv[1]);
+// /* TEST */
+// void test_mst(int **mx, int deg[], int n, int comp[]);
+// void dfs_test(int **mx, int *flag, int deg[], int n, int v, int p);
+// int is_new_result (int *(***list), int *qnt, heu_graph *r);
+// int is_equal (int *old[], int *new[], int n);
+// int*** append_result (int ***list, int qnt, int **new, int n);
+// void free_results (int ***list, int qnt, int n);
+// void print_report(int, int, int, int*, int, int, int, int);
 
-    int sum_max = 0;
-    for(i=0; i<g->n; ++i){
-        for(j=i+1; j<g->n; ++j){
-            sum_max += g->mat[i][j];
-        }
-    }
-    printf("MAX=(%d)\n",sum_max);
 
-    printf("Calculating primal...\n");
-    first_primal(g);
+/**
+ * Save obtained MSTs to ensures new nodes of the solutions
+ * graph are being visited.
+ */
+int is_new_result (int *(***list), int *qnt, heu_graph *r) {
+	int k;
 
-    double **lg = malloc(sizeof(double*)*g->n);
-    for(i=0; i<g->n; i++)
-        lg[i] = malloc(sizeof(double)*g->n);
-    for (i=0; i<g->n; i++){
-        for(j=0; j<g->n; j++){	
-            lg[i][j] = g->mat[i][j];
-        }
-    }
+	for (k=0; k<(*qnt); ++k) {
+		if (is_equal((*list)[k], r->mst, r->n)) 
+			return 0;
+	}
 
-    printf("Calculating dual...\n");
-    mst_prim(lg, g->n);
+	(*list) = append_result((*list), ++(*qnt), r->mst, r->n);
 
-    // // Methods: 'l' = Lagrangian Relaxation. 'm' = Metaheuristic
-    // if (argv[3][0] == 'l'){
-    //     printf("Lagrangian\n");
-    //     o = lagrangian_heuristic(g, atoi(argv[2]));
-    //     //printf("%s,%lf,%lf\n", argv[1], o->dual, o->primal);
-    // }
-    
-    for(i=0; i<g->n; i++) {
-        free(lg[i]);
-        free(g->mat[i]);
-    }
-    free(lg);
-    free(g->mat);
-    free(g->deg);
-    free(g);
-
-    return 0;
+	return 1;
 }
 
-int first_primal(mat_graph *g) {
-    int i, j, k, main, merge, min_edge;
-    int c1, c2, primal = 0;
-    int deg[g->n];  // Indicates the remaining edges alowed per vertex
-    int comp[g->n]; // Indicates the component of the vertex
-    edge2vert *e = malloc(g->m*sizeof(edge2vert));
+int*** append_result (int ***list, int qnt, int **new, int n) {
+	int i, j;
+	int ***new_list = malloc(qnt*sizeof(int**));
 
-    k = 0;
-    for(i=0; i < g->n; ++i) {
-        deg[i] = g->deg[i];
-        comp[i] = i;
-        for(j=i+1; j < g->n; ++j) {
-            e[k].a = i;
-            e[k].b = j; 
-            e[k].cost = g->mat[i][j];
-            ++k;
-        }
-    }
+	memcpy(new_list, list, (qnt-1)*sizeof(int**));
+	new_list[qnt-1] = malloc(n*sizeof(int*));
+	for (i=0; i<n; ++i) {
+		new_list[qnt-1][i] = malloc(n*sizeof(int)); 
+		for (j=0; j<n; ++j) {
+			new_list[qnt-1][i][j] = new[i][j];
+		}
+	}
 
-    min_edge = INT_MAX;
-    k = -1;
-    for (i=0; i<g->n; ++i) {
-        if (deg[i] == 1){
-            for (j=0; j<g->n; ++j) {
-                if (deg[j] > 1 && g->mat[i][j] < min_edge) {
-                    k = j;
-                }
-            }
-
-            if (k > -1) {
-                for (j=0; j<g->m; ++j) {
-                    if (e[j].a == i && e[j].b == k) break;
-                }
-                
-                --deg[e[j].a]; 
-                --deg[e[j].b];
-
-                main  = min(comp[e[i].a],comp[e[i].b]);
-                merge = max(comp[e[i].a],comp[e[i].b]);
-
-                for (j=0; j<g->n; ++j){
-                    if (comp[j] == merge) comp[j] = main;
-                }
-
-                primal += e[i].cost;
-            }
-        }
-    }
-
-
-    qsort(e, g->m, sizeof(edge2vert), compare);
-
-    k = 0;
-    for (i=0; i < g->m; ++i) {
-        c1 = (comp[e[i].a] != comp[e[i].b]);
-        c2 = (deg[e[i].a] > 0 && deg[e[i].b] > 0);
-
-        if (c1 && c2) {
-            main  = min(comp[e[i].a],comp[e[i].b]);
-            merge = max(comp[e[i].a],comp[e[i].b]);
-
-            for (j=0; j<g->n; ++j){
-                if (comp[j] == merge) comp[j] = main;
-            }
-
-            --deg[e[i].a]; 
-            --deg[e[i].b];
-
-            primal += e[i].cost;
-            ++k;
-        }
-        
-        if (k == g->n) break;
-    }
-
-    printf("HMST=(%d)\n", primal);
-    for (i=0; i < g->n; ++i){
-        if(comp[i] != 0 || deg[i] < 0) {
-            printf("FLAWED(0)=>(%d|%d)!!\n",comp[i], deg[i]);
-        }
-    }
-    
-    free(e);
-    return primal;
+	free(list);
+	return new_list;
 }
 
-int compare(const void * a, const void * b) { 
-    return (((edge2vert*)a)->cost - ((edge2vert*)b)->cost); 
+int is_equal (int *old[], int *new[], int n) {
+	int i, j;
+
+	for (i=0; i<n; ++i) {
+		for (j=0; j<n; ++j) {
+			if (old[i][j] != new[i][j])
+				return 0; 
+		}
+	}
+
+	return 1;
+}
+
+void free_results (int ***list, int qnt, int n) {
+	int i, k;
+
+	for (k=0; k<qnt; ++k) {
+		for (i=0; i<n; ++i) {
+			free(list[k][i]);
+		}
+		free(list[k]);
+	}
+
+	free(list);
+}
+
+/**
+ * Print report for the metahuristic local search.
+ */
+void print_report(int best, int high, int first, int* hash, int n, int iters, int nodes, int updates) {
+	int i, sum, avg, reps;
+	long long int count;
+
+	reps = 0;
+	count = 0;
+	sum = 0;
+	for (i=0; i<n; ++i) {
+		if (hash[i] > 0) reps++;
+		count += hash[i];
+		sum += i*hash[i];
+	}
+	avg = (int)floor(sum/count);
+	reps = (int)floor(reps/count);
+	
+	
+	printf("   _______________________________________\n");
+    printf("  |  Best   |  First  |   Avg   |  High   |\n");
+	printf("  |%7d  |%7d  |%7d  |%7d  |\n", best, first, avg, high);
+    printf("  |---------------------------------------|\n");
+    printf("  | iterations | nodes explored | updates |\n");
+    printf("  | %10d | %14d | %7d |  \n", iters, nodes, updates);
+    printf("   --------------------------------------- \n");
+	return;
+}
+
+/**
+ * DFS for testing if a graph is a tree.
+ * Used for checking result correctness.
+ */
+void test_mst(int **mx, int deg[], int n, int comp[]){
+	int i;
+	int *visited = calloc(n, sizeof(int));
+
+	// for (i=0; i<n; ++i) hash[i] = 0;
+	// for (i=0; i<n; ++i) ++hash[comp[i]];
+	// for (i=0; i<n; ++i) {
+	// 	if (hash[i]) {
+	// 		for (j=0; j<n; ++j) {
+	// 			if (comp[j] == i) {
+	// 				count_deg = 0;
+	// 				for (k=0; k<n; ++k) {
+	// 					if (mx[j][k] >= 0) ++count_deg;
+	// 				}
+	// 				if (count_deg - deg[j] < 0) {
+	// 					printf("GAP=>%d\n", i);
+	// 					break;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// printf("\n");
+
+	// for (i=0; i<n; ++i) {
+	// 	for (j=0; j<n; ++j) {
+	// 		if (mx[i][j] > -1)
+	// 			printf("%d|", mx[i][j]);
+	// 		else 
+	// 			printf("*|", mx[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
+
+	// Initilize search
+	dfs_test(mx, visited, deg, n, 0, 0);
+	
+	// Checks if all vertex are reached
+	for (i=0; i<n; ++i) {
+		if (!visited[i]) {
+			printf("FLAWED!! (Not a connected graph)\n");
+			exit(0);
+		}
+	}
+
+	free(visited);
+	return;
+}
+
+/**
+ * DFS for testing if a graph is a tree.
+ * Used for checking result correctness.
+ */
+void dfs_test(int **mx, int *visited, int deg[], int n, int v, int p) {
+    int j, count = 0;
+    visited[v] = 1;
+	// printf("V->(%d)\n",v);
+
+	// Check if the vertex respects the degree contraint
+    for (j=0; j < n; ++j) if (mx[v][j] >= 0) ++count;
+    if (deg != NULL && count > deg[v]) {
+		printf("%d->(%d <= %d)\n", v, count, deg[v]);
+        printf("FLAWED!! (degree constraint violated)\n");
+        exit(0);
+    }
+
+	// Check for loops
+    for (j=0; j < n; ++j) {
+		// if next vertex is visited and not the parent, theres a cycle.
+        if (j!=p && mx[v][j] >= 0 && visited[j]) {
+			// for (i=0; i<n; ++i) printf("-(%d)",visited[i]);
+			// printf("\n");
+			printf("p=(%d)|v->j=(%d,%d)|e=(%d)\n",p,v,j,mx[v][j]);
+            printf("FLAWED!! (cycle detected)\n");
+            exit(0);
+        }
+		// Recursive search on next available edge
+        else if (j!=p && mx[v][j] >= 0) {
+            dfs_test(mx, visited, deg, n, j, v);
+        }
+    }
+
+    return;
 }

@@ -12,29 +12,13 @@ int max_cost;
  */
 
 struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
-    int i;
-    char **tabus, **timer;
+    char **tabus;
+    int **timer;
     int threshold = 100, stagnated = 0;
-    heu_graph *state = first_primal(g);
-    edge_list *e = edge_list_alloc(g->mat, g->n, g->m);
-    struct out *best = out_alloc(state->primal, 0, g->n);
 
-    // TESTING //
-    int iterations = 1, updates = 0;
-    int comp[g->n], deg[g->n];
-    int n_hash = 0;
-    for (i=g->m-1; i>=(g->m-g->n); --i) n_hash += e[i].cost; 
-    int*** results = NULL;
-    int qnt = 0, nodes = 0;
-    int max_primal = state->primal;
-    int first_primal = state->primal;
-    int *hash = calloc(n_hash, sizeof(int));
-    hash[first_primal] = 1;
-    for (i=0; i<g->n; ++i){
-        comp[i] = 0;
-        deg[i] = g->deg[i];
-    } 
-    /////////////
+    heu_graph *state = first_primal(g); // Get initial solution
+    edge_list *e = edge_list_alloc(g->mat, g->n, g->m); // Get sorted edges
+    struct out *best = out_alloc(state->primal, 0, g->n); // Restulting struct
 
     // PARAMS //
     max_cost = e[g->m-1].cost;
@@ -44,34 +28,25 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
     alloc_tabus(&tabus, &timer, g->n);
 
     // Iterate trough the solutions graph
-    while (curr_time(start_time) < max_time) { 
-        // TESTING //
-        test_mst(state->mst, deg, state->n, comp);
-        if (is_new_result(&results, &qnt, state)) ++nodes;
-        if (!hash[state->primal]) {
-            if (state->primal > max_primal)
-                max_primal = state->primal;
-        }
-        hash[state->primal]++;
-        ++iterations;
-        /////////////
-        heuristic(state, e, tabus, timer); // Get new solution
+    while (curr_time(start_time) < max_time) {
+         // Get new solution 
+        heuristic(state, e, tabus, timer);
+
+        // Update primal if found new best
         if (state->primal < (int)best->primal) {
             best->primal = state->primal;
             to_array(state->mst, state->n, best->mst);
-            ++updates; // TESTING //
-        } else if (++stagnated > threshold) {
+        } 
+
+        // If cycling solutions, increase amount o edges permutated
+        else if (++stagnated > threshold) {
             stagnated = 0;
-            perm = min(perm+1, (int)floor((g->n)/2));
+            perm = min(perm+1, (int)floor((g->n)/3));
         }
+
+        // Update tabus timmings
         update_tabus(tabus, timer, g->n);
     }
-
-    // TESTING //
-    print_report((int)best->primal, max_primal, first_primal, hash, n_hash, iterations, nodes, updates);
-    free_results(results, qnt, state->n);
-    free(hash);
-    /////////////
 
     free(e);
     tabus_free(&tabus, &timer, g->n);
@@ -90,7 +65,7 @@ struct out *metaheuristic(mat_graph *g, int max_time, time_t start_time){
  *  timer - Matrix containing remaining number of iterations for the tabus.
  *  Return: void.
  */
-void heuristic(heu_graph* r, edge_list* e, char** tabus, char** timer) {
+void heuristic(heu_graph* r, edge_list* e, char** tabus, int** timer) {
     int i, count;
     int comp[r->n], *vacant;
 
@@ -256,7 +231,7 @@ void insert_edge(heu_graph *r, int vacant[], int comp[], edge_list e) {
  *  e     - Edge to be marked as tabu.
  * Returns: void.
  */
-void add_tabu (char **tabus, char **timer, edge_list e) {
+void add_tabu (char **tabus, int **timer, edge_list e) {
     int start_time = tabu_time(e); 
     tabus[e.a][e.b] = 1;
     tabus[e.b][e.a] = 1;
@@ -284,7 +259,7 @@ int is_tabu (char **tabus, edge_list e) {
  *  n     - Tabus/timers matrix size.
  * Returns: void.
  */
-void update_tabus (char** tabus, char** timer, int n) {
+void update_tabus (char** tabus, int** timer, int n) {
     int i, j;
 
     for (i=0; i<n; ++i) {
