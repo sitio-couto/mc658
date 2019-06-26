@@ -5,7 +5,6 @@
 #define MIN_PI 0.005
 #define MAX_ITER_PI 30
 #define EPS 0.0005
-#define ZERO 0.000001
 #define LARGE_INSTANCE 900
 
 /**
@@ -436,12 +435,12 @@ int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, int *subg
 		subgrad[i] = subgradient(i, g->deg[i], g->n, mst);
 		if (subgrad[i] < 0 && mult[i] == 0)
 			subgrad[i] = 0;
-		subgrad_sum+= subgrad[i]*subgrad[i];
+		subgrad_sum+= (subgrad[i]*subgrad[i]);
 	}
 	
 	// Finished execution if Gi=0 for every i.
 	// If solution is viable, it's the optimum.
-	if (subgrad_sum < ZERO){
+	if (!subgrad_sum){
 		if (viable)
 			ans->primal = ans->dual;
 		return 0;
@@ -468,9 +467,9 @@ int subgradient(int v, int deg, int size, int *mst){
 		count++;
 	
 	// Checking children.
-	for (i=1; i<size; i++)
+	for (i=0; i<size; i++)
 		if (mst[i] == v)
 			count++;
 			
-	return count - deg;
+	return (count - deg);
 }
