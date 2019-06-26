@@ -76,7 +76,6 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 		if (dual > ans->dual){
 			ans->dual = dual;
 			iter = 0;
-			printf("%lf\n", ans->dual);
 			
 			// Updates primal if it's a big instance and possible.
 			if (g->n >= LARGE_INSTANCE)
@@ -98,7 +97,8 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 			break;
     }
     
-    if (ans->dual > ans->primal)
+    // Floating point precision error.
+    if ((ans->primal - ans->dual) >= 1 || ans->dual > ans->primal)
 		ans->dual = floor(ans->dual);
 		    
     // Freeing lagrangian graph and multiplier array.
@@ -427,7 +427,8 @@ int check_cycle_connection(int *tree, int size){
  * @return 0 if the execution is to be stopped. 1 otherwise.
  */
 int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, int *subgrad, struct out *ans, int viable, double pi){		
-	double step, subgrad_sum=0;	
+	double step;	
+	int subgrad_sum = 0;
 	int i;
 	
 	// Subgradients for lagrange multipliers step.
