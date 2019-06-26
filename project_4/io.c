@@ -48,18 +48,27 @@ mat_graph *read_input(char *filename){
 void generate_out_file(char *filename, struct out *ans, int size){
     int i,j;
     int edges=0;
+    FILE *file;
+    int ext;
+    
+    // Creates file name <instance>.out
+    ext = strlen(filename)-3;
+    strncpy(filename+ext, "out", 3);
+    file = fopen(filename, "w");
     
     //Finds children for each vertex.
     for(i=0; i<size-1; i++)
 		for(j=i; j<size; j++)
 			if (ans->mst[j] == i || ans->mst[i] == j){
-				printf("%d %d\n", i+1, j+1);
+				fprintf(file, "%d %d\n", i+1, j+1);
 				edges++;
 			}
-			
+
 	// Test
 	if(edges != size-1)
-		printf("THIS SHOULDN'T HAPPEN! Out tree has %d edges, should have %d\n", edges, size-1);
+		fprintf(stderr, "THIS SHOULDN'T HAPPEN! Out tree has %d edges, should have %d\n", edges, size-1);
+		
+	fclose(file);
 }
 
 /**

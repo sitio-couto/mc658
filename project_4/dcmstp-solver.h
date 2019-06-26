@@ -49,14 +49,14 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time);
 int* mst_prim(double **g, int size);
 int min_value(double *values, char *mst_flag, int size);
 double mult_deg(double *mult, int *deg, int size);
-double subgradient(int v, int deg, int size, int *mst);
 int check_viability(int size, int *r_deg, int *mst);
-void update_primal(struct out *ans, mat_graph *g, int *mst, int viable);
-int *viabilize_mst(int *mst, mat_graph *g);
-void change_edge(mat_graph *g, int parent, int *deg_mst, int *dcmst, int curr_pos);
+void update_primal(struct out *ans, mat_graph *g, int *mst, int viable, time_t start_time, int max_time);
+int *viabilize_mst(int *mst, mat_graph *g, time_t start_time, int max_time);
+int change_edge(mat_graph *g, int parent, int *deg_mst, int *dcmst, int curr_pos);
 int *splice_row(int v, int parent, int *deg, mat_graph *g);
 int check_cycle_connection(int *tree, int size);
-int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, double *subgrad, struct out *ans, int viable, double pi);
+int update_multipliers_and_check(mat_graph *g, double *mult, int *mst, int *subgrad, struct out *ans, int viable, double pi);
+int subgradient(int v, int deg, int size, int *mst);
 
 /* HEURISTIC / METAHEURISTIC */
 heu_graph* first_primal(mat_graph *g);
