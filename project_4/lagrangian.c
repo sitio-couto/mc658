@@ -293,7 +293,7 @@ int *viabilize_mst(int *mst, mat_graph *g, time_t start_time, int max_time){
 	free(deg_mst);
 	
 	// If the final result isn't viable, return null.
-	if(time >= max_time || !check_viability(g->n, g->deg, dcmst)){
+	if(time >= max_time || !check_viability(g->n, g->deg, dcmst) || check_cycle_connection(dcmst, g->n)){
 		free(dcmst);
 		return NULL;
 	}
