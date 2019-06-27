@@ -53,7 +53,7 @@ void generate_out_file(char *filename, struct out *ans, int size){
     
     // Creates file name <instance>.out
     ext = strlen(filename)-3;
-    strncpy(filename+ext, "out", 3);
+    strncpy(filename+ext, "out", 4);
     file = fopen(filename, "w");
     
     //Finds children for each vertex.
