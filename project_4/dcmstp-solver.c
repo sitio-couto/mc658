@@ -118,21 +118,22 @@ heu_graph* random_primal(mat_graph *g) {
     count = 1;
     while (count < g->n) {
         // Randomly select an edge
-        i = rand()%g->m;
+        i = rand()%g->m - 1;
         
-        // NO CYCLES => Vertices must be in different components.
-        c1 = (comp[e[i].a] != comp[e[i].b]);
-        // DEGREE CONSTRAINT => Degrees constraint must be respected
-        c2 = (r->deg[e[i].a] > 0 && r->deg[e[i].b] > 0);
-        // CONNECTED GRAPH => If not last edge, must not saturate both components.
-        // This prevents the insertion to saturate components and result in a disjoint graph.
-        c3 = (count == (g->n-1) || vacant[comp[e[i].a]] > 1 || vacant[comp[e[i].b]] > 1);
+        do {
+            i = (i+1)%g->m;
+            // NO CYCLES => Vertices must be in different components.
+            c1 = (comp[e[i].a] != comp[e[i].b]);
+            // DEGREE CONSTRAINT => Degrees constraint must be respected
+            c2 = (r->deg[e[i].a] > 0 && r->deg[e[i].b] > 0);
+            // CONNECTED GRAPH => If not last edge, must not saturate both components.
+            // This prevents the insertion to saturate components and result in a disjoint graph.
+            c3 = (count == (g->n-1) || vacant[comp[e[i].a]] > 1 || vacant[comp[e[i].b]] > 1);
+        } while ( !(c1 && c2 && c3) );
 
         // Merge and update compoenents by inserting new edge.
-        if (c1 && c2 && c3) {
-            insert_edge(r, vacant, comp, e[i]);
-            ++count;
-        }
+        insert_edge(r, vacant, comp, e[i]);
+        ++count;
     }
 
     free(vacant);
