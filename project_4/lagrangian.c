@@ -97,9 +97,9 @@ struct out *lagrangian_heuristic(mat_graph *g, int max_time, time_t start_time){
 			break;
     }
     
-    // Floating point precision error.
-    if ((ans->primal - ans->dual) >= 1 || ans->dual > ans->primal)
-		ans->dual = floor(ans->dual);
+    // Flooring in case of possible error.
+    //if ((ans->primal - ans->dual) >= 1 || ans->dual > ans->primal)
+		//ans->dual = floor(ans->dual);
 		    
     // Freeing lagrangian graph and multiplier array.
     for(i=0; i<g->n; i++)
