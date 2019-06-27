@@ -1,3 +1,4 @@
 dcmstp-solver
 test
 .vscode/
+*.out
