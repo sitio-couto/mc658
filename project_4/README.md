@@ -1,7 +1,7 @@
 Metaheuristic and Lagrangian Heuristic for DCMSTP
 =================================================
 
-Heuristics for solving the Degree Constrained Minimum Spanning Tree Problem ([DCMSTP](https://en.wikipedia.org/wiki/Degree-constrained_spanning_tree)].
+Heuristics for solving the Degree Constrained Minimum Spanning Tree Problem ([DCMSTP](https://en.wikipedia.org/wiki/Degree-constrained_spanning_tree)).
 Complete detailed description and result analysis in file `report.pdf` (in Portuguese)
 
 Compilation: `make` (needs [GCC](https://www.gnu.org/software/gcc/)).
