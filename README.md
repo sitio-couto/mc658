@@ -9,7 +9,7 @@ Repo for course MC658, with all practical projects developed for the course.
 
 **Project 3** - Constraint Programming MiniZinc model for SPLC. Grade: 10/10.
 
-**Project 4** - Metaheuristic and Lagrangian Heuristic for Degree Constrained MST Problem.
+**Project 4** - Metaheuristic and Lagrangian Heuristic for Degree Constrained MST Problem. Grade: 11.8/10 (+1: additional metaheuristic implementation and discussion. +0.8: 2nd best in class out of 5).
 
 Course given by professor [Cid C. de Souza](https://ic.unicamp.br/~cid/).
 
