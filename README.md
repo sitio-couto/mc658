@@ -11,6 +11,8 @@ Repo for course MC658, with all practical projects developed for the course.
 
 **Project 4** - Metaheuristic and Lagrangian Heuristic for Degree Constrained MST Problem. Grade: 11.8/10 (+1: additional metaheuristic implementation and discussion. +0.8: 2nd best in class out of 5).
 
+**Random** 	  - Python scripts for small exercises (subset sum and multiple knapsack algorithms).
+
 Course given by professor [Cid C. de Souza](https://ic.unicamp.br/~cid/).
 
 [Institute of Computing](http://ic.unicamp.br/en) - [UNICAMP](http://www.unicamp.br/unicamp/) (University of Campinas) - 2019
