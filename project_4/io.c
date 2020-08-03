@@ -30,7 +30,7 @@ mat_graph *read_input(char *filename){
     
     // Initializes (i,i) with -1.
     for (i=0; i<(g->n); i++)
-		g->mat[i][i] = -1;
+        g->mat[i][i] = -1;
     
     // Reads degree constraints
     for (i=0; i<(g->n); i++){
@@ -58,17 +58,17 @@ void generate_out_file(char *filename, struct out *ans, int size){
     
     //Finds children for each vertex.
     for(i=0; i<size-1; i++)
-		for(j=i; j<size; j++)
-			if (ans->mst[j] == i || ans->mst[i] == j){
-				fprintf(file, "%d %d\n", i+1, j+1);
-				edges++;
-			}
+        for(j=i; j<size; j++)
+            if (ans->mst[j] == i || ans->mst[i] == j){
+                fprintf(file, "%d %d\n", i+1, j+1);
+                edges++;
+            }
 
-	// Test
-	if(edges != size-1)
-		fprintf(stderr, "THIS SHOULDN'T HAPPEN! Out tree has %d edges, should have %d\n", edges, size-1);
-		
-	fclose(file);
+    // Test
+    if(edges != size-1)
+        fprintf(stderr, "THIS SHOULDN'T HAPPEN! Out tree has %d edges, should have %d\n", edges, size-1);
+        
+    fclose(file);
 }
 
 /**
@@ -102,8 +102,8 @@ void free_graph(mat_graph *g){
  * Auxiliary function to print found MST to stdout.
  */
 void print_mst(int *mst, int size, int **g){
-	int i;
-	for(i=1; i<size; i++){
-		printf("%d %d %d\n", i+1, mst[i]+1, g[i][mst[i]]);
-	}
+    int i;
+    for(i=1; i<size; i++){
+        printf("%d %d %d\n", i+1, mst[i]+1, g[i][mst[i]]);
+    }
 }
